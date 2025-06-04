@@ -1,0 +1,15 @@
+node_modules
+client/node_modules
+client/src/firebase.js
+backend/node_modules
+backend/config.env
+client/.firebase
+client/build
+client/.firebaserc
+.firebase
+.firebaserc
+build
+flask_backend
+flask_backend/.
+.DS_Store
+.env
