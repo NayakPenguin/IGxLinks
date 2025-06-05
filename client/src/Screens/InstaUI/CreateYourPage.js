@@ -27,7 +27,7 @@ import ControlFooter from "../../Components/ControlFooter";
 const ITEM_TYPES = {
   REDIRECT: 'Redirect',
   SUBGROUP: 'Subgroup',
-  FOLDER_REDIRECT: 'Folder for Redirect Links',
+  // FOLDER_REDIRECT: 'Folder for Redirect Links',
   FORM: 'Custom Form',
   MEETING_SCHEDULER: 'Meeting Scheduler',
 };
@@ -339,7 +339,7 @@ const CreateYourPage = () => {
     setFormItems(formItems.filter((_, i) => i !== index));
   };
 
-  
+
 
   const handleAddField = () => {
     setFormItems([
@@ -452,27 +452,35 @@ const CreateYourPage = () => {
                   </SortableContext>
                 </DndContext>
 
+                {editingIndex !== null && (
+                  <div className="form-edit">
+                    <div className="input-container">
+                      <div className="label">Field Title</div>
+                      <input
+                        className="input-basic"
+                        value={editData.title}
+                        onChange={e => setEditData({ ...editData, title: e.target.value })}
+                        placeholder={getPlaceholder('Field Title')}
+                      />
+                    </div>
+                    <div className="input-container">
+                      <div className="label">Placeholder</div>
+                      <input
+                        className="input-basic"
+                        value={editData.placeholder}
+                        onChange={e => setEditData({ ...editData, placeholder: e.target.value })}
+                        placeholder={getPlaceholder('Placeholder')}
+                      />
+                    </div>
+                    <button className="save-btn" onClick={handleSaveEditForm}>Save Field</button>
+                  </div>
+                )}
+
                 <div className="add-field-btn" onClick={handleAddField}>
                   <div className="line"></div>
                   <div className="text">Add Field</div>
                   <div className="line"></div>
                 </div>
-
-                {editingIndex !== null && (
-                  <div className="form-edit">
-                    <input
-                      placeholder="Field Title"
-                      value={editData.title}
-                      onChange={e => setEditData({ ...editData, title: e.target.value })}
-                    />
-                    <input
-                      placeholder="Placeholder"
-                      value={editData.placeholder}
-                      onChange={e => setEditData({ ...editData, placeholder: e.target.value })}
-                    />
-                    <button onClick={handleSaveEditForm}>Save Field</button>
-                  </div>
-                )}
               </div>
             )}
 
@@ -1076,6 +1084,14 @@ const MainCreate = styled.div`
       }
     }
 
+    .save-btn{
+      border: 1px solid white;
+      background-color: transparent;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 300;
+    }
 
     .add-btn{
         border: none;
