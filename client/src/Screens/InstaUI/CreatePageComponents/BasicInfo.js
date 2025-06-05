@@ -1,15 +1,65 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import AddIcon from "@material-ui/icons/Add";
 import CreateIcon from '@material-ui/icons/Create';
 import DoneIcon from '@material-ui/icons/Done';
+import SearchIcon from '@material-ui/icons/Search';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
 
+const AllSocialMediaPlatforms = [
+    {
+        "id": "instagram",
+        "name": "Instagram",
+        "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png"
+    },
+    {
+        "id": "youtube",
+        "name": "YouTube",
+        "iconUrl": "https://www.svgrepo.com/show/416500/youtube-circle-logo.svg"
+    },
+    {
+        "id": "snapchat",
+        "name": "SnapChat",
+        "iconUrl": "https://cdn2.downdetector.com/static/uploads/c/300/f52a5/image11.png"
+    },
+    {
+        "id": "facebook",
+        "name": "Facebook",
+        "iconUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Facebook_f_logo_%282021%29.svg/2048px-Facebook_f_logo_%282021%29.svg.png"
+    },
+    {
+        "id": "twitter",
+        "name": "Twitter (X)",
+        "iconUrl": "https://img.freepik.com/free-vector/new-2023-twitter-logo-x-icon-design_1017-45418.jpg?semt=ais_hybrid&w=740"
+    },
+    {
+        "id": "linkedin",
+        "name": "LinkedIn",
+        "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/960px-LinkedIn_logo_initials.png"
+    },
+    {
+        "id": "tiktok",
+        "name": "TikTok",
+        "iconUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQP0N3zvG1w5AohL7rpXml844HBmbINcRx0oDSCMCrpiT55vOV8ILlUzTV78Q6na5tPjxs&usqp=CAU"
+    },
+    {
+        "id": "pinterest",
+        "name": "Pinterest",
+        "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/0/08/Pinterest-logo.png"
+    },
+    {
+        "id": "threads",
+        "name": "Threads",
+        "iconUrl": "https://cbx-prod.b-cdn.net/COLOURBOX65108147.jpg?width=800&height=800&quality=70"
+    }
+];
+
 const BasicInfo = () => {
+    const [modelOpen, setModelOpen] = useState(false);
     const [editingField, setEditingField] = useState(null);
     const [formData, setFormData] = useState({
         name: "",
@@ -137,6 +187,50 @@ const BasicInfo = () => {
         setCrop(centeredCrop);
     };
 
+
+    // Social Media
+    const [searchTerm, setSearchTerm] = useState('');
+    const [socialLinks, setSocialLinks] = useState({});
+    const [activeSocialLinks, setActiveSocialLinks] = useState([]);
+    const [filteredPlatforms, setFilteredPlatforms] = useState(AllSocialMediaPlatforms);
+
+    useEffect(() => {
+        // Initialize with empty values for all platforms
+        const initialLinks = {};
+        AllSocialMediaPlatforms.forEach(platform => {
+            initialLinks[platform.id] = '';
+        });
+        setSocialLinks(initialLinks);
+    }, []);
+
+    useEffect(() => {
+        // Filter platforms based on search term
+        const filtered = AllSocialMediaPlatforms.filter(platform =>
+            platform.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredPlatforms(filtered);
+    }, [searchTerm]);
+
+    const handleInputChange = (platformId, value) => {
+        setSocialLinks(prev => ({
+            ...prev,
+            [platformId]: value
+        }));
+    };
+
+    const handleSave = () => {
+        // Filter out empty links and map to include platform info
+        const updatedLinks = AllSocialMediaPlatforms
+            .filter(platform => socialLinks[platform.id]?.trim() !== '')
+            .map(platform => ({
+                ...platform,
+                url: socialLinks[platform.id].trim()
+            }));
+
+        setActiveSocialLinks(updatedLinks);
+        setModelOpen(false);
+    };
+
     return (
         <Container>
             {cropModalOpen && (
@@ -184,6 +278,47 @@ const BasicInfo = () => {
                     </ModalContent>
                 </ModalOverlay>
             )}
+
+            {
+                modelOpen ?
+                    <ModelConatiner>
+                        <div className="model-closer" onClick={() => setModelOpen(false)}></div>
+                        <div className="model">
+                            <div className="model-title">Add or Edit your social media profile pages</div>
+
+                            <div className="search-bar">
+                                <input
+                                    type="text"
+                                    placeholder="Search social media"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                                <div className="search-btn">
+                                    <SearchIcon />
+                                </div>
+                            </div>
+
+                            <div className="all-social-medias">
+                                {filteredPlatforms.map(platform => (
+                                    <div className="one-social-media" key={platform.id}>
+                                        <div className="icon">
+                                            <img src={platform.iconUrl} alt={platform.name} />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            className="input-basic"
+                                            placeholder={`Enter your ${platform.name} profile`}
+                                            value={socialLinks[platform.id] || ''}
+                                            onChange={(e) => handleInputChange(platform.id, e.target.value)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="done-btn" onClick={handleSave}>Done</div>
+                        </div>
+                    </ModelConatiner> : null
+            }
 
             <div className="top-bar">
                 <div className="left">
@@ -262,7 +397,7 @@ const BasicInfo = () => {
                             <img src={src} alt="" />
                         </div>
                     ))}
-                    <div className="social-icon">
+                    <div className="social-icon" onClick={setModelOpen}>
                         <CreateIcon />
                     </div>
                 </div>
@@ -558,5 +693,151 @@ const Container = styled.div`
                 }
             }
         }
+    }
+`
+
+const ModelConatiner = styled.div`
+    width: 100vw;
+    height: calc(100vh - 60px);
+    
+    z-index: 1002;
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    
+    
+    .model-closer{
+        width: 100vw;
+        height: calc(100vh - 60px);
+        
+        position: absolute;
+        top: 0;
+        left: 0;
+        
+        background-color: #00000085; 
+    }
+
+    .model{ 
+        width: 80%;
+        max-height: 50vh;
+        max-width: 400px;
+        border-radius: 10px;
+        /* margin-top: -50px; */
+        background-color: #000;
+        border: 1px solid #363636;
+        z-index: 1009;
+        padding: 20px;
+        overflow: scroll;
+        /* position: relative; */
+
+        .model-title{
+          color: whitesmoke;
+          font-size: 0.85rem;
+          font-weight: 500;
+        }
+
+        .search-bar{
+            margin-top: 20px;
+            display: flex;
+            /* align-items: center; */
+            /* background-color:rgb(22, 22, 22); */
+            /* border: 1px solid #363636; */
+
+            input{
+                width: 100%;
+                border-radius: 10px;
+                /* margin: 15px 0 5px 0; */
+                /* outline: none; */
+                /* background-color: transparent; */
+                /* margin-left: 10px; */
+                background-color:rgb(22, 22, 22);
+                border: 1px solid #363636;
+                padding: 15px;
+                color: white;
+                resize: none;
+                font-size: 0.75rem;
+                font-weight: 300;
+                /* letter-spacing: 0.1rem; */
+                /* outline: white; */
+            }
+            
+            input:focus {
+                outline: 1px solid white;
+                outline-offset: 2px; 
+                letter-spacing: 0.1rem;
+                transition: outline 125ms ease, letter-spacing 125ms ease;
+            }
+
+            .search-btn{
+                background-color: #333;
+                height: 49.5px;
+                aspect-ratio: 1/1;
+                display: grid;
+                place-items: center;
+                border-radius: 10px;
+                margin-left: 10px;
+            }
+        }
+        
+        .all-social-medias{
+            .one-social-media{
+                display: flex;
+                align-items: center;
+                margin-top: 20px;
+
+                .icon{
+                    img{
+                        height: 25px;
+                        border-radius: 100px;
+                    }
+                }
+
+                .input-basic{
+                    width: 100%;
+                    border-radius: 10px;
+                    /* margin: 15px 0 5px 0; */
+                    /* outline: none; */
+                    /* background-color: transparent; */
+                    margin-left: 10px;
+                    background-color:rgb(22, 22, 22);
+                    border: 1px solid #363636;
+                    padding: 15px;
+                    color: white;
+                    resize: none;
+                    font-size: 0.75rem;
+                    font-weight: 300;
+                    /* letter-spacing: 0.1rem; */
+                    /* outline: white; */
+                }
+                
+                .input-basic:focus {
+                    outline: 1px solid white;
+                    outline-offset: 2px; 
+                    letter-spacing: 0.1rem;
+                    transition: outline 125ms ease, letter-spacing 125ms ease;
+                }
+            }
+        }
+
+        .done-btn{
+          border: none;
+          margin-top: 20px;
+          background-color: #0095f6;
+          padding: 10px 20px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 300;
+          text-align: center;
+        }
+    }
+
+    .model::-webkit-scrollbar {
+        display: none;  
     }
 `
