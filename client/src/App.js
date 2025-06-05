@@ -22,7 +22,7 @@ import Form from "./Screens/InstaUI/Form";
 import NewShop from "./Screens/InstaUI/NewShop";
 import BasicUser from "./Screens/InstaUI/BasicUser";
 import BasicUser2 from "./Screens/InstaUI/BasicUser2";
-import CreateYourPage from "./Screens/InstaUI/CreateYourPage";
+import CreateYourPage from "./Screens/InstaUI/CreatePageComponents/CreateYourPage";
 
 const App = () => {
   return (
