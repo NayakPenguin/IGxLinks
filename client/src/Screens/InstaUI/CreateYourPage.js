@@ -17,6 +17,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import DeleteIcon from '@material-ui/icons/Delete';
+import RoomIcon from "@material-ui/icons/Room";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import AddIcon from "@material-ui/icons/Add";
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
@@ -29,6 +30,7 @@ import { styled as muiStyled } from '@mui/material/styles';
 import FormGroup from '@mui/material/FormGroup';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import InfoIcon from '@material-ui/icons/Info';
 
 const ITEM_TYPES = {
   REDIRECT: 'Redirect',
@@ -210,11 +212,13 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
 
               <div className="meeting-select">
                 <div className="info">
+                  <InfoIcon />
                   <div className="text">
-                    Write available times in 24-hour format, using "-" between start and end times,
-                    and "," between different time slots. Example: "09:00-12:00, 14:00-18:00"
+                    Enter available times in 24-hour format. Use '-' to separate start and end times, and ',' to list multiple time slots. Example: 09:00-10:30, 20:15-23:00.
                   </div>
                 </div>
+
+
 
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
                   const dayLower = day.toLowerCase();
@@ -222,6 +226,13 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
                     <div className="day-container" key={day}>
                       <div className="day-open">
                         <FormControlLabel
+                          sx={{
+                            '& .MuiFormControlLabel-label': {
+                              fontSize: '14px',
+                              fontWeight: 500,
+                              marginLeft: '-5px'
+                            },
+                          }}
                           control={
                             <IOSSwitch
                               sx={{ m: 1 }}
@@ -230,6 +241,7 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
                                 `${dayLower}Enabled`,
                                 e.target.checked
                               )}
+                              className="switch"
                             />
                           }
                           label={day}
@@ -239,12 +251,12 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
                         <div className="input-container">
                           <input
                             className="input-basic"
-                            value={editData[`${dayLower}Times`]}
+                            value={editData[`${dayLower}Enabled`] ? editData[`${dayLower}Times`] : ""}
                             onChange={(e) => handleEditChange(
                               `${dayLower}Times`,
                               e.target.value
                             )}
-                            placeholder={day === 'Monday' ? "09:00-12:00, 14:00-18:00" : "..."}
+                            placeholder={editData[`${dayLower}Enabled`] ? "eg., 09:00-12:00, 14:00-18:00" : "Not available on this day."}
                             disabled={!editData[`${dayLower}Enabled`]}
                           />
                         </div>
@@ -338,6 +350,23 @@ const FormContentItem = ({ item, index, onEdit, onDelete, onReorder }) => {
 };
 
 const CreateYourPage = () => {
+  const [modelFormAddOpen, setModelFormAddOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('Text');
+
+  const options = ['Text', 'Long Answer', 'Email', 'Number'];
+
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+  };
+
+  const saveOptionSelect = () => {
+    setModelFormAddOpen(false);
+    setFormItems([
+      ...formItems,
+      { id: Date.now().toString(), type: selectedOption, title: 'New Field', placeholder: '' }
+    ]);
+  }
+
   const [items, setItems] = useState(initialItems);
   const [newItemData, setNewItemData] = useState({
     title: '',
@@ -523,15 +552,95 @@ const CreateYourPage = () => {
   };
 
   const handleAddField = () => {
-    setFormItems([
-      ...formItems,
-      { id: Date.now().toString(), type: 'Text', title: 'New Field', placeholder: '' }
-    ]);
+    setModelFormAddOpen(true);
+    // setFormItems([
+    //   ...formItems,
+    //   { id: Date.now().toString(), type: selectedOption, title: 'New Field', placeholder: '' }
+    // ]);
   };
 
   return (
     <Container>
+      {
+        modelFormAddOpen ?
+          <ModelConatiner>
+            <div className="model-closer" onClick={() => setModelFormAddOpen(false)}></div>
+            <div className="model">
+              <div className="model-title">Select the kind of form field you want to create</div>
+              <div className="checkboxes">
+                {options.map((option) => (
+                  <div
+                    key={option}
+                    className="opt"
+                    onClick={() => handleOptionSelect(option)}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedOption === option}
+                      onChange={() => { }} // Empty handler to avoid warnings
+                      readOnly // Make it controlled
+                    />
+                    <label>{option}</label>
+                  </div>
+                ))}
+              </div>
+              <div className="done-btn" onClick={() => saveOptionSelect()}>Done</div>
+            </div>
+          </ModelConatiner> : null
+      }
       <div className="main-content">
+        <div className="top-bar">
+          <div className="left">
+            <b>Last Published :</b> <br /> 25 May 9:16AM (UTC)
+          </div>
+          <div className="view-btn">View</div>
+        </div>
+
+        <div className="user-data">
+          <div className="logo-x-dp">
+            <img
+              src="https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"
+              alt=""
+            />
+          </div>
+          <div className="name">Your Name</div>
+          <div className="about-header">Your Role @Your Organisation</div>
+          <div className="about-desc">Your bio</div>
+          <div className="about-location">
+            <RoomIcon /> Your Location
+          </div>
+
+          <div className="socials">
+            <div className="social-icon">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png"
+                alt=""
+              />
+            </div>
+            <div className="social-icon">
+              <img
+                src="https://www.svgrepo.com/show/416500/youtube-circle-logo.svg"
+                alt=""
+              />
+            </div>
+            <div className="social-icon light">
+              <img
+                src="https://cdn2.downdetector.com/static/uploads/c/300/f52a5/image11.png"
+                alt=""
+              />
+            </div>
+            <div className="social-icon light">
+              <img
+                src="https://downloadr2.apkmirror.com/wp-content/uploads/2020/10/91/5f9b61e42640e.png"
+                alt=""
+              />
+            </div>
+            <div className="social-icon">
+              <AddIcon />
+            </div>
+          </div>
+        </div>
+
         <div className="add-new-item">
           <div className="selector">
             <div
@@ -681,9 +790,9 @@ const CreateYourPage = () => {
 
                 <div className="meeting-select">
                   <div className="info">
+                    <InfoIcon />
                     <div className="text">
-                      Write available times in 24-hour format, using "-" between start and end times,
-                      and "," between different time slots. Example: "09:00-10:30, 20:15-23:00"
+                      Enter available times in 24-hour format. Use '-' to separate start and end times, and ',' to list multiple time slots. Example: 09:00-10:30, 20:15-23:00.
                     </div>
                   </div>
 
@@ -691,6 +800,13 @@ const CreateYourPage = () => {
                     <div className="day-container" key={day}>
                       <div className="day-open">
                         <FormControlLabel
+                          sx={{
+                            '& .MuiFormControlLabel-label': {
+                              fontSize: '14px',
+                              fontWeight: 500,
+                              marginLeft: '-5px'
+                            },
+                          }}
                           control={
                             <IOSSwitch
                               sx={{ m: 1 }}
@@ -699,6 +815,7 @@ const CreateYourPage = () => {
                                 `${day.toLowerCase()}Enabled`,
                                 e.target.checked
                               )}
+                              className="switch"
                             />
                           }
                           label={day}
@@ -713,7 +830,7 @@ const CreateYourPage = () => {
                               `${day.toLowerCase()}Times`,
                               e.target.value
                             )}
-                            placeholder={day === 'Monday' ? "09:00-12:00, 14:00-18:00" : "..."}
+                            placeholder={newItemData[`${day.toLowerCase()}Enabled`] === true ? "eg., 09:00-12:00, 14:00-18:00" : "Not available on this day."}
                             disabled={newItemData[`${day.toLowerCase()}Enabled`] === false}
                           />
                         </div>
@@ -772,6 +889,57 @@ const Container = styled.div`
     display: flex;  
     flex-direction: column;
     align-items: center;
+
+    .meeting-select{
+      .info{
+        margin: 20px 0;
+        display: flex;
+        align-items: flex-start;
+
+        svg{
+          font-size: 1.25rem;
+        }
+        
+        .text{
+          margin-left: 10px;
+          font-size: 0.7rem;
+          font-weight: 200;
+          letter-spacing: 0.05rem;
+        }
+      }
+
+      .day-container{
+        display: flex;
+        flex-direction: column;
+
+        .day-open{
+          .switch{
+            scale: 0.75;
+          }
+  
+          label{
+            font-size: 0.7rem;
+          }
+          
+        }      
+  
+        .day-time{
+          .input-container{
+            width: 100%;
+            margin: 0px 0 20px 0;
+            border-bottom: none;
+            padding-bottom: 0;
+
+            input:disabled {
+              border: none;
+              /* background-color: #363636; */
+            }
+          }
+        }
+      }
+
+
+    }
 
     .light{
         opacity: 0.5;
@@ -1079,6 +1247,15 @@ const Container = styled.div`
                         font-size: 0.75rem;
                         font-weight: 300;
                         color: cornflowerblue;
+                        letter-spacing: 0.05rem;
+                    }
+
+                    .item-duration{
+                      margin-top: 5px;
+                      font-size: 0.75rem;
+                      font-weight: 300;
+                      color: orange;
+                      letter-spacing: 0.05rem;
                     }
                 }
 
@@ -1258,6 +1435,7 @@ const MainCreate = styled.div`
                   margin-top: 5px;
                   font-size: 0.75rem;
                   font-weight: 300;
+                  letter-spacing: 0.05rem;
               }
           }
 
@@ -1453,6 +1631,79 @@ const MainEdit = styled.div`
             font-weight: 300;
             text-align: center;
             cursor: pointer;
+        }
+    }
+`
+
+
+const ModelConatiner = styled.div`
+    width: 100vw;
+    height: calc(100vh - 60px);
+    
+    z-index: 1002;
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    
+    
+    .model-closer{
+        width: 100vw;
+        height: calc(100vh - 60px);
+        
+        position: absolute;
+        top: 0;
+        left: 0;
+        
+        background-color: #00000085; 
+    }
+
+    .model{ 
+        width: 80%;
+        /* height: 70%; */
+        max-width: 400px;
+        border-radius: 10px;
+        /* margin-top: -50px; */
+        background-color: white;
+        z-index: 1009;
+        padding: 20px;
+
+        
+        .model-title{
+          color: #333;
+          font-size: 0.85rem;
+          font-weight: 500;
+        }
+        
+        .checkboxes{
+          .opt {
+            display: flex;
+            align-items: center;
+            margin: 10px 20px;
+
+            label{
+              color: #333;
+              margin-left: 10px;
+              font-size: 0.75rem;
+              /* margin-top: -15px; */
+            }
+          }
+        }
+
+        .done-btn{
+          border: none;
+          margin-top: 20px;
+          background-color: #0095f6;
+          padding: 10px 20px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 300;
+          text-align: center;
         }
     }
 `
