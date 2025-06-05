@@ -1,13 +1,165 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import RoomIcon from "@material-ui/icons/Room";
 import AddIcon from "@material-ui/icons/Add";
 import CreateIcon from '@material-ui/icons/Create';
 import DoneIcon from '@material-ui/icons/Done';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 const BasicInfo = () => {
+    const [editingField, setEditingField] = useState(null);
+    const [formData, setFormData] = useState({
+        name: "",
+        role: "",
+        org: "",
+        bio: "",
+        location: "",
+        profileImage: "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"
+    });
+    const [cropModalOpen, setCropModalOpen] = useState(false);
+    const [imageSrc, setImageSrc] = useState(null);
+    const [crop, setCrop] = useState({
+        unit: '%',
+        width: 50,
+        height: 50,
+        aspect: 1,  // This enforces 1:1 aspect ratio
+        x: 25,
+        y: 25
+    });
+    const [completedCrop, setCompletedCrop] = useState(null);
+    const imageRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    const handleChange = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleDone = () => {
+        setEditingField(null);
+    };
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            // Check file type
+            if (!file.type.match('image.(jpeg|jpg|png)')) {
+                alert('Please select a JPEG/JPG or PNG image');
+                return;
+            }
+            // Check file size (e.g., 5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size should be less than 5MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                setImageSrc(reader.result);
+                setCropModalOpen(true);
+            });
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleCropComplete = (crop) => {
+        setCompletedCrop(crop);
+    };
+
+    const handleSaveCroppedImage = () => {
+        if (!completedCrop || !imageRef.current) {
+            return;
+        }
+
+        const image = imageRef.current;
+        const canvas = document.createElement('canvas');
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+        canvas.width = completedCrop.width;
+        canvas.height = completedCrop.height;
+        const ctx = canvas.getContext('2d');
+
+        ctx.drawImage(
+            image,
+            completedCrop.x * scaleX,
+            completedCrop.y * scaleY,
+            completedCrop.width * scaleX,
+            completedCrop.height * scaleY,
+            0,
+            0,
+            completedCrop.width,
+            completedCrop.height
+        );
+
+        canvas.toBlob((blob) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, profileImage: reader.result }));
+                setCropModalOpen(false);
+            };
+        }, 'image/jpeg', 1);
+    };
+
+    const renderInput = (field, label, placeholder = "") => (
+        <div className="input-container">
+            <div className="label">{label}</div>
+            <div className="input-line">
+                <input
+                    className="input-basic"
+                    type="text"
+                    placeholder={placeholder}
+                    value={formData[field]}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                />
+                <div className="done-btn" onClick={handleDone}>
+                    <DoneIcon />
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <Container>
+            {cropModalOpen && (
+                <ModalOverlay>
+                    <ModalContent>
+                        <h3>Crop your profile picture (Square 1:1)</h3>
+                        {imageSrc && (
+                            <div style={{ width: '100%', maxWidth: '500px' }}>
+                                <ReactCrop
+                                    src={imageSrc}
+                                    crop={crop}
+                                    onComplete={handleCropComplete}
+                                    onChange={newCrop => setCrop(newCrop)}
+                                    ruleOfThirds
+                                    keepSelection
+                                    style={{
+                                        display: 'block',
+                                        maxWidth: '100%',
+                                        margin: '0 auto'
+                                    }}
+                                >
+                                    <img
+                                        ref={imageRef}
+                                        src={imageSrc}
+                                        alt="Crop me"
+                                        style={{
+                                            maxWidth: '100%',
+                                            maxHeight: '70vh',
+                                            display: 'block'
+                                        }}
+                                    />
+                                </ReactCrop>
+                            </div>
+                        )}
+                        <ModalActions>
+                            <button onClick={() => setCropModalOpen(false)}>Cancel</button>
+                            <button onClick={handleSaveCroppedImage}>Save</button>
+                        </ModalActions>
+                    </ModalContent>
+                </ModalOverlay>
+            )}
+
             <div className="top-bar">
                 <div className="left">
                     <b>Last Published :</b> <br /> 25 May 9:16AM (UTC)
@@ -18,69 +170,124 @@ const BasicInfo = () => {
             <div className="user-data">
                 <div className="logo-x-dp">
                     <img
-                        src="https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"
-                        alt=""
+                        src={formData.profileImage}
+                        alt="Profile"
                     />
-                    <div className="add-btn"><AddIcon /></div>
-                </div>
-                <div className="name">Your Name <CreateIcon /></div>
-
-
-                <div className="input-container">
-                    <div className="label">Your Name</div>
-                    <div className="input-line">
+                    <div className="add-btn" onClick={() => fileInputRef.current.click()}>
+                        <AddIcon />
                         <input
-                            className="input-basic"
-                            type="number"
-                            placeholder="Enter your name"
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/jpeg, image/png"
+                            style={{ display: 'none' }}
                         />
-                        <div className="done-btn">
-                            <DoneIcon/>
-                        </div>
                     </div>
                 </div>
 
-                <div className="about-header">Your Role @Your Organisation <CreateIcon /></div>
-                <div className="about-desc">Your bio <CreateIcon /></div>
-                <div className="about-location">
-                    Your Location <CreateIcon />
-                </div>
+                {/* Rest of your existing code... */}
+                {/* Name */}
+                {editingField === "name"
+                    ? renderInput("name", "Your Name", "Enter your name")
+                    : <div className="name" onClick={() => setEditingField("name")}>
+                        {formData.name || "Your Name"} <CreateIcon />
+                    </div>
+                }
+
+                {/* Role */}
+                {editingField === "role"
+                    ? renderInput("role", "Your Role", "Enter your role")
+                    : <div className="about-header" onClick={() => setEditingField("role")}>
+                        {formData.role || "Your Role"} <CreateIcon />
+                    </div>
+                }
+
+                {/* Organization */}
+                {editingField === "org"
+                    ? renderInput("org", "Your Organization", "Enter your organization")
+                    : <div className="about-header" onClick={() => setEditingField("org")}>
+                        {formData.org || "Your Organisation"} <CreateIcon />
+                    </div>
+                }
+
+                {/* Bio */}
+                {editingField === "bio"
+                    ? renderInput("bio", "Your Bio", "Tell us about yourself")
+                    : <div className="about-desc" onClick={() => setEditingField("bio")}>
+                        {formData.bio || "Your bio"} <CreateIcon />
+                    </div>
+                }
+
+                {/* Location */}
+                {editingField === "location"
+                    ? renderInput("location", "Your Location", "Enter your location")
+                    : <div className="about-location" onClick={() => setEditingField("location")}>
+                        {formData.location || "Your Location"} <CreateIcon />
+                    </div>
+                }
 
                 <div className="socials">
-                    <div className="social-icon light">
-                        <img
-                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png"
-                            alt=""
-                        />
-                    </div>
-                    <div className="social-icon light">
-                        <img
-                            src="https://www.svgrepo.com/show/416500/youtube-circle-logo.svg"
-                            alt=""
-                        />
-                    </div>
-                    <div className="social-icon light">
-                        <img
-                            src="https://cdn2.downdetector.com/static/uploads/c/300/f52a5/image11.png"
-                            alt=""
-                        />
-                    </div>
-                    <div className="social-icon light">
-                        <img
-                            src="https://downloadr2.apkmirror.com/wp-content/uploads/2020/10/91/5f9b61e42640e.png"
-                            alt=""
-                        />
-                    </div>
+                    {[
+                        "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png",
+                        "https://www.svgrepo.com/show/416500/youtube-circle-logo.svg",
+                        "https://cdn2.downdetector.com/static/uploads/c/300/f52a5/image11.png",
+                        "https://downloadr2.apkmirror.com/wp-content/uploads/2020/10/91/5f9b61e42640e.png"
+                    ].map((src, idx) => (
+                        <div key={idx} className="social-icon light">
+                            <img src={src} alt="" />
+                        </div>
+                    ))}
                     <div className="social-icon">
                         <CreateIcon />
                     </div>
                 </div>
             </div>
         </Container>
-    )
-}
+    );
+};
 
-export default BasicInfo
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+`;
+
+const ModalActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 10px;
+
+  button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:last-child {
+    background-color: #007bff;
+    color: white;
+  }
+`;
+
+export default BasicInfo;
 
 const Container = styled.div`
     .top-bar{
@@ -178,14 +385,12 @@ const Container = styled.div`
 
         .input-container{
             width: 100%;
-            /* margin-top: 30px; */
-            /* border-bottom: 1px solid #313231ba; */
-            /* padding-bottom: 20px; */
-            /* background-color: orang e; */
+            margin-top: 10px;
 
             .label{
                 font-size: 0.75rem;
                 font-weight: 500;
+                display: none;
             }
 
             .input-line{
@@ -240,31 +445,30 @@ const Container = styled.div`
         }
 
         .name{
-            margin-top: 20px;
+            margin-top: 35px;
             font-weight: 500;
             text-align: center;
         }
 
         .about-header{
-            margin-top: 10px;
-            font-weight: 500;
+            margin-top: 20px;
+            font-weight: 200;
             font-size: 0.85rem;
             text-align: center;
         }
 
         .about-desc{
-            margin-top: 10px;
+            margin-top: 20px;
             font-weight: 200;
             font-size: 0.85rem;
             text-align: center;
         }
 
         .about-location{
-            margin-top: 10px;
+            margin-top: 20px;
             font-weight: 500;
             font-size: 0.85rem;
             text-align: center;
-
         }
         
         svg{
