@@ -23,6 +23,12 @@ import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import EditIcon from '@material-ui/icons/Edit';
 import ControlFooter from "../../Components/ControlFooter";
+import { Switch } from "@material-ui/core";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import { styled as muiStyled } from '@mui/material/styles';
+import FormGroup from '@mui/material/FormGroup';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 const ITEM_TYPES = {
   REDIRECT: 'Redirect',
@@ -50,6 +56,54 @@ const initialItems = [
   }
 ];
 
+const IOSSwitch = muiStyled((props) => (
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+  width: 42,
+  height: 26,
+  padding: 0,
+  '& .MuiSwitch-switchBase': {
+    padding: 0,
+    margin: 2,
+    transitionDuration: '300ms',
+    '&.Mui-checked': {
+      transform: 'translateX(16px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        backgroundColor: '#65C466',
+        opacity: 1,
+        border: 0,
+      },
+      '&.Mui-disabled + .MuiSwitch-track': {
+        opacity: 0.5,
+      },
+    },
+    '&.Mui-focusVisible .MuiSwitch-thumb': {
+      color: '#33cf4d',
+      border: '6px solid #fff',
+    },
+    '&.Mui-disabled .MuiSwitch-thumb': {
+      color: theme.palette.grey[100],
+    },
+    '&.Mui-disabled + .MuiSwitch-track': {
+      opacity: 0.7,
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxSizing: 'border-box',
+    width: 22,
+    height: 22,
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 26 / 2,
+    backgroundColor: '#E9E9EA',
+    opacity: 1,
+    transition: theme.transitions.create(['background-color'], {
+      duration: 500,
+    }),
+  },
+}));
+
 const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDelete }) => {
   const {
     attributes,
@@ -60,11 +114,28 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
     isDragging,
   } = useSortable({ id: item.id });
 
+  // Initialize editData with all possible fields, including meeting scheduler fields
   const [editData, setEditData] = useState({
     title: item.title,
     url: item.url || '',
     titleInside: item.titleInside || '',
-    description: item.description || ''
+    description: item.description || '',
+    duration: item.duration || 30,
+    // Initialize all days with their current values or defaults
+    mondayEnabled: item.mondayEnabled !== false,
+    mondayTimes: item.mondayTimes || '',
+    tuesdayEnabled: item.tuesdayEnabled !== false,
+    tuesdayTimes: item.tuesdayTimes || '',
+    wednesdayEnabled: item.wednesdayEnabled !== false,
+    wednesdayTimes: item.wednesdayTimes || '',
+    thursdayEnabled: item.thursdayEnabled !== false,
+    thursdayTimes: item.thursdayTimes || '',
+    fridayEnabled: item.fridayEnabled !== false,
+    fridayTimes: item.fridayTimes || '',
+    saturdayEnabled: item.saturdayEnabled || false,
+    saturdayTimes: item.saturdayTimes || '',
+    sundayEnabled: item.sundayEnabled || false,
+    sundayTimes: item.sundayTimes || ''
   });
 
   const style = {
@@ -123,6 +194,68 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
             </div>
           )}
 
+          {(item.type === ITEM_TYPES.MEETING_SCHEDULER) && (
+            <>
+              <div className="input-container">
+                <div className="label">Meeting Duration (in Minutes)</div>
+                <input
+                  className="input-basic"
+                  type="number"
+                  value={editData.duration}
+                  onChange={(e) => handleEditChange('duration', parseInt(e.target.value) || 30)}
+                  placeholder="30"
+                  min="1"
+                />
+              </div>
+
+              <div className="meeting-select">
+                <div className="info">
+                  <div className="text">
+                    Write available times in 24-hour format, using "-" between start and end times,
+                    and "," between different time slots. Example: "09:00-12:00, 14:00-18:00"
+                  </div>
+                </div>
+
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
+                  const dayLower = day.toLowerCase();
+                  return (
+                    <div className="day-container" key={day}>
+                      <div className="day-open">
+                        <FormControlLabel
+                          control={
+                            <IOSSwitch
+                              sx={{ m: 1 }}
+                              checked={editData[`${dayLower}Enabled`]}
+                              onChange={(e) => handleEditChange(
+                                `${dayLower}Enabled`,
+                                e.target.checked
+                              )}
+                            />
+                          }
+                          label={day}
+                        />
+                      </div>
+                      <div className="day-time">
+                        <div className="input-container">
+                          <input
+                            className="input-basic"
+                            value={editData[`${dayLower}Times`]}
+                            onChange={(e) => handleEditChange(
+                              `${dayLower}Times`,
+                              e.target.value
+                            )}
+                            placeholder={day === 'Monday' ? "09:00-12:00, 14:00-18:00" : "..."}
+                            disabled={!editData[`${dayLower}Enabled`]}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
           <div className="edit-actions">
             <button className="save-btn" onClick={() => onSaveEdit(item.id, editData)}>
               Save
@@ -149,6 +282,9 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
         <div className="item-type">Type: {item.type}</div>
         <div className="item-title">{item.title}</div>
         {item.url && <div className="item-url">{item.url}</div>}
+        {item.type === ITEM_TYPES.MEETING_SCHEDULER && (
+          <div className="item-duration">Duration: {item.duration} mins</div>
+        )}
       </div>
       <div className="edit-btn" onClick={() => onEdit(item.id)}>
         <EditIcon />
@@ -208,7 +344,23 @@ const CreateYourPage = () => {
     url: '',
     titleInside: '',
     description: '',
-    formItems: []
+    formItems: [],
+    duration: 30, // Default meeting duration
+    // Initialize all days as enabled with empty times
+    mondayEnabled: true,
+    mondayTimes: '',
+    tuesdayEnabled: true,
+    tuesdayTimes: '',
+    wednesdayEnabled: true,
+    wednesdayTimes: '',
+    thursdayEnabled: true,
+    thursdayTimes: '',
+    fridayEnabled: true,
+    fridayTimes: '',
+    saturdayEnabled: false,
+    saturdayTimes: '',
+    sundayEnabled: false,
+    sundayTimes: ''
   });
 
   useEffect(() => {
@@ -248,19 +400,50 @@ const CreateYourPage = () => {
         description: newItemData.description,
       }),
       ...(itemType === ITEM_TYPES.FORM && { formItems: formItems }),
-      ...(itemType === ITEM_TYPES.MEETING_SCHEDULER && { url: newItemData.url }),
+      ...(itemType === ITEM_TYPES.MEETING_SCHEDULER && {
+        duration: newItemData.duration,
+        mondayEnabled: newItemData.mondayEnabled,
+        mondayTimes: newItemData.mondayTimes,
+        tuesdayEnabled: newItemData.tuesdayEnabled,
+        tuesdayTimes: newItemData.tuesdayTimes,
+        wednesdayEnabled: newItemData.wednesdayEnabled,
+        wednesdayTimes: newItemData.wednesdayTimes,
+        thursdayEnabled: newItemData.thursdayEnabled,
+        thursdayTimes: newItemData.thursdayTimes,
+        fridayEnabled: newItemData.fridayEnabled,
+        fridayTimes: newItemData.fridayTimes,
+        saturdayEnabled: newItemData.saturdayEnabled,
+        saturdayTimes: newItemData.saturdayTimes,
+        sundayEnabled: newItemData.sundayEnabled,
+        sundayTimes: newItemData.sundayTimes
+      }),
       openSection: false
     };
 
     setItems([...items, newItem]);
 
-    // Clear state
+    // Reset form
     setNewItemData({
       title: '',
       url: '',
       titleInside: '',
       description: '',
-      formItems: []
+      formItems: [],
+      duration: 30,
+      mondayEnabled: true,
+      mondayTimes: '',
+      tuesdayEnabled: true,
+      tuesdayTimes: '',
+      wednesdayEnabled: true,
+      wednesdayTimes: '',
+      thursdayEnabled: true,
+      thursdayTimes: '',
+      fridayEnabled: true,
+      fridayTimes: '',
+      saturdayEnabled: false,
+      saturdayTimes: '',
+      sundayEnabled: false,
+      sundayTimes: ''
     });
     setFormItems([]);
   };
@@ -307,11 +490,10 @@ const CreateYourPage = () => {
     }
   };
 
-
-  // form content update 
   const [formItems, setFormItems] = useState([
     { id: '1', type: 'Text', title: 'Sample Text', placeholder: 'Sample Placeholder' },
   ]);
+
   const [editingIndex, setEditingIndex] = useState(null);
   const [editData, setEditData] = useState({});
 
@@ -328,6 +510,7 @@ const CreateYourPage = () => {
       setFormItems(arrayMove(formItems, oldIndex, newIndex));
     }
   };
+
   const handleSaveEditForm = () => {
     const updatedItems = [...formItems];
     updatedItems[editingIndex] = editData;
@@ -338,8 +521,6 @@ const CreateYourPage = () => {
   const handleDeleteForm = (index) => {
     setFormItems(formItems.filter((_, i) => i !== index));
   };
-
-
 
   const handleAddField = () => {
     setFormItems([
@@ -482,6 +663,65 @@ const CreateYourPage = () => {
                   <div className="line"></div>
                 </div>
               </div>
+            )}
+
+            {(itemType === ITEM_TYPES.MEETING_SCHEDULER) && (
+              <>
+                <div className="input-container">
+                  <div className="label">Meeting Duration (in Minutes)</div>
+                  <input
+                    className="input-basic"
+                    type="number"
+                    value={newItemData.duration || ''}
+                    onChange={(e) => handleNewItemChange('duration', e.target.value)}
+                    placeholder="30"
+                    min="1"
+                  />
+                </div>
+
+                <div className="meeting-select">
+                  <div className="info">
+                    <div className="text">
+                      Write available times in 24-hour format, using "-" between start and end times,
+                      and "," between different time slots. Example: "09:00-10:30, 20:15-23:00"
+                    </div>
+                  </div>
+
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                    <div className="day-container" key={day}>
+                      <div className="day-open">
+                        <FormControlLabel
+                          control={
+                            <IOSSwitch
+                              sx={{ m: 1 }}
+                              checked={newItemData[`${day.toLowerCase()}Enabled`] !== false}
+                              onChange={(e) => handleNewItemChange(
+                                `${day.toLowerCase()}Enabled`,
+                                e.target.checked
+                              )}
+                            />
+                          }
+                          label={day}
+                        />
+                      </div>
+                      <div className="day-time">
+                        <div className="input-container">
+                          <input
+                            className="input-basic"
+                            value={newItemData[`${day.toLowerCase()}Times`] || ''}
+                            onChange={(e) => handleNewItemChange(
+                              `${day.toLowerCase()}Times`,
+                              e.target.value
+                            )}
+                            placeholder={day === 'Monday' ? "09:00-12:00, 14:00-18:00" : "..."}
+                            disabled={newItemData[`${day.toLowerCase()}Enabled`] === false}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
 
             <button className="add-btn" onClick={handleAddItem}>
