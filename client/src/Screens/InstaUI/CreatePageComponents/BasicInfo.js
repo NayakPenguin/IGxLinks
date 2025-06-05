@@ -3,8 +3,11 @@ import styled from "styled-components";
 import AddIcon from "@material-ui/icons/Add";
 import CreateIcon from '@material-ui/icons/Create';
 import DoneIcon from '@material-ui/icons/Done';
-import ReactCrop from 'react-image-crop';
+import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+
+const ASPECT_RATIO = 1;
+const MIN_DIMENSION = 150;
 
 const BasicInfo = () => {
     const [editingField, setEditingField] = useState(null);
@@ -118,6 +121,22 @@ const BasicInfo = () => {
         </div>
     );
 
+    const onImageLoad = (e) => {
+        const { width, height } = e.currentTarget;
+        const crop = makeAspectCrop(
+            {
+                unit: "px",
+                width: MIN_DIMENSION,
+            },
+            ASPECT_RATIO,
+            width,
+            height
+        );
+
+        const centeredCrop = centerCrop(crop, width, height);
+        setCrop(centeredCrop);
+    };
+
     return (
         <Container>
             {cropModalOpen && (
@@ -131,6 +150,8 @@ const BasicInfo = () => {
                                     crop={crop}
                                     onComplete={handleCropComplete}
                                     onChange={newCrop => setCrop(newCrop)}
+                                    aspect={ASPECT_RATIO}
+                                    minWidth={MIN_DIMENSION}
                                     ruleOfThirds
                                     keepSelection
                                     style={{
@@ -148,7 +169,11 @@ const BasicInfo = () => {
                                             maxHeight: '70vh',
                                             display: 'block'
                                         }}
+
+                                        onLoad={onImageLoad}
                                     />
+
+
                                 </ReactCrop>
                             </div>
                         )}
