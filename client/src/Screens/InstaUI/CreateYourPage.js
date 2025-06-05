@@ -478,7 +478,7 @@ const CreateYourPage = () => {
 
                 <div className="add-field-btn" onClick={handleAddField}>
                   <div className="line"></div>
-                  <div className="text">Add Field</div>
+                  <div className="text">Add Field + </div>
                   <div className="line"></div>
                 </div>
               </div>
@@ -1063,6 +1063,48 @@ const MainCreate = styled.div`
       .subgroup{
           margin-top: 50px;
       }
+      
+      // edit from the parent
+      .input-container{
+        width: 100%;
+        margin-top: 20px;
+        border-bottom: none;
+        padding-bottom: 0;
+        /* background-color: orange; */
+
+        .label{
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .input-basic{
+            width: 100%;
+            border-radius: 10px;
+            margin: 15px 0 5px 0;
+            /* outline: none; */
+            /* background-color: transparent; */
+            background-color:rgb(22, 22, 22);
+            border: 1px solid #363636;
+            padding: 15px;
+            color: white;
+            resize: none;
+            font-size: 0.75rem;
+            font-weight: 300;
+            /* letter-spacing: 0.1rem; */
+            /* outline: white; */
+        }
+        
+        .input-basic:focus {
+            outline: 1px solid white;
+            outline-offset: 2px; 
+            letter-spacing: 0.1rem;
+            transition: outline 125ms ease, letter-spacing 125ms ease;
+        }
+
+        textarea{
+            height: 200px;
+        }
+      }
 
       .add-field-btn{
           display: flex;
@@ -1085,8 +1127,9 @@ const MainCreate = styled.div`
     }
 
     .save-btn{
-      border: 1px solid white;
-      background-color: transparent;
+      margin-top: 20px;
+      border: 1px solid #363636;
+      background-color: #333333;
       padding: 10px 20px;
       border-radius: 10px;
       font-size: 0.75rem;
