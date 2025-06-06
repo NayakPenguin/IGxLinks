@@ -183,6 +183,7 @@ const BasicInfo = () => {
             reader.readAsDataURL(blob);
             reader.onloadend = () => {
                 console.log("Cropped Image URL:", reader.result); // ✅ Console log added here
+                localStorage.setItem("newLocalImageURL", reader.result);
                 setFormData(prev => {
                     const updated = { ...prev, profileImage: reader.result };
                     setTimeout(() => saveToLocalStorage(), 0);
@@ -338,9 +339,9 @@ const BasicInfo = () => {
 
             <div className="top-bar">
                 <div className="left">
-                    <b>Last Published :</b> <br /> 25 May 9:16AM (UTC)
+                    <div className="color">Unsaved changes</div><b>Last Published :</b> 25 May 9:16AM
                 </div>
-                <div className="view-btn">View</div>
+                <a href="/page/view-edit" className="view-btn">View</a>
             </div>
 
             <div className="user-data">
@@ -454,6 +455,10 @@ const Container = styled.div`
 
         margin-bottom: 10px;
         background-color: black;
+
+        .color{
+            color: yellowgreen;
+        }
 
         .left{
             font-size: 0.65rem;

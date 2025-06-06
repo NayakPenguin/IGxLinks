@@ -23,6 +23,7 @@ import NewShop from "./Screens/InstaUI/NewShop";
 import BasicUser from "./Screens/InstaUI/BasicUser";
 import BasicUser2 from "./Screens/InstaUI/BasicUser2";
 import CreateYourPage from "./Screens/InstaUI/CreatePageComponents/CreateYourPage";
+import ViewChanges from "./Screens/InstaUI/CreatePageComponents/ViewChanges";
 
 const App = () => {
   return (
@@ -38,6 +39,7 @@ const App = () => {
         <Route path="/basicuser" element={<BasicUser />} />
         <Route path="/basicuser2" element={<BasicUser2 />} />
         <Route path="/page/create" element={<CreateYourPage />} />
+        <Route path="/page/view-edit" element={<ViewChanges />} />
         
         
         <Route path="/dashboard" element={<Dashboard />} />
