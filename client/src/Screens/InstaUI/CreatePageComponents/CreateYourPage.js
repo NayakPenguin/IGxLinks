@@ -43,20 +43,18 @@ const ITEM_TYPES = {
 
 const initialItems = [
   {
-    id: "1",
-    type: ITEM_TYPES.REDIRECT,
-    title: "My Instagram",
-    url: "https://instagram.com",
+    id: "0",
+    type: ITEM_TYPES.SUBGROUP,
+    title: "My Links",
     openSection: false
   },
   {
-    id: "2",
-    type: ITEM_TYPES.FORM,
-    title: "Contact Form",
-    titleInside: "Get in Touch",
-    description: "Fill out this form to contact us",
+    id: "1",
+    type: ITEM_TYPES.REDIRECT,
+    title: "Sample Link",
+    url: "https://google.com",
     openSection: false
-  }
+  },
 ];
 
 const IOSSwitch = muiStyled((props) => (
@@ -368,7 +366,10 @@ const CreateYourPage = () => {
     ]);
   }
 
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState(() => {
+    const saved = localStorage.getItem("userContentInfo");
+    return saved ? JSON.parse(saved) : initialItems;
+  });
   const [newItemData, setNewItemData] = useState({
     title: '',
     url: '',
@@ -396,6 +397,7 @@ const CreateYourPage = () => {
   useEffect(() => {
     console.log('====================================');
     console.log(items);
+    localStorage.setItem("userContentInfo", JSON.stringify(items));
     console.log('====================================');
   }, [items]);
 
@@ -590,7 +592,7 @@ const CreateYourPage = () => {
           </ModelConatiner> : null
       }
       <div className="main-content">
-        <BasicInfo/>
+        <BasicInfo />
         <div className="add-new-item">
           <div className="selector">
             <div
