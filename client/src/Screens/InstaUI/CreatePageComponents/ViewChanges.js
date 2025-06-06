@@ -141,11 +141,11 @@ const ViewChanges = () => {
 
         if (subscribed == false) {
             setSubscribed(!subscribed);
-            setNotificationText("Now you will be notified by Somya's content!");
+            setNotificationText(`Now you will be notified by Your Name's content!`);
         }
         else {
             setSubscribed(!subscribed);
-            setNotificationText("You unsubsribed to Somya!");
+            setNotificationText("You unsubsribed to Your Name!");
         }
 
         setNotificationModelOpen(true);
@@ -299,99 +299,40 @@ const ViewChanges = () => {
                     Open to backend-heavy SDE 2 positions at product-based companies.
                 </PinnedAnnouncement> */}
 
-                <div className="group-name-container">
-                    <div className="group-name-container-line"></div>
-                    <div className="group-name">Professional 💼</div>
-                    <div className="group-name-container-line"></div>
+                <div className="group">
+                    {userEditData.Content && userEditData.Content.map((item) => {
+                        const { id, type, title, url } = item;
+
+                        switch (type) {
+                            case "Subgroup":
+                                return (
+                                    <div key={id} className="group-name-container">
+                                        <div className="group-name-container-line"></div>
+                                        <div className="group-name">{title}</div>
+                                        <div className="group-name-container-line"></div>
+                                    </div>
+                                );
+
+                            case "Redirect":
+                                return (
+                                    <a key={id} href={url.startsWith("http") ? url : `https://${url}`} className="link1" target="_blank" rel="noopener noreferrer">
+                                        <div>{title}</div>
+                                        <div className="link-circle">
+                                            <CallMadeIcon />
+                                        </div>
+                                    </a>
+                                );
+
+                            default:
+                                return (
+                                    <div key={id}>
+                                        New Type: {type}
+                                    </div>
+                                );
+                        }
+                    })}
                 </div>
 
-                <div className="link1">
-                    <div>View my Resume - <b>Software Developer • 2 YOE</b></div>
-                    <div className="link-circle">
-                        <CallMadeIcon />
-                    </div>
-                </div>
-
-
-                <div className="link1">
-                    <div>Want a Referral? Fill the Form with Your <b>Experience, Opening Link etc</b></div>
-                    <div className="link-circle">
-                        <ChevronRightIcon />
-                    </div>
-                </div>
-
-                <div className="link1">
-                    <div>Schedule a One-on-One Meeting</div>
-                    <div className="link-circle">
-                        <EventAvailableIcon />
-                    </div>
-                </div>
-
-                <a href="/influencer/form" className="link1">
-                    <div>Invite Me for an Interview</div>
-                    <div className="link-circle">
-                        <ChevronRightIcon />
-                    </div>
-                </a>
-
-                <div className="link1">
-                    <div>Explore My Past Projects</div>
-                    <div className="link-circle">
-                        <ChevronRightIcon />
-                    </div>
-                </div>
-
-                <div className="link1">
-                    <div>Collaborate on a Project - Share your Idea</div>
-                    <div className="link-circle">
-                        <ChevronRightIcon />
-                    </div>
-                </div>
-
-                <div className="group-name-container">
-                    <div className="group-name-container-line"></div>
-                    <div className="group-name">Paid Servies</div>
-                    <div className="group-name-container-line"></div>
-                </div>
-
-                <div className="link1">
-                    <div className="paid-circle">
-                        <MonetizationOnIcon />
-                    </div>
-                    <div>Top <b>200 Leetcode Questions</b> - One needs to Solve</div>
-                    <div className="link-circle">
-                        <ChevronRightIcon />
-                    </div>
-                </div>
-
-                <div className="link1">
-                    <div className="paid-circle">
-                        <MonetizationOnIcon />
-                    </div>
-                    <div><b>Mock Interview</b> - 45 Mins/2 Questions - with feedback</div>
-                    <div className="link-circle">
-                        <ChevronRightIcon />
-                    </div>
-                </div>
-
-
-                <div className="group-name-container">
-                    <div className="group-name-container-line"></div>
-                    <div className="group-name">About me</div>
-                    <div className="group-name-container-line"></div>
-                </div>
-                <div className="link1">
-                    <div>🧸 22 Years of Me – My Story So Far/Timeline</div>
-                    <div className="link-circle">
-                        <ChevronRightIcon />
-                    </div>
-                </div>
-                <div className="link1">
-                    <div>🎧 Music Taste? Basically My Personality <b>Spotify</b></div>
-                    <div className="link-circle">
-                        <CallMadeIcon />
-                    </div>
-                </div>
 
                 <div className="share-my-page">
                     {/* igonel.ink/somyakodan_ */}
@@ -427,283 +368,289 @@ const Container = styled.div`
     
     .main-content{
         max-width: 500px;
-    }
-
-    .user-data{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        margin-bottom: 40px;
-        
-        .logo-x-dp{
-            height: 120px;
-            aspect-ratio: 1/1;
-            overflow: hidden;
-            border-radius: 50%;
-            border: 2px solid #313231;
-
-            img{
-                width: 100%;
-            }
-        }
-
-        .name{
-            margin-top: 20px;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        .about-header{
-            margin-top: 10px;
-            font-weight: 500;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-
-        .about-desc{
-            margin-top: 10px;
-            font-weight: 200;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-
-        .about-location{
-            margin-top: 10px;
-            font-weight: 500;
-            font-size: 0.85rem;
-            text-align: center;
-
-            svg{
-                font-size: 1rem;
-                margin-bottom: -2px;
-            }
-        }
-
-        .main-btns{
-            margin-top: 30px;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-
-            .btn-1{
-                font-size: 0.85rem;
-                padding: 10px 15px;
-                background-color: #0095f6;
-                border-radius: 10px;
-                margin: 0 5px;
-            }
-
-            .secondary{
-                background-color: #363636;
-            }
-
-            .trans{
-                background-color: transparent;
-                border: 1px solid white;
-            }
-        }
-
-        .socials{
-            margin: 30px 0;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            flex-wrap: wrap;
-
-            .social-icon{
-                height: 35px;
-                aspect-ratio: 1/1;
-                background-color:rgb(217, 211, 211);
-                border-radius: 50%;
-                margin: 3.5px;
-
-                padding: 2.5px;
-
-                img{
-                    width: 100%;
-                    border-radius: 100px;
-                }
-            }
-        }
-    }
-        
-    
-            
-    .group-name-container{
-        margin: 30px 0;
-        padding: 0 35px;
-        margin-top: 70px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-
-        .group-name{
-            font-size: 0.85rem;
-            margin: 0 10px;
-            text-align: center;
-        }
-
-        .group-name-container-line{
-            min-width: 20px;
-            height: 3px;
-            border-radius: 100px;
-            background-color: #676363;
-            flex: 1;
-        }
-    }
-
-    .link1{
-        text-decoration: none;
-        background-color: #363636;
-        font-size: 0.75rem;
-        font-weight: 500;
-        text-align: center;
-        padding: 15px 60px;
-        border-radius: 100px;
-        color: #e5e5e5;
-        margin-bottom: 5px;
-
-        display: flex; 
-        align-items: center;
-        justify-content: center;
-
-        height: 60px;
-
-        position: relative;
-
-        b{
-            display: inline;
-            margin-right: 5px;
-        }
-
-        .paid-circle{
-            position: absolute;
-
-            left: 15px;
-            
-            svg{
-                font-size: 1.65rem;
-                fill: yellow;
-            }
-        }
-
-        .link-circle{
-            position: absolute;
-            height: 40px;
-            width: 40px;
-            border-radius: 50%;
-
-            background-color: #0095f6;
-            /* background-color: #3c4f5b; */
-
-            right: -10px;
-
-            display: grid;
-            place-items: center;
-
-            svg{
-                font-size: 1rem;
-                fill: #e5e5e5;
-            }
-        }
-    }
-
-    .shop-2{
         width: 100%;
-        display: flex;
-        flex-wrap: wrap; 
-        /* justify-content: space-between; */
-
-        .link-2-shop{
-            position: relative;
-            /* padding-bottom: 140px; */
-            width: calc(33.33% - 2.5px);
-            aspect-ratio: 1/1;
-            margin-bottom: 3.75px;
-            /* background-color: #363636; */
-            color: #e5e5e5;
-            margin-right: 3.75px;
-            
-            /* border-radius: 10px; */
-            /* margin-bottom: 1px; */
-            /* margin-top: 30px; */
-
-            display: flex; 
+        
+        .user-data{
+            display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            overflow: hidden;
-
-            .border-bottom-light{
-                display: none;
-                position: absolute; 
-                height: 1px;
-                background-color:#313231;
-                bottom: -15px;
-                width: 90%;
-            }
-
-            .left{
-                /* width: 50%; */
-                width: 100%;
-
-                img{
-                    width: 100%;
-                    height: 100%;
-                    /* border-radius: 4px; */
-                    /* margin-bottom: 5px; */
+            align-items: center;
+    
+            margin-bottom: 40px;
+            
+                .logo-x-dp{
+                    height: 120px;
+                    aspect-ratio: 1/1;
+                    overflow: hidden;
+                    border-radius: 50%;
+                    border: 2px solid #313231;
+    
+                    img{
+                        width: 100%;
+                    }
+                }
+    
+                .name{
+                    margin-top: 20px;
+                    font-weight: 500;
+                    text-align: center;
+                }
+    
+                .about-header{
+                    margin-top: 10px;
+                    font-weight: 500;
+                    font-size: 0.85rem;
+                    text-align: center;
+                }
+    
+                .about-desc{
+                    margin-top: 10px;
+                    font-weight: 200;
+                    font-size: 0.85rem;
+                    text-align: center;
+                }
+    
+                .about-location{
+                    margin-top: 10px;
+                    font-weight: 500;
+                    font-size: 0.85rem;
+                    text-align: center;
+    
+                    svg{
+                        font-size: 1rem;
+                        margin-bottom: -2px;
+                    }
+                }
+    
+                .main-btns{
+                    margin-top: 30px;
+                    display: flex;
+                    justify-content: center;
+                    flex-wrap: wrap;
+    
+                    .btn-1{
+                        font-size: 0.85rem;
+                        padding: 10px 15px;
+                        background-color: #0095f6;
+                        border-radius: 10px;
+                        margin: 0 5px;
+                    }
+    
+                    .secondary{
+                        background-color: #363636;
+                    }
+    
+                    .trans{
+                        background-color: transparent;
+                        border: 1px solid white;
+                    }
+                }
+    
+                .socials{
+                    margin-top: 30px;
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    flex-wrap: wrap;
+    
+                    .social-icon{
+                        height: 35px;
+                        aspect-ratio: 1/1;
+                        background-color:rgb(217, 211, 211);
+                        border-radius: 50%;
+                        margin: 3.5px;
+    
+                        padding: 2.5px;
+    
+                        img{
+                            width: 100%;
+                            border-radius: 100px;
+                        }
+                    }
                 }
             }
-
-            .item-name {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                padding: 5px 5px;
-                color: white;
-                font-size: 0.65rem;
+            
+        .group{
+            margin-top: 30px;
+            width: 100%;
+            
+            .group-name-container{
+                margin: 30px 0;
+                padding: 0 35px;
+                margin-top: 70px;
+    
+                display: flex;
+                align-items: center;
+                justify-content: center;
+    
+    
+                .group-name{
+                    font-size: 0.85rem;
+                    margin: 0 10px;
+                    text-align: center;
+                }
+    
+                .group-name-container-line{
+                    min-width: 20px;
+                    height: 3px;
+                    border-radius: 100px;
+                    background-color: #676363;
+                    flex: 1;
+                }
+            }
+    
+            .link1{
+                text-decoration: none;
+                background-color: #363636;
+                font-size: 0.75rem;
                 font-weight: 500;
-                /* font-style: italic; */
-                letter-spacing: 0.05rem;
-                z-index: 2;
+                text-align: center;
+                padding: 15px 60px;
+                border-radius: 100px;
+                color: #e5e5e5;
+                margin-bottom: 5px;
+    
+                display: flex; 
+                align-items: center;
+                justify-content: center;
+    
+                height: 60px;
+    
+                position: relative;
+    
+                b{
+                    display: inline;
+                    margin-right: 5px;
+                }
+    
+                .paid-circle{
+                    position: absolute;
+    
+                    left: 15px;
+                    
+                    svg{
+                        font-size: 1.65rem;
+                        fill: yellow;
+                    }
+                }
+    
+                .link-circle{
+                    position: absolute;
+                    height: 40px;
+                    width: 40px;
+                    border-radius: 50%;
+    
+                    background-color: #0095f6;
+                    /* background-color: #3c4f5b; */
+    
+                    right: -10px;
+    
+                    display: grid;
+                    place-items: center;
+    
+                    svg{
+                        font-size: 1rem;
+                        fill: #e5e5e5;
+                    }
+                }
+    
+            }
+    
+            .shop-2{
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap; 
+                /* justify-content: space-between; */
+    
+                .link-2-shop{
+                    position: relative;
+                    /* padding-bottom: 140px; */
+                    width: calc(33.33% - 2.5px);
+                    aspect-ratio: 1/1;
+                    margin-bottom: 3.75px;
+                    /* background-color: #363636; */
+                    color: #e5e5e5;
+                    margin-right: 3.75px;
+                    
+                    /* border-radius: 10px; */
+                    /* margin-bottom: 1px; */
+                    /* margin-top: 30px; */
+    
+                    display: flex; 
+                    flex-direction: column;
+                    align-items: flex-start;
+                    overflow: hidden;
+    
+                    .border-bottom-light{
+                        display: none;
+                        position: absolute; 
+                        height: 1px;
+                        background-color:#313231;
+                        bottom: -15px;
+                        width: 90%;
+                    }
+    
+                    .left{
+                        /* width: 50%; */
+                        width: 100%;
+    
+                        img{
+                            width: 100%;
+                            height: 100%;
+                            /* border-radius: 4px; */
+                            /* margin-bottom: 5px; */
+                        }
+                    }
+    
+                    .item-name {
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        padding: 5px 5px;
+                        color: white;
+                        font-size: 0.65rem;
+                        font-weight: 500;
+                        /* font-style: italic; */
+                        letter-spacing: 0.05rem;
+                        z-index: 2;
+                    }
+                }
+    
+                .link-2-shop::after {
+                    content: "";
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 50%; /* Adjust for how much fade you want */
+                    background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+                    z-index: 1;
+                }
+            }
+    
+            .shop-2 > .link-2-shop:nth-child(3n) {
+                margin-right: 0;
+            }
+    
+            .view-all-btn{
+                margin: 15px 0 0 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+    
+                .btn-3{
+                    padding: 7.5px 20px;
+                    font-size: 0.65rem;
+                    border: 1px solid #676363;
+                    color: white;
+                    border-radius: 100px;
+                    background-color: #363636;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
             }
         }
-
-        .link-2-shop::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 50%; /* Adjust for how much fade you want */
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
-            z-index: 1;
-        }
     }
 
-    .shop-2 > .link-2-shop:nth-child(3n) {
-        margin-right: 0;
-    }
-
-    .view-all-btn{
-        margin: 15px 0 0 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .btn-3{
-            padding: 7.5px 20px;
-            font-size: 0.65rem;
-            border: 1px solid #676363;
-            color: white;
-            border-radius: 100px;
-            background-color: #363636;
-            text-decoration: none;
-            font-weight: 500;
-        }
-    }
 
     .share-my-page{
         height: 20px;
