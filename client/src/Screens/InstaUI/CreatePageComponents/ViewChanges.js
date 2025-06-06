@@ -95,6 +95,12 @@ const ViewChanges = () => {
     });
 
     useEffect(() => {
+        console.log('====================================');
+        console.log(userEditData);
+        console.log('====================================');
+    }, [userEditData]);
+
+    useEffect(() => {
         if (notificationModelOpen) {
             setTimeout(() => {
                 setShowDone(true);
@@ -141,11 +147,11 @@ const ViewChanges = () => {
 
         if (subscribed == false) {
             setSubscribed(!subscribed);
-            setNotificationText(`Now you will be notified by Your Name's content!`);
+            setNotificationText(`Now you will be notified by ${userEditData.Basic.formData.name ? userEditData.Basic.formData.name : "Your Name"}'s content!`);
         }
         else {
             setSubscribed(!subscribed);
-            setNotificationText("You unsubsribed to Your Name!");
+            setNotificationText(`You unsubsribed to  ${userEditData.Basic.formData.name ? userEditData.Basic.formData.name : "Your Name"}!`);
         }
 
         setNotificationModelOpen(true);
@@ -266,28 +272,30 @@ const ViewChanges = () => {
                     <div className="logo-x-dp">
                         <img src={userEditData.ImageURL ? userEditData.ImageURL : "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"} alt="" />
                     </div>
-                    <div className="name">{userEditData.Basic.name ? userEditData.Basic.name : "Your Name"}</div>
-                    <div className="about-header">{userEditData.Basic.role && userEditData.Basic.org ? `${userEditData.Basic.role} @${userEditData.Basic.org}` : "Role @Organisation"}</div>
-                    <div className="about-desc">{userEditData.Basic.bio ? userEditData.Basic.bio : "Your Bio"}</div>
-                    <div className="about-location"><RoomIcon /> {userEditData.Basic.location ? userEditData.Basic.location : "Your Location Here"}</div>
+                    <div className="name">{userEditData.Basic.formData.name ? userEditData.Basic.formData.name : "Your Name"}</div>
+                    <div className="about-header">{userEditData.Basic.formData.role && userEditData.Basic.formData.org ? `${userEditData.Basic.formData.role} @${userEditData.Basic.formData.org}` : "Role @Organisation"}</div>
+                    <div className="about-desc">{userEditData.Basic.formData.bio ? userEditData.Basic.formData.bio : "Your Bio"}</div>
+                    <div className="about-location"><RoomIcon /> {userEditData.Basic.formData.location ? userEditData.Basic.formData.location : "Your Location Here"}</div>
 
                     {/* <div className="main-btns">
                         <div className="btn-1 trans">30K page views</div>
                         <div className="btn-1">Subscribe</div>
                     </div> */}
+                    <div className="socials">
+                        {userEditData.Basic.socialLinks && (
+                            Object.entries(userEditData.Basic.socialLinks)
+                                .filter(([key, value]) => value.trim() !== "")
+                                .map(([key, value]) => {
+                                    const platform = AllSocialMediaPlatforms.find(p => p.id === key);
+                                    return platform ? (
+                                        <a key={key} href={value} className="social-icon" target="_blank" rel="noopener noreferrer">
+                                            <img src={platform.iconUrl} alt={platform.name} />
+                                        </a>
+                                    ) : null;
+                                })
+                        )}
+                    </div>
 
-                    {userEditData.Basic.socialLinks && (
-                        Object.entries(userEditData.Basic.socialLinks)
-                            .filter(([key, value]) => value.trim() !== "")
-                            .map(([key, value]) => {
-                                const platform = AllSocialMediaPlatforms.find(p => p.id === key);
-                                return platform ? (
-                                    <a key={key} href={value} className="social-icon" target="_blank" rel="noopener noreferrer">
-                                        <img src={platform.iconUrl} alt={platform.name} />
-                                    </a>
-                                ) : null;
-                            })
-                    )}
                 </div>
 
                 {/* <PinnedAnnouncement>
