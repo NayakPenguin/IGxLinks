@@ -75,7 +75,7 @@ const BasicInfo = () => {
         unit: '%',
         width: 50,
         height: 50,
-        aspect: 1,  // This enforces 1:1 aspect ratio
+        aspect: 1,
         x: 25,
         y: 25
     });
@@ -83,33 +83,69 @@ const BasicInfo = () => {
     const imageRef = useRef(null);
     const fileInputRef = useRef(null);
 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [socialLinks, setSocialLinks] = useState({});
+    const [activeSocialLinks, setActiveSocialLinks] = useState([]);
+    const [filteredPlatforms, setFilteredPlatforms] = useState(AllSocialMediaPlatforms);
+
+    useEffect(() => {
+        const savedData = localStorage.getItem('userBasicInfo');
+        if (savedData) {
+            const parsed = JSON.parse(savedData);
+            setFormData(parsed.formData || {});
+            setSocialLinks(parsed.socialLinks || {});
+            setActiveSocialLinks(parsed.activeSocialLinks || []);
+        } else {
+            const initialLinks = {};
+            AllSocialMediaPlatforms.forEach(platform => {
+                initialLinks[platform.id] = '';
+            });
+            setSocialLinks(initialLinks);
+        }
+    }, []);
+
+    useEffect(() => {
+        const filtered = AllSocialMediaPlatforms.filter(platform =>
+            platform.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredPlatforms(filtered);
+    }, [searchTerm]);
+
+    const saveToLocalStorage = () => {
+        const data = {
+            formData,
+            socialLinks,
+            activeSocialLinks
+        };
+        localStorage.setItem('userBasicInfo', JSON.stringify(data));
+    };
+
     const handleChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const handleDone = () => {
         setEditingField(null);
+        saveToLocalStorage();
     };
 
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
-            // Check file type
             if (!file.type.match('image.(jpeg|jpg|png)')) {
                 alert('Please select a JPEG/JPG or PNG image');
                 return;
             }
-            // Check file size (e.g., 5MB limit)
             if (file.size > 5 * 1024 * 1024) {
                 alert('Image size should be less than 5MB');
                 return;
             }
 
             const reader = new FileReader();
-            reader.addEventListener('load', () => {
+            reader.onload = () => {
                 setImageSrc(reader.result);
                 setCropModalOpen(true);
-            });
+            };
             reader.readAsDataURL(file);
         }
     };
@@ -119,18 +155,17 @@ const BasicInfo = () => {
     };
 
     const handleSaveCroppedImage = () => {
-        if (!completedCrop || !imageRef.current) {
-            return;
-        }
+        if (!completedCrop || !imageRef.current) return;
 
         const image = imageRef.current;
         const canvas = document.createElement('canvas');
         const scaleX = image.naturalWidth / image.width;
         const scaleY = image.naturalHeight / image.height;
+
         canvas.width = completedCrop.width;
         canvas.height = completedCrop.height;
-        const ctx = canvas.getContext('2d');
 
+        const ctx = canvas.getContext('2d');
         ctx.drawImage(
             image,
             completedCrop.x * scaleX,
@@ -147,11 +182,17 @@ const BasicInfo = () => {
             const reader = new FileReader();
             reader.readAsDataURL(blob);
             reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, profileImage: reader.result }));
+                console.log("Cropped Image URL:", reader.result); // ✅ Console log added here
+                setFormData(prev => {
+                    const updated = { ...prev, profileImage: reader.result };
+                    setTimeout(() => saveToLocalStorage(), 0);
+                    return updated;
+                });
                 setCropModalOpen(false);
             };
         }, 'image/jpeg', 1);
     };
+
 
     const renderInput = (field, label, placeholder = "") => (
         <div className="input-container">
@@ -182,34 +223,9 @@ const BasicInfo = () => {
             width,
             height
         );
-
         const centeredCrop = centerCrop(crop, width, height);
         setCrop(centeredCrop);
     };
-
-
-    // Social Media
-    const [searchTerm, setSearchTerm] = useState('');
-    const [socialLinks, setSocialLinks] = useState({});
-    const [activeSocialLinks, setActiveSocialLinks] = useState([]);
-    const [filteredPlatforms, setFilteredPlatforms] = useState(AllSocialMediaPlatforms);
-
-    useEffect(() => {
-        // Initialize with empty values for all platforms
-        const initialLinks = {};
-        AllSocialMediaPlatforms.forEach(platform => {
-            initialLinks[platform.id] = '';
-        });
-        setSocialLinks(initialLinks);
-    }, []);
-
-    useEffect(() => {
-        // Filter platforms based on search term
-        const filtered = AllSocialMediaPlatforms.filter(platform =>
-            platform.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredPlatforms(filtered);
-    }, [searchTerm]);
 
     const handleInputChange = (platformId, value) => {
         setSocialLinks(prev => ({
@@ -219,7 +235,6 @@ const BasicInfo = () => {
     };
 
     const handleSave = () => {
-        // Filter out empty links and map to include platform info
         const updatedLinks = AllSocialMediaPlatforms
             .filter(platform => socialLinks[platform.id]?.trim() !== '')
             .map(platform => ({
@@ -229,6 +244,7 @@ const BasicInfo = () => {
 
         setActiveSocialLinks(updatedLinks);
         setModelOpen(false);
+        saveToLocalStorage();
     };
 
     return (
@@ -405,47 +421,6 @@ const BasicInfo = () => {
         </Container>
     );
 };
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 90%;
-  max-height: 90%;
-  overflow: auto;
-`;
-
-const ModalActions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-  gap: 10px;
-
-  button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  button:last-child {
-    background-color: #007bff;
-    color: white;
-  }
-`;
 
 export default BasicInfo;
 
@@ -841,3 +816,44 @@ const ModelConatiner = styled.div`
         display: none;  
     }
 `
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+`;
+
+const ModalActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 10px;
+
+  button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:last-child {
+    background-color: #007bff;
+    color: white;
+  }
+`;
