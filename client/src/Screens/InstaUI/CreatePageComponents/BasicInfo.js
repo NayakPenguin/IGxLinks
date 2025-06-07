@@ -97,7 +97,13 @@ const BasicInfo = () => {
             setFormData(parsed.formData || {});
             setSocialLinks(parsed.socialLinks || {});
             setActiveSocialLinks(parsed.activeSocialLinks || []);
-        } else {
+            setAnnouncementData(parsed.announcementData || {
+                title: "Announcement Title",
+                description: "This is your announcement description",
+                isVisible: true
+            });
+        }
+        else {
             const initialLinks = {};
             AllSocialMediaPlatforms.forEach(platform => {
                 initialLinks[platform.id] = '';
@@ -117,7 +123,8 @@ const BasicInfo = () => {
         const data = {
             formData,
             socialLinks,
-            activeSocialLinks
+            activeSocialLinks,
+            announcementData
         };
         localStorage.setItem('userBasicInfo', JSON.stringify(data));
     };
@@ -251,11 +258,24 @@ const BasicInfo = () => {
     };
 
     const [isAnnouncementEditing, setIsAnnouncementEditing] = useState(false);
-    const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true);
-    const [announcementData, setAnnouncementData] = useState({
-        title: "Announcement Title",
-        description: "This is your announcement description"
-    });
+    const [announcementData, setAnnouncementData] = useState(
+        JSON.parse(localStorage.getItem('announcementData')) || {
+            title: "Announcement Title",
+            description: "This is your announcement description",
+            isVisible: true
+        }
+    );
+
+    useEffect(() => {
+        saveToLocalStorage();
+    }, [announcementData]);
+
+    const toggleAnnouncementVisibility = () => {
+        setAnnouncementData(prev => ({
+            ...prev,
+            isVisible: !prev.isVisible
+        }));
+    };
 
     const handleAnnouncementChange = (field, value) => {
         setAnnouncementData(prev => ({ ...prev, [field]: value }));
@@ -263,11 +283,12 @@ const BasicInfo = () => {
 
     const handleAnnouncementDone = () => {
         setIsAnnouncementEditing(false);
+        saveToLocalStorage();
     };
 
     const renderAnnouncementInput = (field, label, placeholder = "") => (
         <div className="input-container">
-            <div className="label">{label}</div>
+            <div className="label-inside">{label}</div>
             <div className="input-line">
                 <input
                     className="input-basic"
@@ -452,35 +473,39 @@ const BasicInfo = () => {
             </div>
 
             <PinnedAnnouncement>
-                <div className="edit-btn" onClick={() => setIsAnnouncementEditing(true)}>
-                    <CreateIcon />
-                </div>
-
-                <div className="change-visibility" onClick={() => setIsAnnouncementVisible(!isAnnouncementVisible)}>
-                    {isAnnouncementVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                {
+                    isAnnouncementEditing ? null : <div className="edit-btn" onClick={() => {setIsAnnouncementEditing(true); toggleAnnouncementVisibility();}}>
+                        <CreateIcon />
+                    </div>
+                }
+                
+                <div className="change-visibility" onClick={() => {
+                    toggleAnnouncementVisibility();
+                }}>
+                    {announcementData.isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
                     <div className="text">
-                        Click to {isAnnouncementVisible ? "hide" : "show"}
+                        Click to {announcementData.isVisible ? "hide" : "show"}
                     </div>
                 </div>
 
-                {isAnnouncementVisible && (
-                    <div>
-                        <div className="label">
-                            {/* your SVG here */}
-                            Pinned Announcement
-                        </div>
+                <div className="label">
+                    <svg viewBox="0 0 24 24" height="16" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>pin-refreshed</title><path d="M16 5V12L17.7 13.7C17.8 13.8 17.875 13.9125 17.925 14.0375C17.975 14.1625 18 14.2917 18 14.425V15C18 15.2833 17.9042 15.5208 17.7125 15.7125C17.5208 15.9042 17.2833 16 17 16H13V21.85C13 22.1333 12.9042 22.3708 12.7125 22.5625C12.5208 22.7542 12.2833 22.85 12 22.85C11.7167 22.85 11.4792 22.7542 11.2875 22.5625C11.0958 22.3708 11 22.1333 11 21.85V16H7C6.71667 16 6.47917 15.9042 6.2875 15.7125C6.09583 15.5208 6 15.2833 6 15V14.425C6 14.2917 6.025 14.1625 6.075 14.0375C6.125 13.9125 6.2 13.8 6.3 13.7L8 12V5C7.71667 5 7.47917 4.90417 7.2875 4.7125C7.09583 4.52083 7 4.28333 7 4C7 3.71667 7.09583 3.47917 7.2875 3.2875C7.47917 3.09583 7.71667 3 8 3H16C16.2833 3 16.5208 3.09583 16.7125 3.2875C16.9042 3.47917 17 3.71667 17 4C17 4.28333 16.9042 4.52083 16.7125 4.7125C16.5208 4.90417 16.2833 5 16 5ZM8.85 14H15.15L14 12.85V5H10V12.85L8.85 14Z" fill="currentColor"></path></svg>
+                    Pinned Announcement
+                </div>
 
+                {announcementData.isVisible && (
+                    <div>
                         {isAnnouncementEditing ? (
                             <>
                                 {renderAnnouncementInput("title", "Title")}
                                 {renderAnnouncementInput("description", "Description")}
                                 <div className="done-btn" onClick={handleAnnouncementDone}>
-                                    <DoneIcon />
+                                    Done
                                 </div>
                             </>
                         ) : (
                             <>
-                                <b>{announcementData.title}</b>
+                                <div className="title">{announcementData.title}</div>
                                 <div>{announcementData.description}</div>
                             </>
                         )}
@@ -946,7 +971,8 @@ const PinnedAnnouncement = styled.div`
     
     position: relative;
     
-    b{
+    .title{
+        margin-top: 20px;
         font-weight: 600;
         display: block;
         margin-bottom: 5px;
@@ -955,7 +981,7 @@ const PinnedAnnouncement = styled.div`
     .change-visibility{
         display: flex;
         align-items: center;
-        margin-bottom: 20px;
+        /* margin-bottom: 20px; */
 
         .text{
             font-size: 0.75rem;
@@ -970,7 +996,7 @@ const PinnedAnnouncement = styled.div`
         background-color: #d9d3d3;
         position: absolute;
         right: -17.5px;
-        bottom: 35px;
+        top: 9px;
 
         display: grid;
         place-items: center;
@@ -998,5 +1024,77 @@ const PinnedAnnouncement = styled.div`
             margin-right: 5px;
             transform: rotate(45deg);
         }
+    }
+
+    .input-container{
+        width: 100%;
+        margin-top: 10px;
+        
+        .label-inside{
+            position: relative;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .input-line{
+            display: flex;
+            align-items: center;
+            
+            .input-basic{
+                width: 100%;
+                border-radius: 10px;
+                margin: 5px 0 5px 0;
+                /* outline: none; */
+                /* background-color: transparent; */
+                background-color:rgb(22, 22, 22);
+                border: 1px solid #363636;
+                padding: 15px;
+                color: white;
+                resize: none;
+                font-size: 0.75rem;
+                font-weight: 300;
+                /* letter-spacing: 0.1rem; */
+                /* outline: white; */
+            }
+            
+            .input-basic:focus {
+                outline: 1px solid white;
+                outline-offset: 2px; 
+                letter-spacing: 0.1rem;
+                transition: outline 125ms ease, letter-spacing 125ms ease;
+            }
+
+            .done-btn{
+                height: 42px;
+                aspect-ratio: 1/1;
+                border-radius: 50%;
+                background-color: #333;
+                margin-left: 10px;
+
+                display: grid;
+                place-items: center;
+
+                svg{
+                    font-size: 1.25rem;
+                    /* margin-bottom: -2px; */
+                    margin-left: -2.5px;
+                }
+            }
+        }
+
+        textarea{
+            height: 200px;
+        }
+    }
+
+    .done-btn{
+        border: none;
+        margin-top: 20px;
+        background-color: #0095f6;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 300;
+        text-align: center;
     }
 `
