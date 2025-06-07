@@ -32,6 +32,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import InfoIcon from '@material-ui/icons/Info';
 import BasicInfo from "./BasicInfo";
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 const ITEM_TYPES = {
   REDIRECT: 'Redirect Links',
@@ -40,6 +41,21 @@ const ITEM_TYPES = {
   FORM: 'Custom Form',
   MEETING_SCHEDULER: 'Meeting Scheduler',
   WRITE_CONTENT: 'Write your content',
+};
+
+const getRouteForType = (type) => {
+  switch (type) {
+    case ITEM_TYPES.FOLDER_REDIRECT:
+      return "folder";
+    case ITEM_TYPES.FORM:
+      return "form";
+    case ITEM_TYPES.MEETING_SCHEDULER:
+      return "meeting";
+    case ITEM_TYPES.WRITE_CONTENT:
+      return "write";
+    default:
+      return "item"; // fallback route
+  }
 };
 
 const initialItems = [
@@ -125,6 +141,13 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
             </div>
           )}
 
+          {(item.type !== ITEM_TYPES.REDIRECT && item.type !== ITEM_TYPES.SUBGROUP) && (
+            <a href={`/${getRouteForType(item.type)}/${item.id}`} className="inside-edit-btn">
+              <div className="text">View or Update inside content</div>
+              <ChevronRightIcon />
+            </a>
+          )}
+
           <div className="edit-actions">
             <button className="save-btn" onClick={() => onSaveEdit(item.id, editData)}>
               Save
@@ -148,12 +171,9 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
         <DragIndicatorIcon />
       </div>
       <div className="item-content">
-        <div className="item-type">Type: {item.type}</div>
+        <div className="item-type">Type : <b>{item.type}</b></div>
         <div className="item-title">{item.title}</div>
         {item.url && <div className="item-url">{item.url}</div>}
-        {item.type === ITEM_TYPES.MEETING_SCHEDULER && (
-          <div className="item-duration">Duration: {item.duration} mins</div>
-        )}
       </div>
       <div className="edit-btn" onClick={() => onEdit(item.id)}>
         <EditIcon />
@@ -207,7 +227,7 @@ const CreateYourPage = () => {
   const [itemType, setItemType] = useState(ITEM_TYPES.REDIRECT);
   const [editingId, setEditingId] = useState(null);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
- 
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(TouchSensor)
@@ -595,6 +615,13 @@ const Container = styled.div`
                     .item-type{
                         font-size: 0.75rem;
                         font-weight: 200;
+
+
+                        b{
+                          font-weight: 500;
+                          text-transform: uppercase;
+                          letter-spacing: 0.05rem;
+                        }
                     }
                 
                     .item-title {
@@ -717,194 +744,6 @@ const MainCreate = styled.div`
         }
     }
 
-    .form-content{
-      width: 100%;
-      margin-top: 30px;
-      border-bottom: 1px solid #313231ba;
-      padding-bottom: 20px;
-      /* background-color: orange; */
-
-      .content-title{
-          font-size: 0.85rem;
-          font-weight: 500;
-          margin-bottom: 20px;
-      }
-
-      .item {
-          width: 100%;
-          min-height: 60px;
-          border-radius: 10px;
-          background-color: #333;
-          margin-bottom: 10px;
-          padding: 10px 50px;
-
-          touch-action: none; /* Changed from manipulation to none */
-          user-select: none;
-          cursor: default; /* Changed from grab to default */
-          display: flex;
-          align-items: center;
-          color: white;
-          font-size: 1.2rem;
-          position: relative;
-
-          &.dragging {
-              border: 2px solid white;
-              scale: 0.85;
-              transition: transform 0.1s ease, border 0.25s ease;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-              cursor: grabbing;
-          }
-
-          .drag-btn {
-              position: absolute;
-              left: 0;
-              top: 0;
-              height: 100%;
-              display: grid;
-              place-items: center;
-              width: 50px;
-              cursor: grab; /* Add grab cursor only to handle */
-          
-              &:active {
-                  cursor: grabbing;
-              }
-
-              svg {
-                  font-size: 1.25rem;
-                  opacity: 0.7;
-                  transition: opacity 0.2s ease;
-              }
-
-              &:hover svg {
-                  opacity: 1;
-              }
-          }
-
-          .item-content {
-              .item-type{
-                  font-size: 0.75rem;
-                  font-weight: 200;
-              }
-          
-              .item-title {
-                  margin-top: 5px;
-                  font-size: 0.85rem;
-                  font-weight: 500;
-              }
-              
-              .item-placeholder {
-                  margin-top: 5px;
-                  font-size: 0.75rem;
-                  font-weight: 300;
-                  letter-spacing: 0.05rem;
-              }
-          }
-
-          .delete-btn{
-            position: absolute;
-            right: -10px;
-            top: -10px;
-
-            svg {
-              cursor: pointer;
-              font-size: 1.25rem;
-              opacity: 0.7;
-              transition: opacity 0.2s ease;
-            }
-
-            &:hover svg {
-                opacity: 1;
-            }
-          }
-
-          .edit-btn { 
-              position: absolute;
-              right: 0;
-              top: 0;
-              height: 100%;
-              display: grid;
-              place-items: center;
-              width: 50px;
-
-              svg {
-                  cursor: pointer;
-                  font-size: 1.25rem;
-                  opacity: 0.7;
-                  transition: opacity 0.2s ease;
-              }
-
-              &:hover svg {
-                  opacity: 1;
-              }
-          }
-      }
-
-      .subgroup{
-          margin-top: 50px;
-      }
-      
-      // edit from the parent
-      .input-container{
-        width: 100%;
-        margin-top: 20px;
-        border-bottom: none;
-        padding-bottom: 0;
-        /* background-color: orange; */
-
-        .label{
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .input-basic{
-            width: 100%;
-            border-radius: 10px;
-            margin: 15px 0 5px 0;
-            /* outline: none; */
-            /* background-color: transparent; */
-            background-color:rgb(22, 22, 22);
-            border: 1px solid #363636;
-            padding: 15px;
-            color: white;
-            resize: none;
-            font-size: 0.75rem;
-            font-weight: 300;
-            /* letter-spacing: 0.1rem; */
-            /* outline: white; */
-        }
-        
-        .input-basic:focus {
-            outline: 1px solid white;
-            outline-offset: 2px; 
-            letter-spacing: 0.1rem;
-            transition: outline 125ms ease, letter-spacing 125ms ease;
-        }
-
-        textarea{
-            height: 200px;
-        }
-      }
-
-      .add-field-btn{
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-top: 20px;
-
-          .line{
-            flex: 1;
-            height: 2px;
-            border-radius: 100px;
-            background-color: #696969;
-          }
-
-          .text{
-            font-size: 0.75rem;
-            margin: 0 10px;
-          }
-      }
-    }
-
     .save-btn{
       margin-top: 20px;
       border: 1px solid #363636;
@@ -934,8 +773,12 @@ const MainEdit = styled.div`
     /* border-radius: 10px; */
     margin: -10px -50px;
     background-color: black;
-    border-bottom: 1px solid white;
+    /* border-bottom: 1px solid white; */
     border-top: 1px solid #333333;
+    border-bottom: 1px solid #333333;
+
+    display: flex;
+    flex-direction: column;
 
     .input-container{
         width: 100%;
@@ -975,6 +818,24 @@ const MainEdit = styled.div`
         textarea{
             height: 200px;
         }
+    }
+
+    .inside-edit-btn{
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      background-color: transparent;
+      border: 1px solid #fff;
+      padding: 15px;
+      color: white;
+      text-decoration: none;
+      /* text-align: center; */
+      font-size: 0.75rem;
+      font-weight: 300;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .edit-actions{

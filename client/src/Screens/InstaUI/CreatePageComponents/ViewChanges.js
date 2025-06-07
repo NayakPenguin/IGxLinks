@@ -335,11 +335,24 @@ const ViewChanges = () => {
                                     </a>
                                 );
 
+                            case "Meeting Scheduler":
+                                return (
+                                    <div key={id} className="link1">
+                                        <div>{title}</div>
+                                        <div className="link-circle">
+                                            <EventAvailableIcon />
+                                        </div>
+                                    </div>
+                                );
+
                             default:
                                 return (
-                                    <div key={id}>
-                                        New Type: {type}
-                                    </div>
+                                    <a href={`user/${id}`} className="link1">
+                                        <div>{title}</div>
+                                        <div className="link-circle">
+                                            <ChevronRightIcon />
+                                        </div>
+                                    </a>
                                 );
                         }
                     })}
