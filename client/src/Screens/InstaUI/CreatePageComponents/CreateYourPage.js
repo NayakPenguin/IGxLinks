@@ -142,7 +142,7 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
           )}
 
           {(item.type !== ITEM_TYPES.REDIRECT && item.type !== ITEM_TYPES.SUBGROUP) && (
-            <a href={`/${getRouteForType(item.type)}/${item.id}`} className="inside-edit-btn">
+            <a href={`${getRouteForType(item.type)}/${item.id}`} className="inside-edit-btn">
               <div className="text">View or Update inside content</div>
               <ChevronRightIcon />
             </a>
