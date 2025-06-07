@@ -6,6 +6,8 @@ import DoneIcon from '@material-ui/icons/Done';
 import SearchIcon from '@material-ui/icons/Search';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
@@ -248,6 +250,35 @@ const BasicInfo = () => {
         saveToLocalStorage();
     };
 
+    const [isAnnouncementEditing, setIsAnnouncementEditing] = useState(false);
+    const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true);
+    const [announcementData, setAnnouncementData] = useState({
+        title: "Announcement Title",
+        description: "This is your announcement description"
+    });
+
+    const handleAnnouncementChange = (field, value) => {
+        setAnnouncementData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleAnnouncementDone = () => {
+        setIsAnnouncementEditing(false);
+    };
+
+    const renderAnnouncementInput = (field, label, placeholder = "") => (
+        <div className="input-container">
+            <div className="label">{label}</div>
+            <div className="input-line">
+                <input
+                    className="input-basic"
+                    type="text"
+                    placeholder={placeholder}
+                    value={announcementData[field]}
+                    onChange={(e) => handleAnnouncementChange(field, e.target.value)}
+                />
+            </div>
+        </div>
+    );
     return (
         <Container>
             {cropModalOpen && (
@@ -419,6 +450,43 @@ const BasicInfo = () => {
                     </div>
                 </div>
             </div>
+
+            <PinnedAnnouncement>
+                <div className="edit-btn" onClick={() => setIsAnnouncementEditing(true)}>
+                    <CreateIcon />
+                </div>
+
+                <div className="change-visibility" onClick={() => setIsAnnouncementVisible(!isAnnouncementVisible)}>
+                    {isAnnouncementVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                    <div className="text">
+                        Click to {isAnnouncementVisible ? "hide" : "show"}
+                    </div>
+                </div>
+
+                {isAnnouncementVisible && (
+                    <div>
+                        <div className="label">
+                            {/* your SVG here */}
+                            Pinned Announcement
+                        </div>
+
+                        {isAnnouncementEditing ? (
+                            <>
+                                {renderAnnouncementInput("title", "Title")}
+                                {renderAnnouncementInput("description", "Description")}
+                                <div className="done-btn" onClick={handleAnnouncementDone}>
+                                    <DoneIcon />
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <b>{announcementData.title}</b>
+                                <div>{announcementData.description}</div>
+                            </>
+                        )}
+                    </div>
+                )}
+            </PinnedAnnouncement>
         </Container>
     );
 };
@@ -862,3 +930,73 @@ const ModalActions = styled.div`
     color: white;
   }
 `;
+
+const PinnedAnnouncement = styled.div`
+    margin-top: 80px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #363636;
+    font-size: 0.85rem;
+    font-weight: 300;
+    border-radius: 10px;
+    line-height: 1.35rem;
+    border-left: 10px solid white;
+    /* border: 1px solid white; */
+    color: #e5e5e5;
+    
+    position: relative;
+    
+    b{
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .change-visibility{
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+
+        .text{
+            font-size: 0.75rem;
+            margin-left: 5px;
+        }
+    }
+
+    .edit-btn{
+        height: 35px;
+        aspect-ratio: 1/1;
+        border-radius: 50%;
+        background-color: #d9d3d3;
+        position: absolute;
+        right: -17.5px;
+        bottom: 35px;
+
+        display: grid;
+        place-items: center;
+
+        svg{
+            font-size: 1rem;
+            margin-bottom: 0;
+            margin-left: 0;
+            fill: #333;
+        }
+    }
+
+    .label{
+        position: absolute;
+        top: -30px;
+        left: -10px;
+        font-size: 0.7rem;
+        font-weight: 300;
+        /* letter-spacing: 0.04rem; */
+
+        display: flex;
+        align-items: center;
+
+        svg{
+            margin-right: 5px;
+            transform: rotate(45deg);
+        }
+    }
+`
