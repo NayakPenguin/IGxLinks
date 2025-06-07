@@ -325,7 +325,7 @@ const ViewChanges = () => {
                                     </div>
                                 );
 
-                            case "Redirect":
+                            case "Redirect Links":
                                 return (
                                     <a key={id} href={url.startsWith("http") ? url : `https://${url}`} className="link1" target="_blank" rel="noopener noreferrer">
                                         <div>{title}</div>

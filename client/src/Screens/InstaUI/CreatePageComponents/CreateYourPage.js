@@ -34,11 +34,12 @@ import InfoIcon from '@material-ui/icons/Info';
 import BasicInfo from "./BasicInfo";
 
 const ITEM_TYPES = {
-  REDIRECT: 'Redirect',
+  REDIRECT: 'Redirect Links',
   SUBGROUP: 'Subgroup',
-  // FOLDER_REDIRECT: 'Folder for Redirect Links',
+  FOLDER_REDIRECT: 'Folder for Redirect Links',
   FORM: 'Custom Form',
   MEETING_SCHEDULER: 'Meeting Scheduler',
+  WRITE_CONTENT: 'Write your content',
 };
 
 const initialItems = [
@@ -113,27 +114,6 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
             />
           </div>
 
-          {(item.type === ITEM_TYPES.FORM || item.type === ITEM_TYPES.MEETING_SCHEDULER) && (
-            <>
-              <div className="input-container">
-                <div className="label">Title Inside</div>
-                <input
-                  className="input-basic"
-                  value={editData.titleInside}
-                  onChange={(e) => handleEditChange('titleInside', e.target.value)}
-                />
-              </div>
-              <div className="input-container">
-                <div className="label">Description</div>
-                <input
-                  className="input-basic"
-                  value={editData.description}
-                  onChange={(e) => handleEditChange('description', e.target.value)}
-                />
-              </div>
-            </>
-          )}
-
           {(item.type === ITEM_TYPES.REDIRECT) && (
             <div className="input-container">
               <div className="label">URL</div>
@@ -187,10 +167,16 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
 
 const CreateYourPage = () => {
   const [items, setItems] = useState(() => {
-    const saved = localStorage.getItem("userContentInfo");
-    return saved ? JSON.parse(saved) : initialItems;
+    try {
+      const saved = localStorage.getItem("userContentInfo");
+      if (!saved || saved === "undefined") return initialItems;
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error("Invalid JSON in localStorage for 'userContentInfo':", e);
+      return initialItems;
+    }
   });
-  
+
   const [newItemData, setNewItemData] = useState({
     title: '',
     url: '',
@@ -221,7 +207,7 @@ const CreateYourPage = () => {
   const [itemType, setItemType] = useState(ITEM_TYPES.REDIRECT);
   const [editingId, setEditingId] = useState(null);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
-
+ 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(TouchSensor)
@@ -244,28 +230,6 @@ const CreateYourPage = () => {
       type: itemType,
       title: newItemData.title,
       ...(itemType === ITEM_TYPES.REDIRECT && { url: newItemData.url }),
-      ...((itemType === ITEM_TYPES.FORM || itemType === ITEM_TYPES.MEETING_SCHEDULER) && {
-        titleInside: newItemData.titleInside,
-        description: newItemData.description,
-      }),
-      ...(itemType === ITEM_TYPES.FORM),
-      ...(itemType === ITEM_TYPES.MEETING_SCHEDULER && {
-        duration: newItemData.duration,
-        mondayEnabled: newItemData.mondayEnabled,
-        mondayTimes: newItemData.mondayTimes,
-        tuesdayEnabled: newItemData.tuesdayEnabled,
-        tuesdayTimes: newItemData.tuesdayTimes,
-        wednesdayEnabled: newItemData.wednesdayEnabled,
-        wednesdayTimes: newItemData.wednesdayTimes,
-        thursdayEnabled: newItemData.thursdayEnabled,
-        thursdayTimes: newItemData.thursdayTimes,
-        fridayEnabled: newItemData.fridayEnabled,
-        fridayTimes: newItemData.fridayTimes,
-        saturdayEnabled: newItemData.saturdayEnabled,
-        saturdayTimes: newItemData.saturdayTimes,
-        sundayEnabled: newItemData.sundayEnabled,
-        sundayTimes: newItemData.sundayTimes
-      }),
     };
 
     setItems([...items, newItem]);
@@ -337,7 +301,6 @@ const CreateYourPage = () => {
     }
   };
 
-
   return (
     <Container>
       <div className="main-content">
@@ -385,29 +348,6 @@ const CreateYourPage = () => {
                 placeholder={getPlaceholder('title')}
               />
             </div>
-
-            {(itemType === ITEM_TYPES.FORM || itemType === ITEM_TYPES.MEETING_SCHEDULER) && (
-              <>
-                <div className="input-container">
-                  <div className="label">Title Inside</div>
-                  <input
-                    className="input-basic"
-                    value={newItemData.titleInside}
-                    onChange={(e) => handleNewItemChange('titleInside', e.target.value)}
-                    placeholder={getPlaceholder('titleInside')}
-                  />
-                </div>
-                <div className="input-container">
-                  <div className="label">Description (Optional)</div>
-                  <input
-                    className="input-basic"
-                    value={newItemData.description}
-                    onChange={(e) => handleNewItemChange('description', e.target.value)}
-                    placeholder={getPlaceholder('description')}
-                  />
-                </div>
-              </>
-            )}
 
             {(itemType === ITEM_TYPES.REDIRECT) && (
               <div className="input-container">
