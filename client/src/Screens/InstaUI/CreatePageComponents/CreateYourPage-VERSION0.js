@@ -46,14 +46,64 @@ const initialItems = [
     id: "0",
     type: ITEM_TYPES.SUBGROUP,
     title: "My Links",
+    openSection: false
   },
   {
     id: "1",
     type: ITEM_TYPES.REDIRECT,
     title: "Sample Link",
     url: "https://google.com",
+    openSection: false
   },
 ];
+
+const IOSSwitch = muiStyled((props) => (
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+  width: 42,
+  height: 26,
+  padding: 0,
+  '& .MuiSwitch-switchBase': {
+    padding: 0,
+    margin: 2,
+    transitionDuration: '300ms',
+    '&.Mui-checked': {
+      transform: 'translateX(16px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        backgroundColor: '#65C466',
+        opacity: 1,
+        border: 0,
+      },
+      '&.Mui-disabled + .MuiSwitch-track': {
+        opacity: 0.5,
+      },
+    },
+    '&.Mui-focusVisible .MuiSwitch-thumb': {
+      color: '#33cf4d',
+      border: '6px solid #fff',
+    },
+    '&.Mui-disabled .MuiSwitch-thumb': {
+      color: theme.palette.grey[100],
+    },
+    '&.Mui-disabled + .MuiSwitch-track': {
+      opacity: 0.7,
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxSizing: 'border-box',
+    width: 22,
+    height: 22,
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 26 / 2,
+    backgroundColor: '#E9E9EA',
+    opacity: 1,
+    transition: theme.transitions.create(['background-color'], {
+      duration: 500,
+    }),
+  },
+}));
 
 const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDelete }) => {
   const {
@@ -145,6 +195,78 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
             </div>
           )}
 
+          {(item.type === ITEM_TYPES.MEETING_SCHEDULER) && (
+            <>
+              <div className="input-container">
+                <div className="label">Meeting Duration (in Minutes)</div>
+                <input
+                  className="input-basic"
+                  type="number"
+                  value={editData.duration}
+                  onChange={(e) => handleEditChange('duration', parseInt(e.target.value) || 30)}
+                  placeholder="30"
+                  min="0"
+                />
+              </div>
+
+              <div className="meeting-select">
+                <div className="info">
+                  <InfoIcon />
+                  <div className="text">
+                    Enter available times in 24-hour format. Use '-' to separate start and end times, and ',' to list multiple time slots. Example: 09:00-10:30, 20:15-23:00.
+                  </div>
+                </div>
+
+
+
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
+                  const dayLower = day.toLowerCase();
+                  return (
+                    <div className="day-container" key={day}>
+                      <div className="day-open">
+                        <FormControlLabel
+                          sx={{
+                            '& .MuiFormControlLabel-label': {
+                              fontSize: '14px',
+                              fontWeight: 500,
+                              marginLeft: '-5px'
+                            },
+                          }}
+                          control={
+                            <IOSSwitch
+                              sx={{ m: 1 }}
+                              checked={editData[`${dayLower}Enabled`]}
+                              onChange={(e) => handleEditChange(
+                                `${dayLower}Enabled`,
+                                e.target.checked
+                              )}
+                              className="switch"
+                            />
+                          }
+                          label={day}
+                        />
+                      </div>
+                      <div className="day-time">
+                        <div className="input-container">
+                          <input
+                            className="input-basic"
+                            value={editData[`${dayLower}Enabled`] ? editData[`${dayLower}Times`] : ""}
+                            onChange={(e) => handleEditChange(
+                              `${dayLower}Times`,
+                              e.target.value
+                            )}
+                            placeholder={editData[`${dayLower}Enabled`] ? "eg., 09:00-12:00, 14:00-18:00" : "Not available on this day."}
+                            disabled={!editData[`${dayLower}Enabled`]}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
           <div className="edit-actions">
             <button className="save-btn" onClick={() => onSaveEdit(item.id, editData)}>
               Save
@@ -185,17 +307,75 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
   );
 };
 
+const FormContentItem = ({ item, index, onEdit, onDelete, onReorder }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    touchAction: 'none',
+    zIndex: isDragging ? 100 : 'auto',
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`item ${isDragging ? 'dragging' : ''}`}
+    >
+      <div className="drag-btn" {...attributes} {...listeners}>
+        <DragIndicatorIcon />
+      </div>
+      <div className="item-content">
+        <div className="item-type">Type: {item.type}</div>
+        <div className="item-title">{item.title}</div>
+        {item.placeholder && <div className="item-placeholder">{item.placeholder}</div>}
+      </div>
+      <div className="edit-btn" onClick={() => onEdit(index)}>
+        <EditIcon />
+      </div>
+      <div className="delete-btn" onClick={() => onDelete(index)}>
+        <HighlightOffIcon />
+      </div>
+    </div>
+  );
+};
+
 const CreateYourPage = () => {
+  const [modelFormAddOpen, setModelFormAddOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('Text');
+
+  const options = ['Text', 'Long Answer', 'Email', 'Number'];
+
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+  };
+
+  const saveOptionSelect = () => {
+    setModelFormAddOpen(false);
+    setFormItems([
+      ...formItems,
+      { id: Date.now().toString(), type: selectedOption, title: 'New Field', placeholder: '' }
+    ]);
+  }
+
   const [items, setItems] = useState(() => {
     const saved = localStorage.getItem("userContentInfo");
     return saved ? JSON.parse(saved) : initialItems;
   });
-  
   const [newItemData, setNewItemData] = useState({
     title: '',
     url: '',
     titleInside: '',
     description: '',
+    formItems: [],
     duration: 30, // Default meeting duration
     // Initialize all days as enabled with empty times
     mondayEnabled: true,
@@ -215,7 +395,10 @@ const CreateYourPage = () => {
   });
 
   useEffect(() => {
+    console.log('====================================');
+    console.log(items);
     localStorage.setItem("userContentInfo", JSON.stringify(items));
+    console.log('====================================');
   }, [items]);
 
   const [itemType, setItemType] = useState(ITEM_TYPES.REDIRECT);
@@ -248,7 +431,7 @@ const CreateYourPage = () => {
         titleInside: newItemData.titleInside,
         description: newItemData.description,
       }),
-      ...(itemType === ITEM_TYPES.FORM),
+      ...(itemType === ITEM_TYPES.FORM && { formItems: formItems }),
       ...(itemType === ITEM_TYPES.MEETING_SCHEDULER && {
         duration: newItemData.duration,
         mondayEnabled: newItemData.mondayEnabled,
@@ -266,6 +449,7 @@ const CreateYourPage = () => {
         sundayEnabled: newItemData.sundayEnabled,
         sundayTimes: newItemData.sundayTimes
       }),
+      openSection: false
     };
 
     setItems([...items, newItem]);
@@ -293,6 +477,7 @@ const CreateYourPage = () => {
       sundayEnabled: false,
       sundayTimes: ''
     });
+    setFormItems([]);
   };
 
   const handleDelete = (id) => {
@@ -337,9 +522,75 @@ const CreateYourPage = () => {
     }
   };
 
+  const [formItems, setFormItems] = useState([
+    { id: '1', type: 'Text', title: 'Sample Text', placeholder: 'Sample Placeholder' },
+  ]);
+
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editData, setEditData] = useState({});
+
+  const handleEdit = (index) => {
+    setEditingIndex(index);
+    setEditData({ ...formItems[index] });
+  };
+
+  const handleDragEndForm = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = formItems.findIndex(item => item.id === active.id);
+      const newIndex = formItems.findIndex(item => item.id === over.id);
+      setFormItems(arrayMove(formItems, oldIndex, newIndex));
+    }
+  };
+
+  const handleSaveEditForm = () => {
+    const updatedItems = [...formItems];
+    updatedItems[editingIndex] = editData;
+    setFormItems(updatedItems);
+    setEditingIndex(null);
+  };
+
+  const handleDeleteForm = (index) => {
+    setFormItems(formItems.filter((_, i) => i !== index));
+  };
+
+  const handleAddField = () => {
+    setModelFormAddOpen(true);
+    // setFormItems([
+    //   ...formItems,
+    //   { id: Date.now().toString(), type: selectedOption, title: 'New Field', placeholder: '' }
+    // ]);
+  };
 
   return (
     <Container>
+      {
+        modelFormAddOpen ?
+          <ModelConatiner>
+            <div className="model-closer" onClick={() => setModelFormAddOpen(false)}></div>
+            <div className="model">
+              <div className="model-title">Select the kind of form field you want to create</div>
+              <div className="checkboxes">
+                {options.map((option) => (
+                  <div
+                    key={option}
+                    className="opt"
+                    onClick={() => handleOptionSelect(option)}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedOption === option}
+                      onChange={() => { }} // Empty handler to avoid warnings
+                      readOnly // Make it controlled
+                    />
+                    <label>{option}</label>
+                  </div>
+                ))}
+              </div>
+              <div className="done-btn" onClick={() => saveOptionSelect()}>Done</div>
+            </div>
+          </ModelConatiner> : null
+      }
       <div className="main-content">
         <BasicInfo />
         <div className="add-new-item">
@@ -419,6 +670,127 @@ const CreateYourPage = () => {
                   placeholder={getPlaceholder('url')}
                 />
               </div>
+            )}
+
+            {itemType === ITEM_TYPES.FORM && (
+              <div className="form-content">
+                <div className="content-title">Form Content</div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEndForm}
+                  modifiers={[restrictToVerticalAxis]}
+                >
+                  <SortableContext items={formItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                    {formItems.map((item, index) => (
+                      <FormContentItem
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        onEdit={handleEdit}
+                        onDelete={handleDeleteForm}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+
+                {editingIndex !== null && (
+                  <div className="form-edit">
+                    <div className="input-container">
+                      <div className="label">Field Title</div>
+                      <input
+                        className="input-basic"
+                        value={editData.title}
+                        onChange={e => setEditData({ ...editData, title: e.target.value })}
+                        placeholder={getPlaceholder('Field Title')}
+                      />
+                    </div>
+                    <div className="input-container">
+                      <div className="label">Placeholder</div>
+                      <input
+                        className="input-basic"
+                        value={editData.placeholder}
+                        onChange={e => setEditData({ ...editData, placeholder: e.target.value })}
+                        placeholder={getPlaceholder('Placeholder')}
+                      />
+                    </div>
+                    <button className="save-btn" onClick={handleSaveEditForm}>Save Field</button>
+                  </div>
+                )}
+
+                <div className="add-field-btn" onClick={handleAddField}>
+                  <div className="line"></div>
+                  <div className="text">Add Field + </div>
+                  <div className="line"></div>
+                </div>
+              </div>
+            )}
+
+            {(itemType === ITEM_TYPES.MEETING_SCHEDULER) && (
+              <>
+                <div className="input-container">
+                  <div className="label">Meeting Duration (in Minutes)</div>
+                  <input
+                    className="input-basic"
+                    type="number"
+                    value={newItemData.duration || ''}
+                    onChange={(e) => handleNewItemChange('duration', e.target.value)}
+                    placeholder="30"
+                    min="0"
+                  />
+                </div>
+
+                <div className="meeting-select">
+                  <div className="info">
+                    <InfoIcon />
+                    <div className="text">
+                      Enter available times in 24-hour format. Use '-' to separate start and end times, and ',' to list multiple time slots. Example: 09:00-10:30, 20:15-23:00.
+                    </div>
+                  </div>
+
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                    <div className="day-container" key={day}>
+                      <div className="day-open">
+                        <FormControlLabel
+                          sx={{
+                            '& .MuiFormControlLabel-label': {
+                              fontSize: '14px',
+                              fontWeight: 500,
+                              marginLeft: '-5px'
+                            },
+                          }}
+                          control={
+                            <IOSSwitch
+                              sx={{ m: 1 }}
+                              checked={newItemData[`${day.toLowerCase()}Enabled`] !== false}
+                              onChange={(e) => handleNewItemChange(
+                                `${day.toLowerCase()}Enabled`,
+                                e.target.checked
+                              )}
+                              className="switch"
+                            />
+                          }
+                          label={day}
+                        />
+                      </div>
+                      <div className="day-time">
+                        <div className="input-container">
+                          <input
+                            className="input-basic"
+                            value={newItemData[`${day.toLowerCase()}Times`] || ''}
+                            onChange={(e) => handleNewItemChange(
+                              `${day.toLowerCase()}Times`,
+                              e.target.value
+                            )}
+                            placeholder={newItemData[`${day.toLowerCase()}Enabled`] === true ? "eg., 09:00-12:00, 14:00-18:00" : "Not available on this day."}
+                            disabled={newItemData[`${day.toLowerCase()}Enabled`] === false}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
 
             <button className="add-btn" onClick={handleAddItem}>
@@ -1052,6 +1424,79 @@ const MainEdit = styled.div`
             font-weight: 300;
             text-align: center;
             cursor: pointer;
+        }
+    }
+`
+
+
+const ModelConatiner = styled.div`
+    width: 100vw;
+    height: calc(100vh - 60px);
+    
+    z-index: 1002;
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    
+    
+    .model-closer{
+        width: 100vw;
+        height: calc(100vh - 60px);
+        
+        position: absolute;
+        top: 0;
+        left: 0;
+        
+        background-color: #00000085; 
+    }
+
+    .model{ 
+        width: 80%;
+        /* height: 70%; */
+        max-width: 400px;
+        border-radius: 10px;
+        /* margin-top: -50px; */
+        background-color: white;
+        z-index: 1009;
+        padding: 20px;
+
+        
+        .model-title{
+          color: #333;
+          font-size: 0.85rem;
+          font-weight: 500;
+        }
+        
+        .checkboxes{
+          .opt {
+            display: flex;
+            align-items: center;
+            margin: 10px 20px;
+
+            label{
+              color: #333;
+              margin-left: 10px;
+              font-size: 0.75rem;
+              /* margin-top: -15px; */
+            }
+          }
+        }
+
+        .done-btn{
+          border: none;
+          margin-top: 20px;
+          background-color: #0095f6;
+          padding: 10px 20px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 300;
+          text-align: center;
         }
     }
 `
