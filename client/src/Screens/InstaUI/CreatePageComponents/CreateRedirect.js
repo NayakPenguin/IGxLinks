@@ -264,8 +264,8 @@ const CreateRedirect = () => {
                             </div>
                         </div>
 
-                        <button className="add-btn" onClick={handleSaveForm}>
-                            {isEditMode ? "Update Form" : "Add to Page"}
+                        <button className="add-btn full" onClick={handleSaveForm}>
+                            {isEditMode ? "Update List" : "Add to Page"}
                         </button>
                     </MainCreate>
                 </div>
@@ -431,6 +431,11 @@ const Container = styled.div`
                   border-radius: 10px;
                   font-size: 0.85rem;
                   font-weight: 500;
+                }
+
+                .full{
+                    margin-top: 20px;
+                    width: 100%;
                 }
             }
         }
@@ -818,146 +823,9 @@ const MainCreate = styled.div`
         font-weight: 300;
         text-align: center;
     }
-`
 
-const MainEdit = styled.div`
-    width: calc(100% + 100px);
-    padding: 30px 0px;
-    /* border-left: 10px solid white; */
-    /* border-radius: 10px; */
-    margin: -10px -50px;
-    background-color: black;
-    border-bottom: 1px solid white;
-    border-top: 1px solid #333333;
-
-    .input-container{
+    .full{
+        margin-top: 20px;
         width: 100%;
-        /* border-bottom: 1px solid #313231ba; */
-        /* padding-bottom: 20px; */
-        margin-bottom: 20px;
-
-        .label{
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .input-basic{
-            width: 100%;
-            border-radius: 10px;
-            margin: 15px 0 5px 0;
-            /* outline: none; */
-            /* background-color: transparent; */
-            background-color:rgb(22, 22, 22);
-            border: 1px solid #363636;
-            padding: 15px;
-            color: white;
-            resize: none;
-            font-size: 0.75rem;
-            font-weight: 300;
-            /* letter-spacing: 0.1rem; */
-            /* outline: white; */
-        }
-        
-        .input-basic:focus {
-            outline: 1px solid white;
-            outline-offset: 2px; 
-            letter-spacing: 0.1rem;
-            transition: outline 125ms ease, letter-spacing 125ms ease;
-        }
-
-        textarea{
-            height: 200px;
-        }
-    }
-
-    .edit-actions{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        
-        button{
-            width: calc(50% - 10px);
-            border: none;
-            background-color: #0095f6;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 300;
-            text-align: center;
-            cursor: pointer;
-        }
-    }
-`
-
-
-const ModelConatiner = styled.div`
-    width: 100vw;
-    height: calc(100vh - 60px);
-    
-    z-index: 1002;
-    
-    position: fixed;
-    top: 0;
-    left: 0;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    
-    
-    .model-closer{
-        width: 100vw;
-        height: calc(100vh - 60px);
-        
-        position: absolute;
-        top: 0;
-        left: 0;
-        
-        background-color: #00000085; 
-    }
-
-    .model{ 
-        width: 80%;
-        /* height: 70%; */
-        max-width: 400px;
-        border-radius: 10px;
-        /* margin-top: -50px; */
-        background-color: white;
-        z-index: 1009;
-        padding: 20px;
-
-        
-        .model-title{
-          color: #333;
-          font-size: 0.85rem;
-          font-weight: 500;
-        }
-        
-        .checkboxes{
-          .opt {
-            display: flex;
-            align-items: center;
-            margin: 10px 20px;
-
-            label{
-              color: #333;
-              margin-left: 10px;
-              font-size: 0.75rem;
-              /* margin-top: -15px; */
-            }
-          }
-        }
-
-        .done-btn{
-          border: none;
-          margin-top: 20px;
-          background-color: #0095f6;
-          padding: 10px 20px;
-          border-radius: 10px;
-          font-size: 0.75rem;
-          font-weight: 300;
-          text-align: center;
-        }
     }
 `

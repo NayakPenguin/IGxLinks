@@ -576,7 +576,7 @@ const CreateMeetings = () => {
                             ))}
                         </div>
 
-                        <button className="add-btn" onClick={handleSaveMeeting}>
+                        <button className="add-btn full" onClick={handleSaveMeeting}>
                             {isEditMode ? "Update Meeting" : "Add to Page"}
                         </button>
                     </MainCreate>
@@ -1048,6 +1048,11 @@ const MainCreate = styled.div`
         font-size: 0.75rem;
         font-weight: 300;
         text-align: center;
+    }
+
+    .full{
+        margin-top: 20px;
+        width: 100%;
     }
 `
 const ModelConatiner = styled.div`

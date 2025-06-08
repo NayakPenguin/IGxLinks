@@ -339,7 +339,7 @@ const CreateForm = () => {
                             </div>
                         </div>
 
-                        <button className="add-btn" onClick={handleSaveForm}>
+                        <button className="add-btn full" onClick={handleSaveForm}>
                             {isEditMode ? "Update Form" : "Add to Page"}
                         </button>
                     </MainCreate>
@@ -547,6 +547,11 @@ const Container = styled.div`
                   border-radius: 10px;
                   font-size: 0.85rem;
                   font-weight: 500;
+                }
+
+                .full{
+                    margin-top: 20px;
+                    width: 100%;
                 }
             }
         }
@@ -933,6 +938,11 @@ const MainCreate = styled.div`
         font-size: 0.75rem;
         font-weight: 300;
         text-align: center;
+    }
+
+    .full{
+        margin-top: 20px;
+        width: 100%;
     }
 `
 
