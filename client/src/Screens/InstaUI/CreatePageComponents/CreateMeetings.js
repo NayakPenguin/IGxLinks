@@ -69,6 +69,22 @@ const CreateMeetings = () => {
     const [minTimeForPicker, setMinTimeForPicker] = useState("00:00");
     const [maxTimeForPicker, setMaxTimeForPicker] = useState("23:45");
 
+    const parseTimeToMinutes = (timeStr) => {
+        const [time, period] = timeStr.split(' ');
+        const [hours, minutes] = time.split(':').map(Number);
+        let totalMinutes = hours % 12 * 60 + minutes;
+        if (period === 'PM' && hours !== 12) totalMinutes += 12 * 60;
+        return totalMinutes;
+    };
+
+    const formatMinutesToTime = (totalMinutes) => {
+        const hours = Math.floor(totalMinutes / 60) % 24;
+        const mins = totalMinutes % 60;
+        const period = hours < 12 ? 'AM' : 'PM';
+        const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+        return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
+    };
+
     // Function to merge overlapping time slots
     const mergeOverlappingSlots = (slots) => {
         if (slots.length <= 1) return slots;
@@ -106,48 +122,67 @@ const CreateMeetings = () => {
         const existingItem = savedItems.find(item => item.id === id);
 
         // Helper function to ensure consistent time formatting
-        const formatTimeSlot = (slot) => ({
-            start: formatTimeString(slot.start),
-            end: formatTimeString(slot.end)
-        });
-
-        const formatTimeString = (timeStr) => {
-            if (!timeStr) return '09:00 AM'; // Default fallback
-
-            // Handle cases where time might already be formatted
-            if (timeStr.includes(' ')) return timeStr;
-
-            // Convert from 24-hour format if needed
-            const [hours, minutes] = timeStr.split(':').map(Number);
-            const period = hours < 12 ? 'AM' : 'PM';
-            const displayHours = hours % 12 === 0 ? 12 : hours % 12;
-            return `${displayHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+        const formatTimeSlot = (slot) => {
+            if (!slot) return { start: '09:00 AM', end: '10:30 AM' };
+            return {
+                start: formatTimeString(slot.start),
+                end: formatTimeString(slot.end)
+            };
         };
 
-        if (existingItem) {
-            // Merge overlapping slots for each day with consistent formatting
+        const formatTimeString = (timeStr) => {
+            if (!timeStr) return '09:00 AM';
+            if (timeStr.includes(' ')) return timeStr;
+
+            try {
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                const period = hours < 12 ? 'AM' : 'PM';
+                const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+                return `${displayHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+            } catch (e) {
+                console.warn('Failed to format time string:', timeStr);
+                return '09:00 AM';
+            }
+        };
+
+        if (existingItem && existingItem.availability) {
+            // Safely handle availability data
             const availability = {};
-            Object.keys(existingItem.availability).forEach(day => {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+            days.forEach(day => {
                 const dayData = existingItem.availability[day];
+
+                // Handle missing or invalid day data
+                if (!dayData) {
+                    availability[day] = {
+                        enabled: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day),
+                        slots: []
+                    };
+                    return;
+                }
+
+                // Process slots if they exist
+                const slots = Array.isArray(dayData.slots)
+                    ? dayData.slots.map(slot => formatTimeSlot(slot))
+                    : [];
+
                 availability[day] = {
-                    enabled: dayData.enabled,
-                    slots: mergeOverlappingSlots(
-                        dayData.slots.map(slot => formatTimeSlot(slot))
-                    )
+                    enabled: !!dayData.enabled,
+                    slots: mergeOverlappingSlots(slots)
                 };
             });
+
             return availability;
         }
+
         // Default availability with consistent formatting
         return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
             .reduce((acc, day) => {
                 acc[day] = {
                     enabled: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day),
                     slots: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day)
-                        ? [{
-                            start: '09:00 AM',
-                            end: '10:30 AM' // 90 minute default duration
-                        }]
+                        ? [{ start: '09:00 AM', end: '10:30 AM' }]
                         : []
                 };
                 return acc;
@@ -166,6 +201,8 @@ const CreateMeetings = () => {
         const existingItem = savedItems.find(item => item.id === id);
 
         if (id) {
+            console.log("Id : ", id);
+            
             if (existingItem) {
                 setIsEditMode(true);
                 setExistingMeetingData(existingItem);
@@ -173,10 +210,12 @@ const CreateMeetings = () => {
                     title: existingItem.title || '',
                     description: existingItem.description || '',
                     duration: existingItem.duration || 30,
-                    availability: getInitialAvailability()
+                    availability: existingItem.availability || getInitialAvailability()
                 });
+                console.log("formData : ", formData);
+                
             } else {
-                navigate('/pagenotfound');
+                // navigate('/pagenotfound');
             }
         }
     }, [id, navigate]);
@@ -194,22 +233,6 @@ const CreateMeetings = () => {
             default:
                 return "";
         }
-    };
-
-    const parseTimeToMinutes = (timeStr) => {
-        const [time, period] = timeStr.split(' ');
-        const [hours, minutes] = time.split(':').map(Number);
-        let totalMinutes = hours % 12 * 60 + minutes;
-        if (period === 'PM' && hours !== 12) totalMinutes += 12 * 60;
-        return totalMinutes;
-    };
-
-    const formatMinutesToTime = (totalMinutes) => {
-        const hours = Math.floor(totalMinutes / 60) % 24;
-        const mins = totalMinutes % 60;
-        const period = hours < 12 ? 'AM' : 'PM';
-        const displayHours = hours % 12 === 0 ? 12 : hours % 12;
-        return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
     };
 
     const generateTimeSlots = (start = "00:00", end = "23:45") => {
@@ -417,7 +440,7 @@ const CreateMeetings = () => {
         }
 
         localStorage.setItem("userContentInfo", JSON.stringify(updatedItems));
-        navigate('/page/view-edit');
+        navigate('/page/create');
     };
 
     const slots = generateTimeSlots(minTimeForPicker, maxTimeForPicker);
