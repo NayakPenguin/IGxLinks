@@ -41,7 +41,7 @@ const App = () => {
         <Route path="/basicuser2" element={<BasicUser2 />} />
         <Route path="/page/create" element={<CreateYourPage />} />
         <Route path="/page/view-edit" element={<ViewChanges />} />
-        <Route path="/page/meeting/*" element={<CreateMeetings />} />
+        <Route path="/page/meeting/:id" element={<CreateMeetings />} />
         
         
         <Route path="/dashboard" element={<Dashboard />} />

@@ -1,63 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import {
-    DndContext,
-    closestCenter,
-    useSensor,
-    useSensors,
-    PointerSensor,
-    TouchSensor
-} from "@dnd-kit/core";
-import {
-    SortableContext,
-    useSortable,
-    arrayMove,
-    verticalListSortingStrategy
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import DeleteIcon from '@material-ui/icons/Delete';
-import RoomIcon from "@material-ui/icons/Room";
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import AddIcon from "@material-ui/icons/Add";
-import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import EditIcon from '@material-ui/icons/Edit';
 import ControlFooter from "../../../Components/ControlFooter";
 import { Switch } from "@material-ui/core";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { styled as muiStyled } from '@mui/material/styles';
-import FormGroup from '@mui/material/FormGroup';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import InfoIcon from '@material-ui/icons/Info';
-import BasicInfo from "./BasicInfo";
 import RemoveIcon from '@material-ui/icons/Remove';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-
-const ITEM_TYPES = {
-    REDIRECT: 'Redirect',
-    SUBGROUP: 'Subgroup',
-    // FOLDER_REDIRECT: 'Folder for Redirect Links',
-    FORM: 'Custom Form',
-    MEETING_SCHEDULER: 'Meeting Scheduler',
-};
-
-const initialItems = [
-    {
-        id: "0",
-        type: ITEM_TYPES.SUBGROUP,
-        title: "My Links",
-        openSection: false
-    },
-    {
-        id: "1",
-        type: ITEM_TYPES.REDIRECT,
-        title: "Sample Link",
-        url: "https://google.com",
-        openSection: false
-    },
-];
+import DeleteIcon from '@material-ui/icons/Delete';
+import { useParams, useNavigate } from "react-router-dom";
 
 const IOSSwitch = muiStyled((props) => (
     <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
@@ -108,127 +60,135 @@ const IOSSwitch = muiStyled((props) => (
 }));
 
 const CreateMeetings = () => {
-    const [modelFormAddOpen, setModelFormAddOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState('Text');
+    const [modelTimeAddOpen, setModelTimeAddOpen] = useState(false);
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [existingMeetingData, setExistingMeetingData] = useState(null);
+    const [selectedSlotMeta, setSelectedSlotMeta] = useState({ day: null, index: null, type: null });
+    const [minTimeForPicker, setMinTimeForPicker] = useState("00:00");
+    const [maxTimeForPicker, setMaxTimeForPicker] = useState("23:45");
 
-    const options = ['Text', 'Long Answer', 'Email', 'Number'];
+    // Function to merge overlapping time slots
+    const mergeOverlappingSlots = (slots) => {
+        if (slots.length <= 1) return slots;
 
-    const handleOptionSelect = (option) => {
-        setSelectedOption(option);
+        // Convert to minutes and sort
+        const slotsInMinutes = slots.map(slot => ({
+            start: parseTimeToMinutes(slot.start),
+            end: parseTimeToMinutes(slot.end)
+        })).sort((a, b) => a.start - b.start);
+
+        const merged = [slotsInMinutes[0]];
+
+        for (let i = 1; i < slotsInMinutes.length; i++) {
+            const last = merged[merged.length - 1];
+            const current = slotsInMinutes[i];
+
+            if (current.start <= last.end) {
+                // Overlapping or adjacent, merge them
+                last.end = Math.max(last.end, current.end);
+            } else {
+                merged.push(current);
+            }
+        }
+
+        // Convert back to time strings
+        return merged.map(slot => ({
+            start: formatMinutesToTime(slot.start),
+            end: formatMinutesToTime(slot.end)
+        }));
     };
 
-    const [items, setItems] = useState(() => {
-        const saved = localStorage.getItem("userContentInfo");
-        return saved ? JSON.parse(saved) : initialItems;
-    });
+    // Initialize with existing data from localStorage if available
+    const getInitialAvailability = () => {
+        const savedItems = JSON.parse(localStorage.getItem("userContentInfo") || "[]");
+        const existingItem = savedItems.find(item => item.id === id);
 
-    const [newItemData, setNewItemData] = useState({
+        // Helper function to ensure consistent time formatting
+        const formatTimeSlot = (slot) => ({
+            start: formatTimeString(slot.start),
+            end: formatTimeString(slot.end)
+        });
+
+        const formatTimeString = (timeStr) => {
+            if (!timeStr) return '09:00 AM'; // Default fallback
+
+            // Handle cases where time might already be formatted
+            if (timeStr.includes(' ')) return timeStr;
+
+            // Convert from 24-hour format if needed
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            const period = hours < 12 ? 'AM' : 'PM';
+            const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+            return `${displayHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+        };
+
+        if (existingItem) {
+            // Merge overlapping slots for each day with consistent formatting
+            const availability = {};
+            Object.keys(existingItem.availability).forEach(day => {
+                const dayData = existingItem.availability[day];
+                availability[day] = {
+                    enabled: dayData.enabled,
+                    slots: mergeOverlappingSlots(
+                        dayData.slots.map(slot => formatTimeSlot(slot))
+                    )
+                };
+            });
+            return availability;
+        }
+        // Default availability with consistent formatting
+        return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            .reduce((acc, day) => {
+                acc[day] = {
+                    enabled: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day),
+                    slots: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day)
+                        ? [{
+                            start: '09:00 AM',
+                            end: '10:30 AM' // 90 minute default duration
+                        }]
+                        : []
+                };
+                return acc;
+            }, {});
+    };
+
+    const [formData, setFormData] = useState({
         title: '',
-        url: '',
-        titleInside: '',
         description: '',
-        formItems: [],
-        duration: 30, // Default meeting duration
-        // Initialize all days as enabled with empty times
-        mondayEnabled: true,
-        mondayTimes: '',
-        tuesdayEnabled: true,
-        tuesdayTimes: '',
-        wednesdayEnabled: true,
-        wednesdayTimes: '',
-        thursdayEnabled: true,
-        thursdayTimes: '',
-        fridayEnabled: true,
-        fridayTimes: '',
-        saturdayEnabled: false,
-        saturdayTimes: '',
-        sundayEnabled: false,
-        sundayTimes: ''
+        duration: 30,
+        availability: getInitialAvailability()
     });
 
     useEffect(() => {
-        localStorage.setItem("userContentInfo", JSON.stringify(items));
-    }, [items]);
+        const savedItems = JSON.parse(localStorage.getItem("userContentInfo") || "[]");
+        const existingItem = savedItems.find(item => item.id === id);
 
-    const [itemType, setItemType] = useState(ITEM_TYPES.REDIRECT);
-
-    const handleAddItem = () => {
-        if (!newItemData.title.trim()) return;
-
-        const newItem = {
-            id: Date.now().toString(),
-            type: itemType,
-            title: newItemData.title,
-            ...(itemType === ITEM_TYPES.REDIRECT && { url: newItemData.url }),
-            ...((itemType === ITEM_TYPES.FORM || itemType === ITEM_TYPES.MEETING_SCHEDULER) && {
-                titleInside: newItemData.titleInside,
-                description: newItemData.description,
-            }),
-            ...(itemType === ITEM_TYPES.FORM && { formItems: formItems }),
-            ...(itemType === ITEM_TYPES.MEETING_SCHEDULER && {
-                duration: newItemData.duration,
-                mondayEnabled: newItemData.mondayEnabled,
-                mondayTimes: newItemData.mondayTimes,
-                tuesdayEnabled: newItemData.tuesdayEnabled,
-                tuesdayTimes: newItemData.tuesdayTimes,
-                wednesdayEnabled: newItemData.wednesdayEnabled,
-                wednesdayTimes: newItemData.wednesdayTimes,
-                thursdayEnabled: newItemData.thursdayEnabled,
-                thursdayTimes: newItemData.thursdayTimes,
-                fridayEnabled: newItemData.fridayEnabled,
-                fridayTimes: newItemData.fridayTimes,
-                saturdayEnabled: newItemData.saturdayEnabled,
-                saturdayTimes: newItemData.saturdayTimes,
-                sundayEnabled: newItemData.sundayEnabled,
-                sundayTimes: newItemData.sundayTimes
-            }),
-            openSection: false
-        };
-
-        setItems([...items, newItem]);
-
-        // Reset form
-        setNewItemData({
-            title: '',
-            url: '',
-            titleInside: '',
-            description: '',
-            formItems: [],
-            duration: 30,
-            mondayEnabled: true,
-            mondayTimes: '',
-            tuesdayEnabled: true,
-            tuesdayTimes: '',
-            wednesdayEnabled: true,
-            wednesdayTimes: '',
-            thursdayEnabled: true,
-            thursdayTimes: '',
-            fridayEnabled: true,
-            fridayTimes: '',
-            saturdayEnabled: false,
-            saturdayTimes: '',
-            sundayEnabled: false,
-            sundayTimes: ''
-        });
-        setFormItems([]);
-    };
-
-    const handleNewItemChange = (field, value) => {
-        setNewItemData(prev => ({ ...prev, [field]: value }));
-    };
+        if (id) {
+            if (existingItem) {
+                setIsEditMode(true);
+                setExistingMeetingData(existingItem);
+                setFormData({
+                    title: existingItem.title || '',
+                    description: existingItem.description || '',
+                    duration: existingItem.duration || 30,
+                    availability: getInitialAvailability()
+                });
+            } else {
+                navigate('/pagenotfound');
+            }
+        }
+    }, [id, navigate]);
 
     const getPlaceholder = (field) => {
         switch (field) {
             case 'title':
-                return itemType === ITEM_TYPES.REDIRECT
-                    ? "Enter your title eg. My latest instagram reel"
-                    : itemType === ITEM_TYPES.FORM
-                        ? "Enter form title eg. Contact Us"
-                        : "Enter link title";
+                return "Enter link title";
             case 'url':
                 return "Enter your URL, eg. instagram.com/reel/DH-55c";
             case 'titleInside':
-                return "Enter internal title shown on the form";
+                return "Enter heading for this page";
             case 'description':
                 return "Enter description text";
             default:
@@ -236,11 +196,23 @@ const CreateMeetings = () => {
         }
     };
 
-    const [formItems, setFormItems] = useState([
-        { id: '1', type: 'Text', title: 'Sample Text', placeholder: 'Sample Placeholder' },
-    ]);
+    const parseTimeToMinutes = (timeStr) => {
+        const [time, period] = timeStr.split(' ');
+        const [hours, minutes] = time.split(':').map(Number);
+        let totalMinutes = hours % 12 * 60 + minutes;
+        if (period === 'PM' && hours !== 12) totalMinutes += 12 * 60;
+        return totalMinutes;
+    };
 
-    const generateTimeSlots = (start = "09:00", end = "22:00") => {
+    const formatMinutesToTime = (totalMinutes) => {
+        const hours = Math.floor(totalMinutes / 60) % 24;
+        const mins = totalMinutes % 60;
+        const period = hours < 12 ? 'AM' : 'PM';
+        const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+        return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
+    };
+
+    const generateTimeSlots = (start = "00:00", end = "23:45") => {
         const slots = [];
         let [h, m] = start.split(":").map(Number);
         const [endH, endM] = end.split(":").map(Number);
@@ -248,7 +220,8 @@ const CreateMeetings = () => {
         while (h < endH || (h === endH && m <= endM)) {
             const hour = h % 12 === 0 ? 12 : h % 12;
             const meridian = h < 12 ? "AM" : "PM";
-            const formatted = `${hour}:${m.toString().padStart(2, '0')} ${meridian}`;
+            // Ensure two-digit formatting for hours (09 instead of 9)
+            const formatted = `${hour.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${meridian}`;
             slots.push(formatted);
 
             m += 15;
@@ -261,41 +234,216 @@ const CreateMeetings = () => {
         return slots;
     };
 
-    const slots = generateTimeSlots();
-    const selectedRef = useRef(null);
+    const getNextAvailableTime = (day, index) => {
+        if (selectedSlotMeta.type === 'start' && index > 0) {
+            const prevEndTime = formData.availability[day].slots[index - 1].end;
+            const minutes = parseTimeToMinutes(prevEndTime) + 15;
+            return formatMinutesToTime(minutes);
+        }
+        return "00:00";
+    };
 
-    const [selectedTime, setSelectedTime] = useState("12:00 PM");
+    const selectedRef = useRef(null);
+    const [selectedTime, setSelectedTime] = useState("09:00 AM");
 
     useEffect(() => {
-        if (selectedRef.current) {
+        if (selectedRef.current && modelTimeAddOpen) {
             selectedRef.current.scrollIntoView({
-                behavior: "smooth",
-                block: "center"
+                block: "center",
+                behavior: "smooth"
             });
         }
-    }, [selectedTime]);
+    }, [selectedTime, modelTimeAddOpen]);
+
+    const handleInputChange = (field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleInputClick = (day, index, type, currentTime) => {
+        setSelectedSlotMeta({ day, index, type });
+        setSelectedTime(currentTime);
+
+        if (type === 'end') {
+            const startTime = formData.availability[day].slots[index].start;
+            const startMinutes = parseTimeToMinutes(startTime);
+            setMinTimeForPicker(formatMinutesToTime(startMinutes + 15).split(' ')[0]);
+            setMaxTimeForPicker("23:45");
+        } else { // start time
+            const baseTime = getNextAvailableTime(day, index);
+            setMinTimeForPicker(baseTime.split(' ')[0]);
+            setMaxTimeForPicker("23:30");
+        }
+
+        setModelTimeAddOpen(true);
+    };
+
+    const handleDayToggle = (day, enabled) => {
+        setFormData(prev => ({
+            ...prev,
+            availability: {
+                ...prev.availability,
+                [day]: {
+                    enabled,
+                    slots: enabled ? (prev.availability[day].slots.length === 0
+                        ? [{ start: '09:00 AM', end: '10:30 AM' }]
+                        : prev.availability[day].slots) : []
+                }
+            }
+        }));
+    };
+
+    const handleAddTimeSlot = (day) => {
+        const lastSlot = formData.availability[day].slots[formData.availability[day].slots.length - 1];
+        const defaultStart = lastSlot ?
+            formatMinutesToTime(parseTimeToMinutes(lastSlot.end) + 15) :
+            '09:00 AM';
+
+        const startMinutes = parseTimeToMinutes(defaultStart);
+        const endMinutes = Math.min(startMinutes + 90, parseTimeToMinutes("11:45 PM"));
+        const defaultEnd = formatMinutesToTime(endMinutes);
+
+        setFormData(prev => ({
+            ...prev,
+            availability: {
+                ...prev.availability,
+                [day]: {
+                    ...prev.availability[day],
+                    slots: [
+                        ...prev.availability[day].slots,
+                        { start: defaultStart, end: defaultEnd }
+                    ]
+                }
+            }
+        }));
+    };
+
+    const handleRemoveTimeSlot = (day, index) => {
+        setFormData(prev => ({
+            ...prev,
+            availability: {
+                ...prev.availability,
+                [day]: {
+                    ...prev.availability[day],
+                    slots: prev.availability[day].slots.filter((_, i) => i !== index)
+                }
+            }
+        }));
+    };
+
+    const handleTimeSelection = (time) => {
+        const { day, index, type } = selectedSlotMeta;
+
+        if (day !== null && index !== null && type) {
+            setFormData(prev => {
+                const updatedSlots = [...prev.availability[day].slots];
+                const currentSlot = updatedSlots[index];
+
+                if (type === 'end') {
+                    const startMinutes = parseTimeToMinutes(currentSlot.start);
+                    const endMinutes = parseTimeToMinutes(time);
+                    if (endMinutes <= startMinutes) {
+                        time = formatMinutesToTime(startMinutes + 15);
+                    }
+                } else if (type === 'start') {
+                    const startMinutes = parseTimeToMinutes(time);
+                    const endMinutes = parseTimeToMinutes(currentSlot.end);
+                    if (startMinutes >= endMinutes) {
+                        time = formatMinutesToTime(endMinutes - 15);
+                    }
+                    if (index > 0) {
+                        const prevEndMinutes = parseTimeToMinutes(prev.availability[day].slots[index - 1].end);
+                        if (startMinutes < prevEndMinutes + 15) {
+                            time = formatMinutesToTime(prevEndMinutes + 15);
+                        }
+                    }
+                }
+
+                updatedSlots[index] = {
+                    ...updatedSlots[index],
+                    [type]: time
+                };
+
+                // Merge overlapping slots after update
+                const mergedSlots = mergeOverlappingSlots(updatedSlots);
+
+                return {
+                    ...prev,
+                    availability: {
+                        ...prev.availability,
+                        [day]: {
+                            ...prev.availability[day],
+                            slots: mergedSlots
+                        }
+                    }
+                };
+            });
+        }
+        setModelTimeAddOpen(false);
+    };
+
+    const handleSaveMeeting = () => {
+        const savedItems = JSON.parse(localStorage.getItem("userContentInfo") || "[]");
+
+        // Merge overlapping slots before saving
+        const mergedAvailability = {};
+        Object.keys(formData.availability).forEach(day => {
+            mergedAvailability[day] = {
+                enabled: formData.availability[day].enabled,
+                slots: mergeOverlappingSlots(formData.availability[day].slots)
+            };
+        });
+
+        const newItem = {
+            id: isEditMode ? id : Date.now().toString(),
+            type: "Meeting Scheduler",
+            title: formData.title,
+            description: formData.description,
+            duration: formData.duration,
+            availability: mergedAvailability,
+            createdAt: isEditMode ? existingMeetingData.createdAt : new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        let updatedItems;
+        if (isEditMode) {
+            updatedItems = savedItems.map(item =>
+                item.id === id ? newItem : item
+            );
+        } else {
+            updatedItems = [...savedItems, newItem];
+        }
+
+        localStorage.setItem("userContentInfo", JSON.stringify(updatedItems));
+        navigate('/page/view-edit');
+    };
+
+    const slots = generateTimeSlots(minTimeForPicker, maxTimeForPicker);
 
     return (
         <Container>
-            {
-                modelFormAddOpen ?
-                    <ModelConatiner>
-                        <div className="model-closer" onClick={() => setModelFormAddOpen(false)}></div>
-                        <div className="model">
-                            <div className="all-times">
-                                {slots.map((time) => (
-                                    <div
-                                        key={time}
-                                        className={`one-time ${time === selectedTime ? "selected-time" : ""}`}
-                                        ref={time === selectedTime ? selectedRef : null}
-                                    >
-                                        {time}
-                                    </div>
-                                ))}
-                            </div>
+            {modelTimeAddOpen &&
+                <ModelConatiner>
+                    <div className="model-closer" onClick={() => setModelTimeAddOpen(false)}></div>
+                    <div className="model">
+                        <div className="all-times">
+                            {slots.map((time) => (
+                                <div
+                                    key={time}
+                                    className={`one-time ${time === selectedTime ? "selected-time" : ""}`}
+                                    ref={time === selectedTime ? selectedRef : null}
+                                    onClick={() => handleTimeSelection(time)}
+                                >
+                                    {time}
+                                </div>
+                            ))}
                         </div>
-                    </ModelConatiner> : null
+                    </div>
+                </ModelConatiner>
             }
+
             <div className="main-content">
                 <div className="top-bar">
                     <a href="/page/create" className="left">
@@ -303,36 +451,36 @@ const CreateMeetings = () => {
                     </a>
                     <a href="/page/view-edit" className="view-btn">View</a>
                 </div>
+
                 <div className="add-new-item">
                     <MainCreate>
                         <div className="input-container">
                             <div className="label">Heading</div>
                             <input
                                 className="input-basic"
-                                value={newItemData.titleInside}
-                                onChange={(e) => handleNewItemChange('titleInside', e.target.value)}
                                 placeholder={getPlaceholder('titleInside')}
+                                value={formData.title}
+                                onChange={(e) => handleInputChange('title', e.target.value)}
                             />
                         </div>
                         <div className="input-container">
                             <div className="label">Description (Optional)</div>
                             <textarea
                                 className="input-basic"
-                                value={newItemData.description}
-                                onChange={(e) => handleNewItemChange('description', e.target.value)}
                                 placeholder={getPlaceholder('description')}
+                                value={formData.description}
+                                onChange={(e) => handleInputChange('description', e.target.value)}
                             />
                         </div>
-
                         <div className="input-container">
                             <div className="label">Meeting Duration (in Minutes)</div>
                             <input
                                 className="input-basic"
                                 type="number"
-                                value={newItemData.duration || ''}
-                                onChange={(e) => handleNewItemChange('duration', e.target.value)}
                                 placeholder="30"
                                 min="0"
+                                value={formData.duration}
+                                onChange={(e) => handleInputChange('duration', Number(e.target.value))}
                             />
                         </div>
 
@@ -344,7 +492,7 @@ const CreateMeetings = () => {
                                 </div>
                             </div>
 
-                            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                            {Object.keys(formData.availability).map(day => (
                                 <div className="day-container" key={day}>
                                     <div className="day-open">
                                         <FormControlLabel
@@ -358,51 +506,52 @@ const CreateMeetings = () => {
                                             control={
                                                 <IOSSwitch
                                                     sx={{ m: 1 }}
-                                                    checked={newItemData[`${day.toLowerCase()}Enabled`] !== false}
-                                                    onChange={(e) => handleNewItemChange(
-                                                        `${day.toLowerCase()}Enabled`,
-                                                        e.target.checked
-                                                    )}
                                                     className="switch"
+                                                    checked={formData.availability[day]?.enabled}
+                                                    onChange={(e) => handleDayToggle(day, e.target.checked)}
                                                 />
                                             }
                                             label={day}
                                         />
                                     </div>
+
                                     <div className="day-time">
-                                        <div className="input-container-2">
-                                            {/* <input
-                                                className="input-basic"
-                                                value={newItemData[`${day.toLowerCase()}Times`] || ''}
-                                                onChange={(e) => handleNewItemChange(
-                                                    `${day.toLowerCase()}Times`,
-                                                    e.target.value
+                                        {formData.availability[day].enabled && formData.availability[day].slots.map((slot, index) => (
+                                            <div className="input-container-2" key={index}>
+                                                <div
+                                                    className="input-time"
+                                                    onClick={() => handleInputClick(day, index, 'start', slot.start)}
+                                                >
+                                                    {slot.start}
+                                                </div>
+
+                                                <RemoveIcon className="space" />
+
+                                                <div
+                                                    className="input-time"
+                                                    onClick={() => handleInputClick(day, index, 'end', slot.end)}
+                                                >
+                                                    {slot.end}
+                                                </div>
+
+                                                {index === 0 ? (
+                                                    <div className="add-more-time-btn" onClick={() => handleAddTimeSlot(day)}>
+                                                        <AddIcon />
+                                                    </div>
+                                                ) : (
+                                                    <div className="add-more-time-btn" onClick={() => handleRemoveTimeSlot(day, index)}>
+                                                        <DeleteIcon />
+                                                    </div>
                                                 )}
-                                                placeholder={newItemData[`${day.toLowerCase()}Enabled`] === true ? "eg., 09:00-12:00, 14:00-18:00" : "Not available on this day."}
-                                                disabled={newItemData[`${day.toLowerCase()}Enabled`] === false}
-                                            /> */}
-
-                                            <div className="input-time">
-                                                09:00 AM
                                             </div>
-
-                                            <RemoveIcon className="space" />
-
-                                            <div className="input-time">
-                                                10:30 AM
-                                            </div>
-
-                                            <div className="add-more-time-btn">
-                                                <AddIcon />
-                                            </div>
-                                        </div>
+                                        ))}
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <button className="add-btn" onClick={handleAddItem}>
-                            Add to Page
+                        <button className="add-btn" onClick={handleSaveMeeting}>
+                            {isEditMode ? "Update Meeting" : "Add to Page"}
                         </button>
                     </MainCreate>
                 </div>
@@ -429,7 +578,8 @@ const Container = styled.div`
 
     .meeting-select{
       .info{
-        margin: 20px 0;
+        margin: 30px 0;
+        /* margin-bottom: 50px; */
         display: flex;
         align-items: flex-start;
 
@@ -448,8 +598,10 @@ const Container = styled.div`
       .day-container{
         display: flex;
         flex-direction: column;
+        margin-bottom: 20px;
 
         .day-open{
+          margin-bottom: 10px;
           .switch{
             scale: 0.75;
           }
@@ -544,10 +696,9 @@ const Container = styled.div`
         }
 
         .add-new-item{
-            padding: 40px 0;
-            margin-bottom: 40px;
-            
-            border-bottom: 1px solid #313232;
+            padding: 20px 0;
+            /* margin-bottom: 20px; */
+            /* border-bottom: 1px solid #313232; */
             
             .selector{
                 display: flex;
@@ -793,7 +944,7 @@ const MainCreate = styled.div`
         width: 100%;
         padding-bottom: 20px;
         margin-top: 10px;
-        margin-bottom: 20px;
+        /* margin-bottom: 20px; */
         
         display: flex;
         align-items: center;
@@ -808,11 +959,12 @@ const MainCreate = styled.div`
             border-radius: 10px;
             background-color:rgb(22, 22, 22);
             border: 1px solid #363636;
-            padding: 7.5px 15px;
+            padding: 7.5px 0;
             color: white;
             resize: none;
             font-size: 0.75rem;
             font-weight: 300;
+            text-align: center;
         }
 
         .space{
@@ -832,162 +984,6 @@ const MainCreate = styled.div`
         textarea{
             height: 200px;
         }
-    }
-
-    .form-content{
-      width: 100%;
-      margin-top: 30px;
-      border-bottom: 1px solid #313231ba;
-      padding-bottom: 20px;
-      /* background-color: orange; */
-
-      .content-title{
-          font-size: 0.85rem;
-          font-weight: 500;
-          margin-bottom: 20px;
-      }
-
-      .item {
-          width: 100%;
-          min-height: 60px;
-          border-radius: 10px;
-          background-color: #333;
-          margin-bottom: 10px;
-          padding: 10px 50px;
-
-          touch-action: none; /* Changed from manipulation to none */
-          user-select: none;
-          cursor: default; /* Changed from grab to default */
-          display: flex;
-          align-items: center;
-          color: white;
-          font-size: 1.2rem;
-          position: relative;
-
-          &.dragging {
-              border: 2px solid white;
-              scale: 0.85;
-              transition: transform 0.1s ease, border 0.25s ease;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-              cursor: grabbing;
-          }
-
-          .drag-btn {
-              position: absolute;
-              left: 0;
-              top: 0;
-              height: 100%;
-              display: grid;
-              place-items: center;
-              width: 50px;
-              cursor: grab; /* Add grab cursor only to handle */
-          
-              &:active {
-                  cursor: grabbing;
-              }
-
-              svg {
-                  font-size: 1.25rem;
-                  opacity: 0.7;
-                  transition: opacity 0.2s ease;
-              }
-
-              &:hover svg {
-                  opacity: 1;
-              }
-          }
-
-          .item-content {
-              .item-type{
-                  font-size: 0.75rem;
-                  font-weight: 200;
-              }
-          
-              .item-title {
-                  margin-top: 5px;
-                  font-size: 0.85rem;
-                  font-weight: 500;
-              }
-              
-              .item-placeholder {
-                  margin-top: 5px;
-                  font-size: 0.75rem;
-                  font-weight: 300;
-                  letter-spacing: 0.05rem;
-              }
-          }
-
-          .delete-btn{
-            position: absolute;
-            right: -10px;
-            top: -10px;
-
-            svg {
-              cursor: pointer;
-              font-size: 1.25rem;
-              opacity: 0.7;
-              transition: opacity 0.2s ease;
-            }
-
-            &:hover svg {
-                opacity: 1;
-            }
-          }
-
-          .edit-btn { 
-              position: absolute;
-              right: 0;
-              top: 0;
-              height: 100%;
-              display: grid;
-              place-items: center;
-              width: 50px;
-
-              svg {
-                  cursor: pointer;
-                  font-size: 1.25rem;
-                  opacity: 0.7;
-                  transition: opacity 0.2s ease;
-              }
-
-              &:hover svg {
-                  opacity: 1;
-              }
-          }
-      }
-
-      .subgroup{
-          margin-top: 50px;
-      }
-      
-      .add-field-btn{
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-top: 20px;
-
-          .line{
-            flex: 1;
-            height: 2px;
-            border-radius: 100px;
-            background-color: #696969;
-          }
-
-          .text{
-            font-size: 0.75rem;
-            margin: 0 10px;
-          }
-      }
-    }
-
-    .save-btn{
-      margin-top: 20px;
-      border: 1px solid #363636;
-      background-color: #333333;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 0.75rem;
-      font-weight: 300;
     }
 
     .add-btn{
@@ -1047,13 +1043,12 @@ const ModelConatiner = styled.div`
             display: flex;
             flex-direction: column;
             align-items: center;
-
             max-height: 400px;
             overflow-y: scroll;
 
             .one-time{
                 width: 100%;
-                padding: 10px;
+                padding: 10px 0;
                 margin: 5px;
                 /* background-color: orange; */
                 font-size: 0.85rem;
@@ -1071,3 +1066,4 @@ const ModelConatiner = styled.div`
         }
     }
 `
+
