@@ -35,12 +35,13 @@ import BasicInfo from "./BasicInfo";
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 const ITEM_TYPES = {
-  REDIRECT: 'Redirect Links',
+  REDIRECT: 'Redirect Link',
   SUBGROUP: 'Subgroup',
   FOLDER_REDIRECT: 'Folder for Redirect Links',
   FORM: 'Custom Form',
   MEETING_SCHEDULER: 'Meeting Scheduler',
   WRITE_CONTENT: 'Write your content',
+  ANONYMOUS: 'Anonymous Replies',
 };
 
 const getRouteForType = (type) => {
@@ -88,6 +89,7 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
     url: item.url || '',
     titleInside: item.titleInside || '',
     description: item.description || '',
+    question: item.question || '',
     duration: item.duration || 30,
     // Initialize all days with their current values or defaults
     mondayEnabled: item.mondayEnabled !== false,
@@ -141,11 +143,22 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
             </div>
           )}
 
-          {(item.type !== ITEM_TYPES.REDIRECT && item.type !== ITEM_TYPES.SUBGROUP) && (
+          {(item.type !== ITEM_TYPES.REDIRECT && item.type !== ITEM_TYPES.ANONYMOUS && item.type !== ITEM_TYPES.SUBGROUP) && (
             <a href={`${getRouteForType(item.type)}/${item.id}`} className="inside-edit-btn">
               <div className="text">View or Update inside content</div>
               <ChevronRightIcon />
             </a>
+          )}
+
+          {item.type === ITEM_TYPES.ANONYMOUS && (
+            <div className="input-container">
+              <div className="label">Question</div>
+              <input
+                className="input-basic"
+                value={editData.question}
+                onChange={(e) => handleEditChange('question', e.target.value)}
+              />
+            </div>
           )}
 
           <div className="edit-actions">
@@ -174,6 +187,7 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
         <div className="item-type">Type : <b>{item.type}</b></div>
         <div className="item-title">{item.title}</div>
         {item.url && <div className="item-url">{item.url}</div>}
+        {item.question && <div className="item-ques">{item.question}</div>}
       </div>
       <div className="edit-btn" onClick={() => onEdit(item.id)}>
         <EditIcon />
@@ -202,6 +216,7 @@ const CreateYourPage = () => {
     url: '',
     titleInside: '',
     description: '',
+    question: '',
     duration: 30, // Default meeting duration
     // Initialize all days as enabled with empty times
     mondayEnabled: true,
@@ -250,6 +265,7 @@ const CreateYourPage = () => {
       type: itemType,
       title: newItemData.title,
       ...(itemType === ITEM_TYPES.REDIRECT && { url: newItemData.url }),
+      ...(itemType === ITEM_TYPES.ANONYMOUS && { question: newItemData.question }),
     };
 
     setItems([...items, newItem]);
@@ -260,6 +276,7 @@ const CreateYourPage = () => {
       url: '',
       titleInside: '',
       description: '',
+      question: '',
       formItems: [],
       duration: 30,
       mondayEnabled: true,
@@ -377,6 +394,18 @@ const CreateYourPage = () => {
                   value={newItemData.url}
                   onChange={(e) => handleNewItemChange('url', e.target.value)}
                   placeholder={getPlaceholder('url')}
+                />
+              </div>
+            )}
+
+            {itemType === ITEM_TYPES.ANONYMOUS && (
+              <div className="input-container">
+                <div className="label">Question</div>
+                <input
+                  className="input-basic"
+                  value={newItemData.question}
+                  onChange={(e) => handleNewItemChange('question', e.target.value)}
+                  placeholder="Enter your anonymous question"
                 />
               </div>
             )}
@@ -635,6 +664,14 @@ const Container = styled.div`
                         font-size: 0.75rem;
                         font-weight: 300;
                         color: cornflowerblue;
+                        letter-spacing: 0.05rem;
+                    }
+
+                    .item-ques {
+                        margin-top: 5px;
+                        font-size: 0.75rem;
+                        font-weight: 300;
+                        color: yellowgreen;
                         letter-spacing: 0.05rem;
                     }
 

@@ -107,43 +107,43 @@ const CreateWrite = () => {
     }, [writeData.writeItems]);
 
     const handleSaveAndUpdate = () => {
-    const storedRaw = localStorage.getItem("userContentInfo");
-    let storedData = [];
+        const storedRaw = localStorage.getItem("userContentInfo");
+        let storedData = [];
 
-    try {
-        storedData = JSON.parse(storedRaw);
-        if (!Array.isArray(storedData)) {
-            storedData = [storedData];
-        }
-    } catch {
-        storedData = [];
-    }
-
-    const existingEntry = storedData.find(entry => entry.id === id);
-
-    // Preserve everything not in writeData
-    const preservedFields = {};
-    if (existingEntry) {
-        Object.keys(existingEntry).forEach(key => {
-            if (!(key in writeData)) {
-                preservedFields[key] = existingEntry[key];
+        try {
+            storedData = JSON.parse(storedRaw);
+            if (!Array.isArray(storedData)) {
+                storedData = [storedData];
             }
-        });
-    }
+        } catch {
+            storedData = [];
+        }
 
-    const updatedEntry = {
-        id,
-        ...preservedFields,
-        ...writeData, // writeData can override fields if needed
+        const existingEntry = storedData.find(entry => entry.id === id);
+
+        // Preserve everything not in writeData
+        const preservedFields = {};
+        if (existingEntry) {
+            Object.keys(existingEntry).forEach(key => {
+                if (!(key in writeData)) {
+                    preservedFields[key] = existingEntry[key];
+                }
+            });
+        }
+
+        const updatedEntry = {
+            id,
+            ...preservedFields,
+            ...writeData, // writeData can override fields if needed
+        };
+
+        const updatedData = storedData.filter(entry => entry.id !== id);
+        updatedData.push(updatedEntry);
+
+        localStorage.setItem("userContentInfo", JSON.stringify(updatedData));
+
+        alert("Content saved successfully!");
     };
-
-    const updatedData = storedData.filter(entry => entry.id !== id);
-    updatedData.push(updatedEntry);
-
-    localStorage.setItem("userContentInfo", JSON.stringify(updatedData));
-
-    alert("Content saved successfully!");
-};
 
 
     return (
