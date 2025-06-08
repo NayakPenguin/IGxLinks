@@ -245,30 +245,47 @@ const CreateWrite = () => {
                                 <div key={item.id} className="preview-item">
                                     {!item.isEditing ? (
                                         <>
-                                            <div><strong>Type:</strong> {item.type}</div>
+                                            {/* <div><strong>Type:</strong> {item.type}</div> */}
                                             {item.type === "Link" ? (
-                                                <>
-                                                    <div><strong>Title:</strong> {item.title}</div>
-                                                    <div><strong>URL:</strong> {item.url}</div>
-                                                </>
+                                                <div className="link">
+                                                    <a href={item.url}>{item.title}</a>
+                                                </div>
                                             ) : item.type === "Numeric Point" ? (
+                                                <div className="numeric-point">
+                                                    <div className="num">{item.pointNumber}.</div>
+                                                    <p>{item.content}</p>
+                                                </div>
+                                            ) : item.type === "Subheading" ? (
                                                 <>
-                                                    <div><strong>Point #{item.pointNumber}</strong>: {item.content}</div>
+                                                    <h3>{item.content}</h3>
                                                 </>
+                                            ) : item.type === "Paragraph" ? (
+                                                <>
+                                                    <p>{item.content}</p>
+                                                </>
+                                            ) : item.type === "Bullet Point" ? (
+                                                <ul>
+                                                    <li>{item.content}</li>
+                                                </ul>
                                             ) : (
                                                 <div>{item.content}</div>
                                             )}
 
-                                            <button onClick={() => {
-                                                const updated = [...writeData.writeItems];
-                                                updated[index].isEditing = true;
-                                                setWriteData({ ...writeData, writeItems: updated });
-                                            }}>Edit</button>
+                                            {/*  */}
 
-                                            <button onClick={() => {
-                                                const updated = writeData.writeItems.filter((_, i) => i !== index);
-                                                setWriteData({ ...writeData, writeItems: updated });
-                                            }}>Delete</button>
+                                            <div className="control-btns">
+                                                <div className="control-btn" onClick={() => {
+                                                    const updated = [...writeData.writeItems];
+                                                    updated[index].isEditing = true;
+                                                    setWriteData({ ...writeData, writeItems: updated });
+                                                }}>Edit</div>
+
+                                                <div className="control-btn" onClick={() => {
+                                                    const updated = writeData.writeItems.filter((_, i) => i !== index);
+                                                    setWriteData({ ...writeData, writeItems: updated });
+                                                }}>Delete</div>
+                                            </div>
+
                                         </>
                                     ) : (
                                         <>
@@ -714,5 +731,64 @@ const MainCreate = styled.div`
     .full{
         margin-top: 20px;
         width: 100%;
+    }
+
+    .preview-section{
+        .control-btns{
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+
+            .control-btn{
+                font-size: 0.75rem;
+                color: orange;
+                margin-right: 15px;
+            }
+        }
+
+        h3{
+            font-size: 1rem;
+        }
+
+        p{
+            margin-top: 25px;
+            font-size: 0.85rem;
+            font-weight: 200;
+        }
+
+        ul{
+            margin-left: 15px;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            font-weight: 200;
+        }
+
+        .numeric-point{
+            margin-top: 25px;
+            display: flex;
+            align-items: flex-start;
+
+            .num{
+                font-size: 0.85rem;
+                font-weight: 200;
+                margin-right: 10px;
+            }
+
+            p{
+                margin-top: 0px;
+                font-size: 0.85rem;
+                font-weight: 200;
+            }
+        }
+
+        .link{
+            margin-top: 25px;
+
+            a{
+                text-decoration: none;
+                font-size: 0.85rem;
+                font-weight: 500;
+            }
+        }
     }
 `
