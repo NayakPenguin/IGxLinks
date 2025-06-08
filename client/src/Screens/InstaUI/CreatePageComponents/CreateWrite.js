@@ -73,10 +73,38 @@ const CreateWrite = () => {
                             />
                         </div>
 
-                        
+                        <div className="all-opts">
+                                {["Subheading", "Paragraph", "Bullet Point", "Numeric Point", "Link"].map((val) => (
+                                    <div
+                                        className={`opt ${val == "Bullet Point" ? 'selected' : ''}`}
+                                    >
+                                        {val}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="input-container input-modified">
+                                <div className="label">Subheading</div>
+                            <input
+                                className="input-basic"
+                                placeholder="Enter subheading"
+                            />
+                        </div>
+
+                        <div className="input-container input-modified">
+                            <div className="label">Paragraph</div>
+                            <textarea
+                                className="input-basic"
+                                placeholder="Enter paragraph"
+                            />
+                        </div>
 
                         <button className="add-btn">
-                            Update Write
+                            Add to your writing
+                        </button>
+
+                        <button className="add-btn full">
+                            Save and update
                         </button>
                     </MainCreate>
                 </div>
@@ -175,73 +203,6 @@ const Container = styled.div`
                 text-decoration: none;
                 font-weight: 200;
                 letter-spacing: 0.07rem;
-            }
-        }
-
-        .add-new-item{
-            /* padding: 20px 0; */
-            /* border-bottom: 1px solid #313232; */
-            
-            .selector{
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                
-                .add-type{
-                    flex: 1;
-                    /* background-color: #333;
-                    padding: 10px 20px;
-                    border-radius: 10px;
-                    font-size: 0.85rem; */
-                    /* margin-right: 20px; */
-    
-                    display: flex;
-                    flex-direction: column;
-                    // align-items: center;
-                    // justify-content: space-between;
-    
-                    font-weight: 200;
-                    letter-spacing: 0.06rem;
-
-                    .top{
-                      background-color: #333;
-                      padding: 10px 20px;
-                      border-radius: 10px;
-                      font-size: 0.85rem;
-                      font-weight: 500;
-                      display: flex;
-                      align-items: center;
-                      justify-content: space-between;
-                    }
-
-                    .bottom{
-                      .select-opt{
-                        background-color: #161616;
-                        border: 1px solid #363636;
-                        padding: 10px 20px;
-                        border-radius: 10px;
-                        font-size: 0.85rem;
-                        margin: 10px 0;
-                      }
-
-                      &:last-child {
-                        margin-bottom: 0;
-                      }
-                    }
-    
-                    svg{
-                        font-size: 1.5rem;
-                    }
-                }
-    
-                .add-btn{
-                  border: none;
-                  background-color: #0095f6;
-                  padding: 10px 20px;
-                  border-radius: 10px;
-                  font-size: 0.85rem;
-                  font-weight: 500;
-                }
             }
         }
 
@@ -416,149 +377,13 @@ const MainCreate = styled.div`
         }
     }
 
-    .form-content{
-      width: 100%;
-      margin-top: 30px;
-      border-bottom: 1px solid #313231ba;
-      padding-bottom: 20px;
-      /* background-color: orange; */
-
-      .content-title{
-          font-size: 0.85rem;
-          font-weight: 500;
-          margin-bottom: 20px;
-      }
-
-      .item {
-          width: 100%;
-          min-height: 60px;
-          border-radius: 10px;
-          background-color: #333;
-          margin-bottom: 10px;
-          padding: 10px 50px;
-
-          touch-action: none; /* Changed from manipulation to none */
-          user-select: none;
-          cursor: default; /* Changed from grab to default */
-          display: flex;
-          align-items: center;
-          color: white;
-          font-size: 1.2rem;
-          position: relative;
-
-          &.dragging {
-              border: 2px solid white;
-              scale: 0.85;
-              transition: transform 0.1s ease, border 0.25s ease;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-              cursor: grabbing;
-          }
-
-          .drag-btn {
-              position: absolute;
-              left: 0;
-              top: 0;
-              height: 100%;
-              display: grid;
-              place-items: center;
-              width: 50px;
-              cursor: grab; /* Add grab cursor only to handle */
-          
-              &:active {
-                  cursor: grabbing;
-              }
-
-              svg {
-                  font-size: 1.25rem;
-                  opacity: 0.7;
-                  transition: opacity 0.2s ease;
-              }
-
-              &:hover svg {
-                  opacity: 1;
-              }
-          }
-
-          .item-content {
-              .item-type{
-                  font-size: 0.75rem;
-                  font-weight: 200;
-              }
-          
-              .item-title {
-                  margin-top: 5px;
-                  font-size: 0.85rem;
-                  font-weight: 500;
-              }
-              
-              .item-placeholder {
-                  margin-top: 5px;
-                  font-size: 0.75rem;
-                  font-weight: 300;
-                  letter-spacing: 0.05rem;
-              }
-          }
-
-          .delete-btn{
-            position: absolute;
-            right: -10px;
-            top: -10px;
-
-            svg {
-              cursor: pointer;
-              font-size: 1.25rem;
-              opacity: 0.7;
-              transition: opacity 0.2s ease;
-            }
-
-            &:hover svg {
-                opacity: 1;
-            }
-          }
-
-          .edit-btn { 
-              position: absolute;
-              right: 0;
-              top: 0;
-              height: 100%;
-              display: grid;
-              place-items: center;
-              width: 50px;
-
-              svg {
-                  cursor: pointer;
-                  font-size: 1.25rem;
-                  opacity: 0.7;
-                  transition: opacity 0.2s ease;
-              }
-
-              &:hover svg {
-                  opacity: 1;
-              }
-          }
-      }
-
-      .subgroup{
-          margin-top: 50px;
-      }
-      
-      // edit from the parent
-      .input-container{
-        width: 100%;
-        margin-top: 20px;
+    .input-modified{
+        margin-top: 10px;
         border-bottom: none;
-        padding-bottom: 0;
-        /* background-color: orange; */
-
-        .label{
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
 
         .input-basic{
-            width: 100%;
-            border-radius: 10px;
-            margin: 15px 0 5px 0;
+            margin: 0;
+            margin-top: 15px;
             /* outline: none; */
             /* background-color: transparent; */
             background-color:rgb(22, 22, 22);
@@ -571,41 +396,6 @@ const MainCreate = styled.div`
             /* letter-spacing: 0.1rem; */
             /* outline: white; */
         }
-        
-        .input-basic:focus {
-            outline: 1px solid white;
-            outline-offset: 2px; 
-            letter-spacing: 0.1rem;
-            transition: outline 125ms ease, letter-spacing 125ms ease;
-        }
-
-        textarea{
-            height: 200px;
-        }
-      }
-
-      .add-field-btn{
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-top: 20px;
-
-          .line{
-            flex: 1;
-            height: 2px;
-            border-radius: 100px;
-            background-color: #696969;
-          }
-
-          .text{
-            font-size: 0.75rem;
-            margin: 0 10px;
-
-            svg{
-                margin-bottom: -5px;
-            }
-          }
-      }
     }
 
     .save-btn{
@@ -618,9 +408,35 @@ const MainCreate = styled.div`
       font-weight: 300;
     }
 
+    .all-opts{
+        display: flex;
+        flex-wrap: wrap;
+        margin: 15px 0 30px 0;
+
+        .opt{
+            margin-top: 5px;
+            padding: 10px;
+            margin-right: 5px;
+            border-radius: 10px;
+            background-color:rgb(22, 22, 22);
+            border: 1px solid #363636;
+            color: #8d8d8d;
+            font-size: 0.75rem;
+            font-weight: 300;
+
+            display: grid;
+            place-items: center;
+        }
+
+        .selected{
+            font-weight: 500;
+            border-color: white;
+            color: white;
+        }
+    }
+
     .add-btn{
         border: none;
-        margin-top: 20px;
         background-color: #0095f6;
         padding: 10px 20px;
         border-radius: 10px;
@@ -628,146 +444,9 @@ const MainCreate = styled.div`
         font-weight: 300;
         text-align: center;
     }
-`
-
-const MainEdit = styled.div`
-    width: calc(100% + 100px);
-    padding: 30px 0px;
-    /* border-left: 10px solid white; */
-    /* border-radius: 10px; */
-    margin: -10px -50px;
-    background-color: black;
-    border-bottom: 1px solid white;
-    border-top: 1px solid #333333;
-
-    .input-container{
+    
+    .full{
+        margin-top: 20px;
         width: 100%;
-        /* border-bottom: 1px solid #313231ba; */
-        /* padding-bottom: 20px; */
-        margin-bottom: 20px;
-
-        .label{
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .input-basic{
-            width: 100%;
-            border-radius: 10px;
-            margin: 15px 0 5px 0;
-            /* outline: none; */
-            /* background-color: transparent; */
-            background-color:rgb(22, 22, 22);
-            border: 1px solid #363636;
-            padding: 15px;
-            color: white;
-            resize: none;
-            font-size: 0.75rem;
-            font-weight: 300;
-            /* letter-spacing: 0.1rem; */
-            /* outline: white; */
-        }
-        
-        .input-basic:focus {
-            outline: 1px solid white;
-            outline-offset: 2px; 
-            letter-spacing: 0.1rem;
-            transition: outline 125ms ease, letter-spacing 125ms ease;
-        }
-
-        textarea{
-            height: 200px;
-        }
-    }
-
-    .edit-actions{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        
-        button{
-            width: calc(50% - 10px);
-            border: none;
-            background-color: #0095f6;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 300;
-            text-align: center;
-            cursor: pointer;
-        }
-    }
-`
-
-
-const ModelConatiner = styled.div`
-    width: 100vw;
-    height: calc(100vh - 60px);
-    
-    z-index: 1002;
-    
-    position: fixed;
-    top: 0;
-    left: 0;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    
-    
-    .model-closer{
-        width: 100vw;
-        height: calc(100vh - 60px);
-        
-        position: absolute;
-        top: 0;
-        left: 0;
-        
-        background-color: #00000085; 
-    }
-
-    .model{ 
-        width: 80%;
-        /* height: 70%; */
-        max-width: 400px;
-        border-radius: 10px;
-        /* margin-top: -50px; */
-        background-color: white;
-        z-index: 1009;
-        padding: 20px;
-
-        
-        .model-title{
-          color: #333;
-          font-size: 0.85rem;
-          font-weight: 500;
-        }
-        
-        .checkboxes{
-          .opt {
-            display: flex;
-            align-items: center;
-            margin: 10px 20px;
-
-            label{
-              color: #333;
-              margin-left: 10px;
-              font-size: 0.75rem;
-              /* margin-top: -15px; */
-            }
-          }
-        }
-
-        .done-btn{
-          border: none;
-          margin-top: 20px;
-          background-color: #0095f6;
-          padding: 10px 20px;
-          border-radius: 10px;
-          font-size: 0.75rem;
-          font-weight: 300;
-          text-align: center;
-        }
     }
 `
