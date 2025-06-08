@@ -27,6 +27,7 @@ import ViewChanges from "./Screens/InstaUI/CreatePageComponents/ViewChanges";
 import CreateMeetings from "./Screens/InstaUI/CreatePageComponents/CreateMeetings";
 import CreateForm from "./Screens/InstaUI/CreatePageComponents/CreateForm";
 import CreateRedirect from "./Screens/InstaUI/CreatePageComponents/CreateRedirect";
+import CreateWrite from "./Screens/InstaUI/CreatePageComponents/CreateWrite";
 
 const App = () => {
   return (
@@ -46,6 +47,7 @@ const App = () => {
         <Route path="/page/meeting/:id" element={<CreateMeetings />} />
         <Route path="/page/form/:id" element={<CreateForm />} />
         <Route path="/page/folder/:id" element={<CreateRedirect />} />
+        <Route path="/page/write/:id" element={<CreateWrite />} />
         
         
         <Route path="/dashboard" element={<Dashboard />} />
