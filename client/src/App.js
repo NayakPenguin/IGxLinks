@@ -25,6 +25,7 @@ import BasicUser2 from "./Screens/InstaUI/BasicUser2";
 import CreateYourPage from "./Screens/InstaUI/CreatePageComponents/CreateYourPage";
 import ViewChanges from "./Screens/InstaUI/CreatePageComponents/ViewChanges";
 import CreateMeetings from "./Screens/InstaUI/CreatePageComponents/CreateMeetings";
+import CreateForm from "./Screens/InstaUI/CreatePageComponents/CreateForm";
 
 const App = () => {
   return (
@@ -42,6 +43,7 @@ const App = () => {
         <Route path="/page/create" element={<CreateYourPage />} />
         <Route path="/page/view-edit" element={<ViewChanges />} />
         <Route path="/page/meeting/:id" element={<CreateMeetings />} />
+        <Route path="/page/form/:id" element={<CreateForm />} />
         
         
         <Route path="/dashboard" element={<Dashboard />} />
