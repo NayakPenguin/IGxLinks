@@ -24,7 +24,8 @@ import ControlFooter from "../../../Components/ControlFooter";
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { useParams, useNavigate } from "react-router-dom";
 
-const FormContentItem = ({ item, index, onEdit, onDelete, onReorder }) => {
+// FormContentItem.jsx
+const FormContentItem = ({ item, index, onEdit, onDelete }) => {
     const {
         attributes,
         listeners,
@@ -53,7 +54,7 @@ const FormContentItem = ({ item, index, onEdit, onDelete, onReorder }) => {
             <div className="item-content">
                 <div className="item-type">Type: {item.type}</div>
                 <div className="item-title">{item.title}</div>
-                {item.placeholder && <div className="item-placeholder">{item.placeholder}</div>}
+                {item.url && <div className="item-url">{item.url}</div>}
             </div>
             <div className="edit-btn" onClick={() => onEdit(index)}>
                 <EditIcon />
@@ -65,160 +66,113 @@ const FormContentItem = ({ item, index, onEdit, onDelete, onReorder }) => {
     );
 };
 
-const CreateForm = () => {
+// CreateRedirect.jsx
+const CreateRedirect = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [isEditMode, setIsEditMode] = useState(false);
     const [existingFormData, setExistingFormData] = useState(null);
 
-    const [modelFormAddOpen, setModelFormAddOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState('Text');
-    const options = ['Text', 'Long Answer', 'Email', 'Number'];
-
-    // Initialize form data
     const [formData, setFormData] = useState({
         titleInside: '',
         description: '',
-        formItems: [
-            { id: '1', type: 'Text', title: 'Sample Text', placeholder: 'Sample Placeholder' },
+        linkItems: [
+            {
+                id: '1',
+                type: 'Text',
+                title: 'Sample Title',
+                url: 'https://example.com',
+            }
         ]
     });
 
-    // Load existing data if in edit mode
     useEffect(() => {
-        const savedItems = JSON.parse(localStorage.getItem("userContentInfo") || []);
-        const existingItem = savedItems.find(item => item.id === id);
+        const saved = JSON.parse(localStorage.getItem("userContentInfo") || "[]");
+        const existingItem = saved.find(item => item.id === id);
 
-        if (id) {
-            if (existingItem) {
-                setIsEditMode(true);
-                setExistingFormData(existingItem);
-                setFormData({
-                    titleInside: existingItem.titleInside || '',
-                    description: existingItem.description || '',
-                    formItems: existingItem.formItems || []
-                });
-            } else {
-                // navigate('/pagenotfound');
-            }
+        if (existingItem) {
+            setIsEditMode(true);
+            setExistingFormData(existingItem);
+            setFormData({
+                titleInside: existingItem.titleInside || '',
+                description: existingItem.description || '',
+                linkItems: existingItem.linkItems || []
+            });
         }
-    }, [id, navigate]);
+    }, [id]);
 
-    const handleOptionSelect = (option) => {
-        setSelectedOption(option);
-    };
-
-    const saveOptionSelect = () => {
-        setModelFormAddOpen(false);
-        setFormData(prev => ({
-            ...prev,
-            formItems: [
-                ...prev.formItems,
-                {
-                    id: Date.now().toString(),
-                    type: selectedOption,
-                    title: 'New Field',
-                    placeholder: ''
-                }
-            ]
-        }));
-    };
-
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(TouchSensor)
-    );
-
-    const handleNewItemChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
-
-    const getPlaceholder = (field) => {
-        switch (field) {
-            case 'titleInside':
-                return "Enter internal title shown on the form";
-            case 'description':
-                return "Enter description text";
-            default:
-                return "";
-        }
-    };
+    const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
 
     const [editingIndex, setEditingIndex] = useState(null);
     const [editData, setEditData] = useState({});
 
     const handleEdit = (index) => {
         setEditingIndex(index);
-        setEditData({ ...formData.formItems[index] });
-    };
-
-    const handleDragEndForm = (event) => {
-        const { active, over } = event;
-        if (active.id !== over.id) {
-            const oldIndex = formData.formItems.findIndex(item => item.id === active.id);
-            const newIndex = formData.formItems.findIndex(item => item.id === over.id);
-            setFormData(prev => ({
-                ...prev,
-                formItems: arrayMove(prev.formItems, oldIndex, newIndex)
-            }));
-        }
+        setEditData({ ...formData.linkItems[index] });
     };
 
     const handleSaveEditForm = () => {
-        setFormData(prev => {
-            const updatedItems = [...prev.formItems];
-            updatedItems[editingIndex] = editData;
-            return { ...prev, formItems: updatedItems };
-        });
+        const updated = [...formData.linkItems];
+        updated[editingIndex] = editData;
+        setFormData({ ...formData, linkItems: updated });
         setEditingIndex(null);
     };
 
     const handleDeleteForm = (index) => {
         setFormData(prev => ({
             ...prev,
-            formItems: prev.formItems.filter((_, i) => i !== index)
+            linkItems: prev.linkItems.filter((_, i) => i !== index)
         }));
     };
 
-    const handleAddField = () => {
-        setModelFormAddOpen(true);
+    const handleDragEndForm = (event) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        const oldIndex = formData.linkItems.findIndex(item => item.id === active.id);
+        const newIndex = formData.linkItems.findIndex(item => item.id === over.id);
+        const newItems = arrayMove(formData.linkItems, oldIndex, newIndex);
+        setFormData({ ...formData, linkItems: newItems });
     };
 
+    const handleNewItemChange = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleAddNewField = () => {
+        const newField = {
+            id: Date.now().toString(),
+            type: 'Text',
+            title: 'Sample Link Title',
+            url: 'example.com',
+        };
+        setFormData(prev => ({
+            ...prev,
+            linkItems: [...prev.linkItems, newField]
+        }));
+    };
+
+
     const handleSaveForm = () => {
-        const savedItems = JSON.parse(localStorage.getItem("userContentInfo") || []);
+        const savedItems = JSON.parse(localStorage.getItem("userContentInfo") || "[]");
 
-        const newItem = {
-            // Preserve specific fields from existing data
-            ...(isEditMode && {
-                title: existingFormData.title,
-                // Add any other fields you want to preserve here
-                someOtherField: existingFormData.someOtherField
-            }),
-
-            // Updated fields
+        const updatedItem = {
+            ...(isEditMode && { title: existingFormData.title }),
             id: isEditMode ? id : Date.now().toString(),
-            type: "Form",
+            type: "Folder for Redirect Links",
             titleInside: formData.titleInside,
             description: formData.description,
-            formItems: formData.formItems,
+            linkItems: formData.linkItems,
             updatedAt: new Date().toISOString(),
-
-            // New item fields
-            ...(!isEditMode && {
+            ...(isEditMode ? {} : {
                 createdAt: new Date().toISOString(),
-                title: 'Default Title' // Set default title for new forms if needed
+                title: 'Default Title'
             })
         };
 
-        // Rest of the save logic remains the same
-        let updatedItems;
-        if (isEditMode) {
-            updatedItems = savedItems.map(item =>
-                item.id === id ? newItem : item
-            );
-        } else {
-            updatedItems = [...savedItems, newItem];
-        }
+        const updatedItems = isEditMode
+            ? savedItems.map(item => item.id === id ? updatedItem : item)
+            : [...savedItems, updatedItem];
 
         localStorage.setItem("userContentInfo", JSON.stringify(updatedItems));
         navigate('/page/view-edit');
@@ -226,38 +180,9 @@ const CreateForm = () => {
 
     return (
         <Container>
-            {modelFormAddOpen && (
-                <ModelConatiner>
-                    <div className="model-closer" onClick={() => setModelFormAddOpen(false)}></div>
-                    <div className="model">
-                        <div className="model-title">Select the kind of form field you want to create</div>
-                        <div className="checkboxes">
-                            {options.map((option) => (
-                                <div
-                                    key={option}
-                                    className="opt"
-                                    onClick={() => handleOptionSelect(option)}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedOption === option}
-                                        onChange={() => { }}
-                                        readOnly
-                                    />
-                                    <label>{option}</label>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="done-btn" onClick={saveOptionSelect}>Done</div>
-                    </div>
-                </ModelConatiner>
-            )}
-
             <div className="main-content">
                 <div className="top-bar">
-                    <a href="/page/create" className="left">
-                        <ArrowBackIosIcon />
-                    </a>
+                    <a href="/page/create" className="left"><ArrowBackIosIcon /></a>
                     <a href="/page/view-edit" className="view-btn">View</a>
                 </div>
 
@@ -269,7 +194,7 @@ const CreateForm = () => {
                                 className="input-basic"
                                 value={formData.titleInside}
                                 onChange={(e) => handleNewItemChange('titleInside', e.target.value)}
-                                placeholder={getPlaceholder('titleInside')}
+                                placeholder="Enter internal title shown on the form"
                             />
                         </div>
 
@@ -279,7 +204,7 @@ const CreateForm = () => {
                                 className="input-basic"
                                 value={formData.description}
                                 onChange={(e) => handleNewItemChange('description', e.target.value)}
-                                placeholder={getPlaceholder('description')}
+                                placeholder="Enter description text"
                             />
                         </div>
 
@@ -291,10 +216,10 @@ const CreateForm = () => {
                                 modifiers={[restrictToVerticalAxis]}
                             >
                                 <SortableContext
-                                    items={formData.formItems.map(item => item.id)}
+                                    items={formData.linkItems.map(i => i.id)}
                                     strategy={verticalListSortingStrategy}
                                 >
-                                    {formData.formItems.map((item, index) => (
+                                    {formData.linkItems.map((item, index) => (
                                         <FormContentItem
                                             key={item.id}
                                             item={item}
@@ -309,30 +234,30 @@ const CreateForm = () => {
                             {editingIndex !== null && (
                                 <div className="form-edit">
                                     <div className="input-container">
-                                        <div className="label">Field Title</div>
+                                        <div className="label">Link Title</div>
                                         <input
                                             className="input-basic"
                                             value={editData.title}
                                             onChange={e => setEditData({ ...editData, title: e.target.value })}
-                                            placeholder={getPlaceholder('Field Title')}
+                                            placeholder="Enter link title"
                                         />
                                     </div>
+
                                     <div className="input-container">
-                                        <div className="label">Placeholder</div>
+                                        <div className="label">Link URL</div>
                                         <input
                                             className="input-basic"
-                                            value={editData.placeholder}
-                                            onChange={e => setEditData({ ...editData, placeholder: e.target.value })}
-                                            placeholder={getPlaceholder('Placeholder')}
+                                            value={editData.url}
+                                            onChange={e => setEditData({ ...editData, url: e.target.value })}
+                                            placeholder="https://example.com"
                                         />
                                     </div>
-                                    <button className="save-btn" onClick={handleSaveEditForm}>
-                                        Save Field
-                                    </button>
+
+                                    <button className="save-btn" onClick={handleSaveEditForm}>Save Field</button>
                                 </div>
                             )}
 
-                            <div className="add-field-btn" onClick={handleAddField}>
+                            <div className="add-field-btn" onClick={handleAddNewField}>
                                 <div className="line"></div>
                                 <div className="text"><AddIcon /></div>
                                 <div className="line"></div>
@@ -351,7 +276,8 @@ const CreateForm = () => {
     );
 };
 
-export default CreateForm;
+export default CreateRedirect;
+
 
 const Container = styled.div`
     width: 100vw;
@@ -366,56 +292,14 @@ const Container = styled.div`
     flex-direction: column;
     align-items: center;
 
-    .meeting-select{
-      .info{
-        margin: 20px 0;
-        display: flex;
-        align-items: flex-start;
-
-        svg{
-          font-size: 1.25rem;
-        }
-        
-        .text{
-          margin-left: 10px;
-          font-size: 0.7rem;
-          font-weight: 200;
-          letter-spacing: 0.05rem;
-        }
-      }
-
-      .day-container{
-        display: flex;
-        flex-direction: column;
-
-        .day-open{
-          .switch{
-            scale: 0.75;
-          }
-  
-          label{
-            font-size: 0.7rem;
-          }
-          
-        }      
-  
-        .day-time{
-          .input-container{
-            width: 100%;
-            margin: 0px 0 20px 0;
-            border-bottom: none;
-            padding-bottom: 0;
-
-            input:disabled {
-              border: none;
-              /* background-color: #363636; */
-            }
-          }
-        }
-      }
-
-
+    .item-url {
+        margin-top: 5px;
+        font-size: 0.75rem;
+        font-weight: 300;
+        color: cornflowerblue;
+        letter-spacing: 0.05rem;
     }
+
 
     .light{
         opacity: 0.5;
