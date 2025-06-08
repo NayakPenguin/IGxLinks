@@ -30,6 +30,21 @@ const CreateWrite = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [existingWriteData, setExistingWriteData] = useState(null);
 
+    useEffect(() => {
+        const storedData = localStorage.getItem("userContentInfo");
+        if (storedData) {
+            const parsed = JSON.parse(storedData);
+            const matchedEntry = parsed.find(entry => entry.id === id);
+            if (matchedEntry) {
+                setWriteData({
+                    titleInside: matchedEntry.titleInside || '',
+                    description: matchedEntry.description || '',
+                    writeItems: matchedEntry.writeItems || []
+                });
+            }
+        }
+    }, [id]);
+
     const [selectedType, setSelectedType] = useState("Subheading");
 
     const [inputData, setInputData] = useState({
@@ -90,6 +105,27 @@ const CreateWrite = () => {
     useEffect(() => {
         console.log("Updated Write Items:", writeData.writeItems);
     }, [writeData.writeItems]);
+
+    const handleSaveAndUpdate = () => {
+        const storedRaw = localStorage.getItem("userContentInfo");
+        let storedData = [];
+
+        try {
+            storedData = JSON.parse(storedRaw);
+            if (!Array.isArray(storedData)) {
+                storedData = [storedData]; // Normalize single object
+            }
+        } catch {
+            storedData = [];
+        }
+
+        const updated = storedData.filter(entry => entry.id !== id);
+        updated.push({ id, ...writeData });
+        localStorage.setItem("userContentInfo", JSON.stringify(updated));
+
+        // alert("Content saved successfully!");
+    };
+
 
     return (
         <Container>
@@ -288,7 +324,7 @@ const CreateWrite = () => {
 
                                         </>
                                     ) : (
-                                        <>
+                                        <div className="input-container input-modified">
                                             {/* Show editable fields */}
                                             {item.type === "Subheading" && (
                                                 <input
@@ -368,12 +404,12 @@ const CreateWrite = () => {
                                                     />
                                                 </>
                                             )}
-                                            <button onClick={() => {
+                                            <div className="save-btn" onClick={() => {
                                                 const updated = [...writeData.writeItems];
                                                 updated[index].isEditing = false;
                                                 setWriteData({ ...writeData, writeItems: updated });
-                                            }}>Save</button>
-                                        </>
+                                            }}>Save</div>
+                                        </div>
                                     )}
                                 </div>
                             ))}
@@ -381,7 +417,7 @@ const CreateWrite = () => {
 
                         <div className="line"></div>
 
-                        <button className="add-btn full">
+                        <button className="add-btn full" onClick={handleSaveAndUpdate}>
                             Save and update
                         </button>
                     </MainCreate>
@@ -663,6 +699,9 @@ const MainCreate = styled.div`
     .input-modified{
         margin-top: 10px;
         border-bottom: none;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
 
         .input-basic{
             margin: 0;
@@ -679,17 +718,19 @@ const MainCreate = styled.div`
             /* letter-spacing: 0.1rem; */
             /* outline: white; */
         }
+
+        .save-btn{
+          margin-top: 20px;
+          border: 1px solid #363636;
+          background-color: #333333;
+          padding: 10px 20px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 300;
+        }
+        
     }
 
-    .save-btn{
-      margin-top: 20px;
-      border: 1px solid #363636;
-      background-color: #333333;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 0.75rem;
-      font-weight: 300;
-    }
 
     .all-opts{
         display: flex;
