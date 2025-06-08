@@ -30,22 +30,66 @@ const CreateWrite = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [existingWriteData, setExistingWriteData] = useState(null);
 
+    const [selectedType, setSelectedType] = useState("Subheading");
+
+    const [inputData, setInputData] = useState({
+        subheading: '',
+        paragraph: '',
+        bulletPoint: '',
+        numericPointNumber: '',
+        numericPointText: '',
+        linkTitle: '',
+        linkUrl: ''
+    });
+
     const [writeData, setWriteData] = useState({
         titleInside: '',
         description: '',
-        writeItems: [
-            {
-                id: '1',
-                type: 'Sub-heading',
-                content: 'This is a sub heading',
-            },
-            {
-                id: '2',
-                type: 'para',
-                content: 'this is a paragraph',
-            }
-        ]
+        writeItems: []
     });
+
+    const handleAddItem = () => {
+        let newItem = { id: Date.now().toString(), type: selectedType };
+
+        switch (selectedType) {
+            case "Subheading":
+                newItem.content = inputData.subheading;
+                break;
+            case "Paragraph":
+                newItem.content = inputData.paragraph;
+                break;
+            case "Bullet Point":
+                newItem.content = inputData.bulletPoint;
+                break;
+            case "Numeric Point":
+                newItem.pointNumber = inputData.numericPointNumber;
+                newItem.content = inputData.numericPointText;
+                break;
+            case "Link":
+                newItem.title = inputData.linkTitle;
+                newItem.url = inputData.linkUrl;
+                break;
+            default:
+                return;
+        }
+
+        const updatedItems = [...writeData.writeItems, newItem];
+        setWriteData(prev => ({ ...prev, writeItems: updatedItems }));
+
+        setInputData({
+            subheading: '',
+            paragraph: '',
+            bulletPoint: '',
+            numericPointNumber: '',
+            numericPointText: '',
+            linkTitle: '',
+            linkUrl: ''
+        });
+    };
+
+    useEffect(() => {
+        console.log("Updated Write Items:", writeData.writeItems);
+    }, [writeData.writeItems]);
 
     return (
         <Container>
@@ -62,6 +106,10 @@ const CreateWrite = () => {
                             <input
                                 className="input-basic"
                                 placeholder="Enter page heading"
+                                value={writeData.titleInside}
+                                onChange={(e) =>
+                                    setWriteData({ ...writeData, titleInside: e.target.value })
+                                }
                             />
                         </div>
 
@@ -70,38 +118,251 @@ const CreateWrite = () => {
                             <textarea
                                 className="input-basic"
                                 placeholder="Enter description text"
+                                value={writeData.description}
+                                onChange={(e) =>
+                                    setWriteData({ ...writeData, description: e.target.value })
+                                }
                             />
                         </div>
 
                         <div className="all-opts">
-                                {["Subheading", "Paragraph", "Bullet Point", "Numeric Point", "Link"].map((val) => (
-                                    <div
-                                        className={`opt ${val == "Bullet Point" ? 'selected' : ''}`}
-                                    >
-                                        {val}
-                                    </div>
-                                ))}
-                            </div>
+                            {["Subheading", "Paragraph", "Bullet Point", "Numeric Point", "Link"].map((val) => (
+                                <div
+                                    key={val}
+                                    className={`opt ${selectedType === val ? 'selected' : ''}`}
+                                    onClick={() => setSelectedType(val)}
+                                >
+                                    {val}
+                                </div>
+                            ))}
+                        </div>
 
+                        {selectedType === "Subheading" && (
                             <div className="input-container input-modified">
                                 <div className="label">Subheading</div>
-                            <input
-                                className="input-basic"
-                                placeholder="Enter subheading"
-                            />
-                        </div>
+                                <input
+                                    className="input-basic"
+                                    placeholder="Enter subheading"
+                                    value={inputData.subheading}
+                                    onChange={(e) =>
+                                        setInputData({ ...inputData, subheading: e.target.value })
+                                    }
+                                />
+                            </div>
+                        )}
 
-                        <div className="input-container input-modified">
-                            <div className="label">Paragraph</div>
-                            <textarea
-                                className="input-basic"
-                                placeholder="Enter paragraph"
-                            />
-                        </div>
+                        {selectedType === "Paragraph" && (
+                            <div className="input-container input-modified">
+                                <div className="label">Paragraph</div>
+                                <textarea
+                                    className="input-basic"
+                                    placeholder="Enter your paragraph"
+                                    value={inputData.paragraph}
+                                    onChange={(e) =>
+                                        setInputData({ ...inputData, paragraph: e.target.value })
+                                    }
+                                />
+                            </div>
+                        )}
 
-                        <button className="add-btn">
+                        {selectedType === "Bullet Point" && (
+                            <div className="input-container input-modified">
+                                <div className="label">Bullet Point</div>
+                                <textarea
+                                    className="input-basic"
+                                    placeholder="Enter your bullet point"
+                                    value={inputData.bulletPoint}
+                                    onChange={(e) =>
+                                        setInputData({ ...inputData, bulletPoint: e.target.value })
+                                    }
+                                />
+                            </div>
+                        )}
+
+                        {selectedType === "Numeric Point" && (
+                            <>
+                                <div className="input-container input-modified">
+                                    <div className="label">Point Number</div>
+                                    <input
+                                        type="number"
+                                        className="input-basic"
+                                        placeholder="Enter point number"
+                                        value={inputData.numericPointNumber}
+                                        onChange={(e) =>
+                                            setInputData({ ...inputData, numericPointNumber: e.target.value })
+                                        }
+                                    />
+                                </div>
+                                <div className="input-container input-modified">
+                                    <div className="label">Point Text</div>
+                                    <textarea
+                                        className="input-basic"
+                                        placeholder="Enter your point"
+                                        value={inputData.numericPointText}
+                                        onChange={(e) =>
+                                            setInputData({ ...inputData, numericPointText: e.target.value })
+                                        }
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        {selectedType === "Link" && (
+                            <>
+                                <div className="input-container input-modified">
+                                    <div className="label">Link Title</div>
+                                    <input
+                                        className="input-basic"
+                                        placeholder="Enter your link title"
+                                        value={inputData.linkTitle}
+                                        onChange={(e) =>
+                                            setInputData({ ...inputData, linkTitle: e.target.value })
+                                        }
+                                    />
+                                </div>
+                                <div className="input-container input-modified">
+                                    <div className="label">URL</div>
+                                    <input
+                                        className="input-basic"
+                                        placeholder="Enter your url"
+                                        value={inputData.linkUrl}
+                                        onChange={(e) =>
+                                            setInputData({ ...inputData, linkUrl: e.target.value })
+                                        }
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        <button className="add-btn" onClick={handleAddItem}>
                             Add to your writing
                         </button>
+
+                        <div className="line"></div>
+
+                        <div className="preview-section">
+                            {writeData.writeItems.map((item, index) => (
+                                <div key={item.id} className="preview-item">
+                                    {!item.isEditing ? (
+                                        <>
+                                            <div><strong>Type:</strong> {item.type}</div>
+                                            {item.type === "Link" ? (
+                                                <>
+                                                    <div><strong>Title:</strong> {item.title}</div>
+                                                    <div><strong>URL:</strong> {item.url}</div>
+                                                </>
+                                            ) : item.type === "Numeric Point" ? (
+                                                <>
+                                                    <div><strong>Point #{item.pointNumber}</strong>: {item.content}</div>
+                                                </>
+                                            ) : (
+                                                <div>{item.content}</div>
+                                            )}
+
+                                            <button onClick={() => {
+                                                const updated = [...writeData.writeItems];
+                                                updated[index].isEditing = true;
+                                                setWriteData({ ...writeData, writeItems: updated });
+                                            }}>Edit</button>
+
+                                            <button onClick={() => {
+                                                const updated = writeData.writeItems.filter((_, i) => i !== index);
+                                                setWriteData({ ...writeData, writeItems: updated });
+                                            }}>Delete</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {/* Show editable fields */}
+                                            {item.type === "Subheading" && (
+                                                <input
+                                                    className="input-basic"
+                                                    value={item.content}
+                                                    onChange={(e) => {
+                                                        const updated = [...writeData.writeItems];
+                                                        updated[index].content = e.target.value;
+                                                        setWriteData({ ...writeData, writeItems: updated });
+                                                    }}
+                                                />
+                                            )}
+                                            {item.type === "Paragraph" && (
+                                                <textarea
+                                                    className="input-basic"
+                                                    value={item.content}
+                                                    onChange={(e) => {
+                                                        const updated = [...writeData.writeItems];
+                                                        updated[index].content = e.target.value;
+                                                        setWriteData({ ...writeData, writeItems: updated });
+                                                    }}
+                                                />
+                                            )}
+                                            {item.type === "Bullet Point" && (
+                                                <textarea
+                                                    className="input-basic"
+                                                    value={item.content}
+                                                    onChange={(e) => {
+                                                        const updated = [...writeData.writeItems];
+                                                        updated[index].content = e.target.value;
+                                                        setWriteData({ ...writeData, writeItems: updated });
+                                                    }}
+                                                />
+                                            )}
+                                            {item.type === "Numeric Point" && (
+                                                <>
+                                                    <input
+                                                        type="number"
+                                                        className="input-basic"
+                                                        value={item.pointNumber}
+                                                        onChange={(e) => {
+                                                            const updated = [...writeData.writeItems];
+                                                            updated[index].pointNumber = Number(e.target.value);
+                                                            setWriteData({ ...writeData, writeItems: updated });
+                                                        }}
+                                                    />
+                                                    <textarea
+                                                        className="input-basic"
+                                                        value={item.content}
+                                                        onChange={(e) => {
+                                                            const updated = [...writeData.writeItems];
+                                                            updated[index].content = e.target.value;
+                                                            setWriteData({ ...writeData, writeItems: updated });
+                                                        }}
+                                                    />
+                                                </>
+                                            )}
+                                            {item.type === "Link" && (
+                                                <>
+                                                    <input
+                                                        className="input-basic"
+                                                        value={item.title}
+                                                        onChange={(e) => {
+                                                            const updated = [...writeData.writeItems];
+                                                            updated[index].title = e.target.value;
+                                                            setWriteData({ ...writeData, writeItems: updated });
+                                                        }}
+                                                    />
+                                                    <input
+                                                        className="input-basic"
+                                                        value={item.url}
+                                                        onChange={(e) => {
+                                                            const updated = [...writeData.writeItems];
+                                                            updated[index].url = e.target.value;
+                                                            setWriteData({ ...writeData, writeItems: updated });
+                                                        }}
+                                                    />
+                                                </>
+                                            )}
+                                            <button onClick={() => {
+                                                const updated = [...writeData.writeItems];
+                                                updated[index].isEditing = false;
+                                                setWriteData({ ...writeData, writeItems: updated });
+                                            }}>Save</button>
+                                        </>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="line"></div>
 
                         <button className="add-btn full">
                             Save and update
@@ -130,6 +391,11 @@ const Container = styled.div`
     display: flex;  
     flex-direction: column;
     align-items: center;
+
+    .line{
+        margin: 40px 0 20px 0;
+        border-bottom: 1px solid #313231;
+    }
 
     .item-url {
         margin-top: 5px;
