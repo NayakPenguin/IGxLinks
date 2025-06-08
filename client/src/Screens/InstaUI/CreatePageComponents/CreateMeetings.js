@@ -202,7 +202,7 @@ const CreateMeetings = () => {
 
         if (id) {
             console.log("Id : ", id);
-            
+
             if (existingItem) {
                 setIsEditMode(true);
                 setExistingMeetingData(existingItem);
@@ -213,7 +213,7 @@ const CreateMeetings = () => {
                     availability: existingItem.availability || getInitialAvailability()
                 });
                 console.log("formData : ", formData);
-                
+
             } else {
                 // navigate('/pagenotfound');
             }
@@ -497,14 +497,17 @@ const CreateMeetings = () => {
                         </div>
                         <div className="input-container">
                             <div className="label">Meeting Duration (in Minutes)</div>
-                            <input
-                                className="input-basic"
-                                type="number"
-                                placeholder="30"
-                                min="0"
-                                value={formData.duration}
-                                onChange={(e) => handleInputChange('duration', Number(e.target.value))}
-                            />
+                            <div className="all-opts">
+                                {[15, 30, 45, 60].map((val) => (
+                                    <div
+                                        key={val}
+                                        className={`opt ${formData.duration === val ? 'selected' : ''}`}
+                                        onClick={() => handleInputChange('duration', val)}
+                                    >
+                                        {val}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="meeting-select">
@@ -960,6 +963,33 @@ const MainCreate = styled.div`
 
         textarea{
             height: 200px;
+        }
+
+        .all-opts{
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 15px;
+
+            .opt{
+                height: 49.5px;
+                margin-right: 10px;
+                border-radius: 10px;
+                aspect-ratio: 1/1;
+                background-color:rgb(22, 22, 22);
+                border: 1px solid #363636;
+                color: #8d8d8d;
+                font-size: 0.75rem;
+                font-weight: 300;
+
+                display: grid;
+                place-items: center;
+            }
+
+            .selected{
+                font-weight: 500;
+                border-color: white;
+                color: white;
+            }
         }
     }
 
