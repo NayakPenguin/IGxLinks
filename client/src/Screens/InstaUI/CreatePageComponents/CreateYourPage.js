@@ -47,14 +47,14 @@ const getRouteForType = (type) => {
   switch (type) {
     case ITEM_TYPES.FOLDER_REDIRECT:
       return "folder";
-    case ITEM_TYPES.FORM:
+    case ITEM_TYPES.FORM || "Form":
       return "form";
     case ITEM_TYPES.MEETING_SCHEDULER:
       return "meeting";
     case ITEM_TYPES.WRITE_CONTENT:
       return "write";
     default:
-      return "item"; // fallback route
+      return "form"; // fallback route
   }
 };
 
