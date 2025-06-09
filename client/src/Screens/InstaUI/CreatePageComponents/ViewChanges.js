@@ -16,6 +16,7 @@ import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 import BookmarkIcon from '@material-ui/icons/Bookmark';
 import EventAvailableIcon from '@material-ui/icons/EventAvailable';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
@@ -25,6 +26,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import FlagIcon from '@material-ui/icons/Flag';
 
 import basicUser2Dp from "../../../Images/basicUser2Dp.png"
+import { parseRichText } from '../../Helpers/parseRichText';
 
 import WhatsAppIcon from '@material-ui/icons/WhatsApp';
 import { CircularProgress } from "@material-ui/core";
@@ -297,7 +299,7 @@ const ViewChanges = () => {
                     </div>
 
                 </div>
-                
+
                 {
                     userEditData.Basic.announcementData.isVisible ? (
                         <PinnedAnnouncement>
@@ -306,7 +308,7 @@ const ViewChanges = () => {
                                 Pinned Announcement
                             </div>
                             <div className="title">{userEditData.Basic.announcementData.title}</div>
-                            <div>{userEditData.Basic.announcementData.description}</div>
+                            <div className="desc">{parseRichText(userEditData.Basic.announcementData.description)}</div>
                         </PinnedAnnouncement>
                     ) : null
                 }
@@ -320,35 +322,57 @@ const ViewChanges = () => {
                                 return (
                                     <div key={id} className="group-name-container">
                                         <div className="group-name-container-line"></div>
-                                        <div className="group-name">{title}</div>
+                                        <div className="group-name">{parseRichText(title)}</div>
                                         <div className="group-name-container-line"></div>
                                     </div>
                                 );
 
-                            case "Redirect Links":
+                            case "Redirect Link":
                                 return (
                                     <a key={id} href={url.startsWith("http") ? url : `https://${url}`} className="link1" target="_blank" rel="noopener noreferrer">
-                                        <div>{title}</div>
+                                        <div>{parseRichText(title)}</div>
                                         <div className="link-circle">
                                             <CallMadeIcon />
                                         </div>
                                     </a>
                                 );
 
+                            case "Anonymous Replies":
+                                return (
+                                    <a key={id} href={`/page/view-edit/${id}`} className="link1">
+                                        <div>{parseRichText(title)}</div>
+                                        <div className="link-circle">
+                                            <svg
+                                                viewBox="-20.4 -20.4 64.8 64.8"
+                                                version="1.1"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="#ffffff"
+                                                stroke="#ffffff"
+                                            >
+                                                <g strokeWidth="1.2" fill="none" fillRule="evenodd">
+                                                    <g fill="#ffffff" fillRule="nonzero">
+                                                        <path d="M17.5,11.75 C20.1233526,11.75 22.25,13.8766474 22.25,16.5 C22.25,19.1233526 20.1233526,21.25 17.5,21.25 C15.4019872,21.25 13.6216629,19.8898135 12.9927596,18.0031729 L11.0072404,18.0031729 C10.3783371,19.8898135 8.59801283,21.25 6.5,21.25 C3.87664744,21.25 1.75,19.1233526 1.75,16.5 C1.75,13.8766474 3.87664744,11.75 6.5,11.75 C8.9545808,11.75 10.9743111,13.6118164 11.224028,16.0002862 L12.775972,16.0002862 C13.0256889,13.6118164 15.0454192,11.75 17.5,11.75 Z M6.5,13.75 C4.98121694,13.75 3.75,14.9812169 3.75,16.5 C3.75,18.0187831 4.98121694,19.25 6.5,19.25 C8.01878306,19.25 9.25,18.0187831 9.25,16.5 C9.25,14.9812169 8.01878306,13.75 6.5,13.75 Z M17.5,13.75 C15.9812169,13.75 14.75,14.9812169 14.75,16.5 C14.75,18.0187831 15.9812169,19.25 17.5,19.25 C19.0187831,19.25 20.25,18.0187831 20.25,16.5 C20.25,14.9812169 19.0187831,13.75 17.5,13.75 Z M15.5119387,3 C16.7263613,3 17.7969992,3.79658742 18.145961,4.95979331 L19.1520701,8.31093387 C19.944619,8.44284508 20.7202794,8.59805108 21.4790393,8.77658283 C22.0166428,8.90307776 22.3499121,9.44143588 22.2234172,9.9790393 C22.0969222,10.5166428 21.5585641,10.8499121 21.0209607,10.7234172 C18.2654221,10.0750551 15.258662,9.75 12,9.75 C8.74133802,9.75 5.73457794,10.0750551 2.97903933,10.7234172 C2.44143588,10.8499121 1.90307776,10.5166428 1.77658283,9.9790393 C1.6500879,9.44143588 1.98335721,8.90307776 2.52096067,8.77658283 C3.27940206,8.59812603 4.05472975,8.4429754 4.8469317,8.31110002 L5.85403902,4.95979331 C6.20300079,3.79658742 7.2736387,3 8.4880613,3 L15.5119387,3 Z" />
+                                                    </g>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                    </a>
+                                );
+
                             case "Meeting Scheduler":
                                 return (
-                                    <div key={id} className="link1">
-                                        <div>{title}</div>
+                                    <a key={id} href={`/page/view-edit/${id}`} className="link1">
+                                        <div>{parseRichText(title)}</div>
                                         <div className="link-circle">
                                             <EventAvailableIcon />
                                         </div>
-                                    </div>
+                                    </a>
                                 );
 
                             default:
                                 return (
-                                    <a href={`user/${id}`} className="link1">
-                                        <div>{title}</div>
+                                    <a key={id} href={`/page/view-edit/${id}`} className="link1">
+                                        <div>{parseRichText(title)}</div>
                                         <div className="link-circle">
                                             <ChevronRightIcon />
                                         </div>
@@ -546,6 +570,10 @@ const Container = styled.div`
                     display: inline;
                     margin-right: 5px;
                 }
+
+                strong{
+                    font-weight: 700;
+                }
     
                 .paid-circle{
                     position: absolute;
@@ -575,6 +603,11 @@ const Container = styled.div`
                     svg{
                         font-size: 1rem;
                         fill: #e5e5e5;
+                    }
+
+                    img{
+                        height: 100%;
+                        width: 100%;
                     }
                 }
     
@@ -1171,8 +1204,6 @@ const PinnedAnnouncement = styled.div`
     margin-bottom: -20px;
     padding: 15px;
     background-color: #363636;
-    font-size: 0.85rem;
-    font-weight: 300;
     border-radius: 10px;
     line-height: 1.35rem;
     border-left: 10px solid white;
@@ -1182,16 +1213,21 @@ const PinnedAnnouncement = styled.div`
     position: relative;
 
     .title{
+        font-size: 0.85rem;
         font-weight: 600;
         display: block;
         margin-bottom: 5px;
+    }
+
+    .desc{
+        font-size: 0.85rem;
+        font-weight: 300;
+
+        strong{
+            font-weight: 500;
+        }
     }
     
-    b{
-        font-weight: 600;
-        display: block;
-        margin-bottom: 5px;
-    }
 
     .label{
         position: absolute;

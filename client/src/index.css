@@ -73,8 +73,8 @@ input{
   overflow: hidden;
 }
 
-a{
+/* a{
   word-break: break-all;
   overflow-wrap: anywhere;
   white-space: normal;
-}
+} */

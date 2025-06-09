@@ -34,6 +34,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import BasicInfo from "./BasicInfo";
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { trimUrl } from '../../Helpers/trimUrl';
+import { parseRichText } from '../../Helpers/parseRichText';
 
 const ITEM_TYPES = {
   SUBGROUP: 'Subgroup',
@@ -186,7 +187,7 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
       </div>
       <div className="item-content">
         <div className="item-type">Type : <b>{item.type}</b></div>
-        <div className="item-title">{item.title}</div>
+        <div className="item-title">{parseRichText(item.title)}</div>
         {item.url && (
           <a href={item.url} target="_blank" className="item-url" rel="noopener noreferrer">
             {trimUrl(item.url)}

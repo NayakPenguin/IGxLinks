@@ -8,6 +8,7 @@ import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import { parseRichText } from '../../Helpers/parseRichText';
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
@@ -505,8 +506,8 @@ const BasicInfo = () => {
                             </>
                         ) : (
                             <>
-                                <div className="title">{announcementData.title}</div>
-                                <div>{announcementData.description}</div>
+                                <div className="title">{parseRichText(announcementData.title)}</div>
+                                <div className="desc">{parseRichText(announcementData.description)}</div>
                             </>
                         )}
                     </div>
@@ -976,6 +977,15 @@ const PinnedAnnouncement = styled.div`
         font-weight: 600;
         display: block;
         margin-bottom: 5px;
+    }
+
+    .desc{
+        font-size: 0.85rem;
+        font-weight: 300;
+
+        strong{
+            font-weight: 500;
+        }
     }
 
     .change-visibility{
