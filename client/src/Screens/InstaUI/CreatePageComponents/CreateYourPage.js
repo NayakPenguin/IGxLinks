@@ -35,27 +35,27 @@ import BasicInfo from "./BasicInfo";
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 const ITEM_TYPES = {
-  REDIRECT: 'Redirect Link',
   SUBGROUP: 'Subgroup',
+  REDIRECT: 'Redirect Link',
+  ANONYMOUS: 'Anonymous Replies',
   FOLDER_REDIRECT: 'Folder for Redirect Links',
   FORM: 'Custom Form',
   MEETING_SCHEDULER: 'Meeting Scheduler',
   WRITE_CONTENT: 'Write your content',
-  ANONYMOUS: 'Anonymous Replies',
 };
 
 const getRouteForType = (type) => {
   switch (type) {
     case ITEM_TYPES.FOLDER_REDIRECT:
       return "folder";
-    case ITEM_TYPES.FORM || "Form":
+    case ITEM_TYPES.FORM:
       return "form";
     case ITEM_TYPES.MEETING_SCHEDULER:
       return "meeting";
     case ITEM_TYPES.WRITE_CONTENT:
       return "write";
     default:
-      return "form"; // fallback route
+      return "default"; // fallback route
   }
 };
 
@@ -153,7 +153,7 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
           {item.type === ITEM_TYPES.ANONYMOUS && (
             <div className="input-container">
               <div className="label">Question</div>
-              <input
+              <textarea
                 className="input-basic"
                 value={editData.question}
                 onChange={(e) => handleEditChange('question', e.target.value)}
@@ -239,7 +239,7 @@ const CreateYourPage = () => {
     localStorage.setItem("userContentInfo", JSON.stringify(items));
   }, [items]);
 
-  const [itemType, setItemType] = useState(ITEM_TYPES.REDIRECT);
+  const [itemType, setItemType] = useState(ITEM_TYPES.SUBGROUP);
   const [editingId, setEditingId] = useState(null);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
@@ -401,7 +401,7 @@ const CreateYourPage = () => {
             {itemType === ITEM_TYPES.ANONYMOUS && (
               <div className="input-container">
                 <div className="label">Question</div>
-                <input
+                <textarea
                   className="input-basic"
                   value={newItemData.question}
                   onChange={(e) => handleNewItemChange('question', e.target.value)}
@@ -657,6 +657,9 @@ const Container = styled.div`
                         margin-top: 5px;
                         font-size: 0.85rem;
                         font-weight: 500;
+                        /* word-wrap: break-word;
+                        overflow-wrap: break-word;
+                        white-space: normal; */
                     }
                     
                     .item-url {
@@ -665,6 +668,9 @@ const Container = styled.div`
                         font-weight: 300;
                         color: cornflowerblue;
                         letter-spacing: 0.05rem;
+                        word-break: break-all;
+                        overflow-wrap: anywhere;
+                        white-space: normal;
                     }
 
                     .item-ques {

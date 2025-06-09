@@ -197,7 +197,7 @@ const CreateForm = () => {
 
             // Updated fields
             id: isEditMode ? id : Date.now().toString(),
-            type: "Form",
+            type: "Custom Form",
             titleInside: formData.titleInside,
             description: formData.description,
             formItems: formData.formItems,

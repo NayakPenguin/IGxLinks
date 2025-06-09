@@ -298,6 +298,9 @@ const Container = styled.div`
         font-weight: 300;
         color: cornflowerblue;
         letter-spacing: 0.05rem;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        white-space: normal;
     }
 
 

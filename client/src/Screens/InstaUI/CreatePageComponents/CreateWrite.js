@@ -807,7 +807,9 @@ const MainCreate = styled.div`
         }
 
         h3{
+            margin-top: 25px;
             font-size: 1rem;
+            font-weight: 500;
         }
 
         p{

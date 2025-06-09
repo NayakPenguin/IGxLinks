@@ -72,3 +72,9 @@ input{
 .no-scroll {
   overflow: hidden;
 }
+
+a{
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
