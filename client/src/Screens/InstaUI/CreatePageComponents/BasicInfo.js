@@ -474,7 +474,7 @@ const BasicInfo = () => {
 
             <PinnedAnnouncement>
                 {
-                    isAnnouncementEditing ? null : <div className="edit-btn" onClick={() => {setIsAnnouncementEditing(true); toggleAnnouncementVisibility();}}>
+                    isAnnouncementEditing ? null : <div className="edit-btn" onClick={() => {setIsAnnouncementEditing(true); setAnnouncementData(prev => ({ ...prev, isVisible: true }));}}>
                         <CreateIcon />
                     </div>
                 }
@@ -1000,6 +1000,8 @@ const PinnedAnnouncement = styled.div`
 
         display: grid;
         place-items: center;
+
+        z-index: 10;
 
         svg{
             font-size: 1rem;

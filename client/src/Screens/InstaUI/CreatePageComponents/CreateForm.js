@@ -221,7 +221,7 @@ const CreateForm = () => {
         }
 
         localStorage.setItem("userContentInfo", JSON.stringify(updatedItems));
-        navigate('/page/view-edit');
+        navigate('/page/create');
     };
 
     return (

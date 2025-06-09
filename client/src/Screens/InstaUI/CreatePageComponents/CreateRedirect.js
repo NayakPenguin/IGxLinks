@@ -175,7 +175,7 @@ const CreateRedirect = () => {
             : [...savedItems, updatedItem];
 
         localStorage.setItem("userContentInfo", JSON.stringify(updatedItems));
-        navigate('/page/view-edit');
+        navigate('/page/create');
     };
 
     return (
@@ -265,7 +265,7 @@ const CreateRedirect = () => {
                         </div>
 
                         <button className="add-btn full" onClick={handleSaveForm}>
-                            {isEditMode ? "Update List" : "Add to Page"}
+                            Update List
                         </button>
                     </MainCreate>
                 </div>

@@ -142,7 +142,7 @@ const CreateWrite = () => {
 
         localStorage.setItem("userContentInfo", JSON.stringify(updatedData));
 
-        alert("Content saved successfully!");
+        navigate('/page/create');
     };
 
 
@@ -437,7 +437,7 @@ const CreateWrite = () => {
                         <div className="line"></div>
 
                         <button className="add-btn full" onClick={handleSaveAndUpdate}>
-                            Save and update
+                            Update Page
                         </button>
                     </MainCreate>
                 </div>

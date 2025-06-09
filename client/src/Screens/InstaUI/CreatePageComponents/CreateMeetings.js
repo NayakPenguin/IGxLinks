@@ -208,6 +208,7 @@ const CreateMeetings = () => {
                 setExistingMeetingData(existingItem);
                 setFormData({
                     title: existingItem.title || '',
+                    titleInside: existingItem.titleInside || '',
                     description: existingItem.description || '',
                     duration: existingItem.duration || 30,
                     availability: existingItem.availability || getInitialAvailability()
@@ -423,6 +424,7 @@ const CreateMeetings = () => {
             id: isEditMode ? id : Date.now().toString(),
             type: "Meeting Scheduler",
             title: formData.title,
+            titleInside: formData.titleInside,
             description: formData.description,
             duration: formData.duration,
             availability: mergedAvailability,
@@ -482,8 +484,8 @@ const CreateMeetings = () => {
                             <input
                                 className="input-basic"
                                 placeholder={getPlaceholder('titleInside')}
-                                value={formData.title}
-                                onChange={(e) => handleInputChange('title', e.target.value)}
+                                value={formData.titleInside}
+                                onChange={(e) => handleInputChange('titleInside', e.target.value)}
                             />
                         </div>
                         <div className="input-container">

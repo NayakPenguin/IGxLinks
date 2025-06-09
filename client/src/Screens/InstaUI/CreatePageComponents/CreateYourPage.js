@@ -33,6 +33,7 @@ import Typography from '@mui/material/Typography';
 import InfoIcon from '@material-ui/icons/Info';
 import BasicInfo from "./BasicInfo";
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import { trimUrl } from '../../Helpers/trimUrl';
 
 const ITEM_TYPES = {
   SUBGROUP: 'Subgroup',
@@ -186,7 +187,11 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
       <div className="item-content">
         <div className="item-type">Type : <b>{item.type}</b></div>
         <div className="item-title">{item.title}</div>
-        {item.url && <div className="item-url">{item.url}</div>}
+        {item.url && (
+          <a href={item.url} target="_blank" className="item-url" rel="noopener noreferrer">
+            {trimUrl(item.url)}
+          </a>
+        )}
         {item.question && <div className="item-ques">{item.question}</div>}
       </div>
       <div className="edit-btn" onClick={() => onEdit(item.id)}>
@@ -668,6 +673,7 @@ const Container = styled.div`
                         font-weight: 300;
                         color: cornflowerblue;
                         letter-spacing: 0.05rem;
+                        text-decoration: none;
                         word-break: break-all;
                         overflow-wrap: anywhere;
                         white-space: normal;
