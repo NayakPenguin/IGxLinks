@@ -4,15 +4,9 @@ import InsideAnonymous from './InsideAnonymous';
 import InsideFolder from './InsideFolder';
 import InsideForm from './InsideForm';
 import InsideWrite from './InsideWrite';
+import InsideMeeting from './InsideMeeting';
 
-// Dummy components for each type — replace with your actual ones
-const Subgroup = ({ data }) => <div>Subgroup: {data.title}</div>;
-const RedirectLink = ({ data }) => <div>Redirect Link: {data.title}</div>;
-const AnonymousReplies = ({ data }) => <div>Anonymous Replies: {data.title}</div>;
-const FolderForRedirectLinks = ({ data }) => <div>Folder: {data.title}</div>;
-const CustomForm = ({ data }) => <div>Custom Form: {data.title}</div>;
 const MeetingScheduler = ({ data }) => <div>Meeting Scheduler: {data.title}</div>;
-const WriteYourContent = ({ data }) => <div>Write Content: {data.title}</div>;
 
 const ViewChangeInside = () => {
   const { id } = useParams();
@@ -32,7 +26,7 @@ const ViewChangeInside = () => {
     case "Custom Form":
       return <InsideForm data={selectedItem} />;
     case "Meeting Scheduler":
-      return <InsideWrite data={selectedItem} />;
+      return <InsideMeeting data={selectedItem} />;
     case "Write your content":
       return <InsideWrite data={selectedItem} />;
     default:

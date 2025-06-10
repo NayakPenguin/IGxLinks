@@ -38,7 +38,7 @@ const ControlFooter = () => {
                     {/* <a href="/">
                         <EditIcon/>
                     </a> */}
-                    <a href="/">
+                    <a href="/notification">
                         <NotificationsNoneOutlinedIcon/>
                     </a>
                     {/* <a href="/">

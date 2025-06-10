@@ -42,7 +42,7 @@ const ITEM_TYPES = {
   ANONYMOUS: 'Anonymous Replies',
   FOLDER_REDIRECT: 'Folder for Redirect Links',
   FORM: 'Custom Form',
-  MEETING_SCHEDULER: 'Meeting Scheduler',
+  // MEETING_SCHEDULER: 'Meeting Scheduler',
   WRITE_CONTENT: 'Write your content',
 };
 
