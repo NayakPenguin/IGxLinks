@@ -16,7 +16,7 @@ const ControlFooter = () => {
                 !true ? (
                     <div className="before-login"><a href="/">Log in</a> or <a href="/">sign up</a> to create your page.</div>
                 ) : <div className="after-login">
-                    <a href="/">
+                    <a href="/page/create">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"

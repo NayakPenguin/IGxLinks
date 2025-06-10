@@ -17,7 +17,7 @@ const Notification = () => {
             title: "Welcome to IGxLinks!",
             type: "System",
             text: "Your account has been created successfully. You can complete your setup by visiting the 'Create Your Profile' page.",
-            redirectLink: "/create-profile"
+            redirectLink: "/page/create"
         },
         {
             title: "You're now following IGxLinks Official",
