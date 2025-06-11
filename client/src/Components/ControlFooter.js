@@ -8,6 +8,7 @@ import BookmarkBorderOutlinedIcon from '@material-ui/icons/BookmarkBorderOutline
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import EditIcon from '@material-ui/icons/Edit';
 import ExploreOutlinedIcon from '@material-ui/icons/ExploreOutlined';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 
 const ControlFooter = () => {
     return (
@@ -32,12 +33,12 @@ const ControlFooter = () => {
                             <path d="M9 22V12h6v10"></path>
                         </svg>
                     </a>
-                    <a href="/">
-                        <ExploreOutlinedIcon/>
-                    </a>
                     {/* <a href="/">
-                        <EditIcon/>
+                        <ExploreOutlinedIcon/>
                     </a> */}
+                    <a href="/engagement">
+                        <FavoriteBorderIcon/>
+                    </a>
                     <a href="/notification">
                         <NotificationsNoneOutlinedIcon/>
                     </a>

@@ -30,6 +30,7 @@ import CreateRedirect from "./Screens/InstaUI/CreatePageComponents/CreateRedirec
 import CreateWrite from "./Screens/InstaUI/CreatePageComponents/CreateWrite";
 import ViewChangeInside from "./Screens/InstaUI/CreatePageComponents/ViewChangeInside";
 import Notification from "./Screens/InstaUI/Notification/Notification";
+import Engagement from "./Screens/InstaUI/Engagement/Engagement";
 
 const App = () => {
   return (
@@ -52,6 +53,7 @@ const App = () => {
         <Route path="/page/write/:id" element={<CreateWrite />} />
         <Route path="/page/view-edit/:id" element={<ViewChangeInside />} />
         <Route path="/notification" element={<Notification />} />
+        <Route path="/engagement" element={<Engagement />} />
         
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/user/getreplies" element={<GetReplies />} />
