@@ -15,6 +15,11 @@ const MIN_DIMENSION = 150;
 
 const AllSocialMediaPlatforms = [
     {
+        "id": "mail",
+        "name": "Mail",
+        "iconUrl": "https://images.seeklogo.com/logo-png/37/1/gmail-icon-logo-png_seeklogo-379374.png"
+    },
+    {
         "id": "instagram",
         "name": "Instagram",
         "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png"
@@ -58,6 +63,21 @@ const AllSocialMediaPlatforms = [
         "id": "threads",
         "name": "Threads",
         "iconUrl": "https://cbx-prod.b-cdn.net/COLOURBOX65108147.jpg?width=800&height=800&quality=70"
+    },
+    {
+        "id": "github",
+        "name": "Github",
+        "iconUrl": "https://cdn4.iconfinder.com/data/icons/iconsimple-logotypes/512/github-512.png"
+    },
+    {
+        "id": "leetcode",
+        "name": "Leetcode",
+        "iconUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4h4yf5vhuu8_Dqf5VC1l1tFbIJ88N4H24jg&s"
+    },
+    {
+        "id": "codeforces",
+        "name": "Codeforces",
+        "iconUrl": "https://media2.dev.to/dynamic/image/width=1080,height=1080,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fcer3l19eex0wy900b101.jpg"
     }
 ];
 
@@ -250,7 +270,7 @@ const BasicInfo = () => {
             .filter(platform => socialLinks[platform.id]?.trim() !== '')
             .map(platform => ({
                 ...platform,
-                url: socialLinks[platform.id].trim()
+                url: socialLinks[platform.id]
             }));
 
         setActiveSocialLinks(updatedLinks);
@@ -377,7 +397,7 @@ const BasicInfo = () => {
                                         <input
                                             type="text"
                                             className="input-basic"
-                                            placeholder={`Enter your ${platform.name} profile`}
+                                            placeholder={`${platform.name} username/URL`}
                                             value={socialLinks[platform.id] || ''}
                                             onChange={(e) => handleInputChange(platform.id, e.target.value)}
                                         />
@@ -794,12 +814,12 @@ const ModelConatiner = styled.div`
         top: 0;
         left: 0;
         
-        background-color: #00000085; 
+        background-color: #000000c7; 
     }
 
     .model{ 
         width: 80%;
-        max-height: 50vh;
+        /* max-height: 50vh; */
         max-width: 400px;
         border-radius: 10px;
         /* margin-top: -50px; */
@@ -807,8 +827,8 @@ const ModelConatiner = styled.div`
         border: 1px solid #363636;
         z-index: 1009;
         padding: 20px;
-        overflow: scroll;
-        /* position: relative; */
+        
+        position: relative;
 
         .model-title{
           color: whitesmoke;
@@ -860,6 +880,10 @@ const ModelConatiner = styled.div`
         }
         
         .all-social-medias{
+            overflow: scroll;
+            height: 225px;
+            margin-top: 10px;
+
             .one-social-media{
                 display: flex;
                 align-items: center;
@@ -899,6 +923,10 @@ const ModelConatiner = styled.div`
             }
         }
 
+        .all-social-medias::-webkit-scrollbar {
+            display: none;  
+        }
+
         .done-btn{
           border: none;
           margin-top: 20px;
@@ -908,12 +936,15 @@ const ModelConatiner = styled.div`
           font-size: 0.75rem;
           font-weight: 300;
           text-align: center;
+
+          position: absolute;
+          bottom: -50px;
+          left: 0;
+          width: 100%;
         }
     }
 
-    .model::-webkit-scrollbar {
-        display: none;  
-    }
+    
 `
 
 const ModalOverlay = styled.div`
