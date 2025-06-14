@@ -35,6 +35,7 @@ import BasicInfo from "./BasicInfo";
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { trimUrl } from '../../Helpers/trimUrl';
 import { parseRichText } from '../../Helpers/parseRichText';
+import Publish from "../../../Components/Publish";
 
 const ITEM_TYPES = {
   SUBGROUP: 'Subgroup',
@@ -346,6 +347,7 @@ const CreateYourPage = () => {
 
   return (
     <Container>
+      <Publish/>
       <div className="main-content">
         <BasicInfo />
         <div className="add-new-item">

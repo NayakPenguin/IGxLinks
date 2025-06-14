@@ -30,6 +30,7 @@ import { parseRichText } from '../../Helpers/parseRichText';
 
 import WhatsAppIcon from '@material-ui/icons/WhatsApp';
 import { CircularProgress } from "@material-ui/core";
+import Publish from "../../../Components/Publish";
 
 const AllSocialMediaPlatforms = [
     {
@@ -255,6 +256,9 @@ const ViewChanges = () => {
                         </div>
                     </NotificationModelConatiner> : null
             }
+
+            <Publish/>
+        
             <div className="main-content">
                 <Subscribe>
                     {/*  */}
@@ -270,6 +274,12 @@ const ViewChanges = () => {
                         )
                     }
                 </Subscribe>
+                <BackBtn>
+                    <a href="/page/create">
+                        <ChevronLeftIcon/>
+                        Back to Edit
+                    </a>
+                </BackBtn>
                 <div className="user-data">
                     <div className="logo-x-dp">
                         <img src={userEditData.ImageURL ? userEditData.ImageURL : "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"} alt="" />
@@ -500,9 +510,11 @@ const Container = styled.div`
                     align-items: center; 
                     justify-content: center;
                     flex-wrap: wrap;
+
+                    width: 240px;
     
                     .social-icon{
-                        height: 35px;
+                        height: 30px;
                         aspect-ratio: 1/1;
                         background-color:rgb(217, 211, 211);
                         border-radius: 50%;
@@ -765,6 +777,31 @@ const Subscribe = styled.div`
     }
 `
 
+const BackBtn = styled.div`
+    a{
+        position: fixed; 
+        top: 20px;
+        left: 20px;
+        border-radius: 500px;
+        padding: 0 15px;
+        height: 30px;
+        background-color: #ffffff;
+        z-index: 1000;
+        font-size: 0.75rem;
+        color: #000;
+        text-decoration: none;
+    
+        display: flex;
+        align-items: center;
+    
+        svg{
+            height: 1.25rem;
+            fill: black;
+            margin-left: -10px;
+        }
+    }
+`
+
 const RedorGreenFlag = styled.div`
     display: flex;
     align-items: center;
@@ -868,7 +905,6 @@ const ModelConatiner = styled.div`
     width: 100vw;
     height: calc(100vh - 60px);
 
-    
     z-index: 1002;
     
     position: fixed;
@@ -1197,7 +1233,6 @@ const NotificationModelConatiner = styled.div`
     }
   }
 `;
-
 
 const PinnedAnnouncement = styled.div`
     margin-top: 100px;

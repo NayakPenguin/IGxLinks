@@ -8,8 +8,8 @@ const Notification = () => {
     const [selected, setSelected] = useState("All");
 
     const options = [
-        { label: "All", value: 1 },
-        { label: "Following", value: 0 },
+        { label: "All", value: 2 },
+        { label: "Following", value: 1 }
     ];
 
     const notifications = [
