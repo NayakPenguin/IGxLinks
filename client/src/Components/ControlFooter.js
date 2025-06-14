@@ -1,60 +1,55 @@
-import React, { useState, useEffect, useRef } from "react";
-import styled from 'styled-components'
+import React from "react";
+import styled from 'styled-components';
+import { useLocation } from "react-router-dom";
 
-import ShoppingCartOutlinedIcon from '@material-ui/icons/ShoppingCartOutlined';
-import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
-import NotificationsNoneOutlinedIcon from '@material-ui/icons/NotificationsNoneOutlined';
-import BookmarkBorderOutlinedIcon from '@material-ui/icons/BookmarkBorderOutlined';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import EditIcon from '@material-ui/icons/Edit';
-import ExploreOutlinedIcon from '@material-ui/icons/ExploreOutlined';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import NotificationsNoneOutlinedIcon from '@material-ui/icons/NotificationsNoneOutlined';
+import NotificationsIcon from '@material-ui/icons/Notifications';
+import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
 const ControlFooter = () => {
+    const location = useLocation();
+    const currentPath = location.pathname;
+
+    const isActive = (basePath) => currentPath === basePath || currentPath.startsWith(`${basePath}/`);
+
     return (
         <Container>
             {
                 !true ? (
                     <div className="before-login"><a href="/">Log in</a> or <a href="/">sign up</a> to create your page.</div>
-                ) : <div className="after-login">
-                    <a href="/page/create">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <path d="M3 9L12 3l9 6v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"></path>
-                            <path d="M9 22V12h6v10"></path>
-                        </svg>
-                    </a>
-                    {/* <a href="/">
-                        <ExploreOutlinedIcon/>
-                    </a> */}
-                    <a href="/engagement">
-                        <FavoriteBorderIcon/>
-                    </a>
-                    <a href="/notification">
-                        <NotificationsNoneOutlinedIcon/>
-                    </a>
-                    {/* <a href="/">
-                        <ShoppingCartOutlinedIcon/>
-                    </a> */}
-                    <a href="/profile">
-                        <AccountCircleOutlinedIcon/>
-                    </a>
-                </div>
+                ) : (
+                    <div className="after-login">
+                        <a href="/page/create">
+                            {isActive("/page/create") ? (
+                                <svg aria-label="Home" fill="currentColor" height="24" viewBox="0 0 24 24" width="24">
+                                    <path d="M22 23h-6.001a1 1 0 0 1-1-1v-5.455a2.997 2.997 0 1 0-5.993 0V22a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V11.543a1.002 1.002 0 0 1 .31-.724l10-9.543a1.001 1.001 0 0 1 1.38 0l10 9.543a1.002 1.002 0 0 1 .31.724V22a1 1 0 0 1-1 1Z"></path>
+                                </svg>
+                            ) : (
+                                <svg aria-label="Home" fill="currentColor" height="24" viewBox="0 0 24 24" width="24">
+                                    <path d="M9.005 16.545a2.997 2.997 0 0 1 2.997-2.997A2.997 2.997 0 0 1 15 16.545V22h7V11.543L12 2 2 11.543V22h7.005Z" fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2"></path>
+                                </svg>
+                            )}
+                        </a>
+                        <a href="/engagement">
+                            {isActive("/engagement") ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                        </a>
+                        <a href="/notification">
+                            {isActive("/notification") ? <NotificationsIcon /> : <NotificationsNoneOutlinedIcon />}
+                        </a>
+                        <a href="/profile">
+                            {isActive("/profile") ? <AccountCircleIcon /> : <AccountCircleOutlinedIcon />}
+                        </a>
+                    </div>
+                )
             }
         </Container>
-    )
-}
+    );
+};
 
-export default ControlFooter
+export default ControlFooter;
 
 const Container = styled.div`
     background-color: #000;
