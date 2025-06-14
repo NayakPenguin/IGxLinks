@@ -785,18 +785,22 @@ const BackBtn = styled.div`
         border-radius: 500px;
         padding: 0 15px;
         height: 30px;
-        background-color: #ffffff;
         z-index: 1000;
         font-size: 0.75rem;
-        color: #000;
         text-decoration: none;
+
+        background: rgba(255, 255, 255, 0.1); /* subtle white tint */
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
     
         display: flex;
         align-items: center;
     
         svg{
             height: 1.25rem;
-            fill: black;
+            fill: white;
             margin-left: -10px;
         }
     }
