@@ -3,140 +3,99 @@ import styled from "styled-components";
 import ControlFooter from '../../../Components/ControlFooter';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SettingsIcon from '@material-ui/icons/Settings';
+import CallMadeIcon from '@material-ui/icons/CallMade';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { parseRichText } from '../../Helpers/parseRichText';
 
 const Profile = () => {
-    const [contentItems, setContentItems] = useState([]);
+    const [basicItems, setBasicItems] = useState([]);
 
     useEffect(() => {
-        const storedData = localStorage.getItem("userContentInfo");
+        const storedData = localStorage.getItem("userBasicInfo");
         if (storedData) {
             try {
                 const parsed = JSON.parse(storedData);
-                setContentItems(parsed);
+                setBasicItems(parsed.formData);
+                console.log(parsed.formData);
             } catch (e) {
-                console.error("Failed to parse userContentInfo", e);
+                console.error("Failed to parse userBasicInfo", e);
             }
         }
     }, []);
 
     return (
         <Container>
-            <div className="page-name">Profiles</div>
+            <div className="page-name">Your Profile</div>
 
             <div className="main-content">
-                {contentItems.map((item) => {
-                    let containerClass = "item-card";
-
-                    switch (item.type?.toLowerCase()) {
-                        case "subgroup":
-                            containerClass = "subgroup-container";
-                            break;
-                        case "redirect link":
-                            containerClass = "redirect-container";
-                            break;
-                        case "anonymous replies":
-                            containerClass = "anonymous-container";
-                            break;
-                        case "folder for redirect links":
-                            containerClass = "folder-container";
-                            break;
-                        case "custom form":
-                            containerClass = "form-container";
-                            break;
-                        case "write your content":
-                            containerClass = "write-content-container";
-                            break;
-                        default:
-                            containerClass = "item-card";
-                            break;
-                    }
-
-                    return (
-                        <div className={containerClass == "subgroup-container" ? "container-basic bold-border" : "container-basic"} key={item.id}>
-                            <div className="title">{parseRichText(item.title)}</div>
-                            {
-                                containerClass == "redirect-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Clicks : </div>
-                                        <div className="stat-value">1,782</div>
-                                    </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">258</div>
-                                    </div>
-                                </div>
-                            }
-                            {
-                                containerClass == "anonymous-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Responses : </div>
-                                        <div className="stat-value">91</div>
-                                    </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">23</div>
-                                    </div>
-                                    <div className="view-responses">
-                                        <div className="text">View All Responses</div>
-                                        <ChevronRightIcon/>
-                                    </div>
-                                </div>
-                            }
-                            {
-                                containerClass == "folder-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Responses : </div>
-                                        <div className="stat-value">91</div>
-                                    </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">23</div>
-                                    </div>
-                                </div>
-                            }
-                            {
-                                containerClass == "form-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Responses : </div>
-                                        <div className="stat-value">91</div>
-                                    </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">23</div>
-                                    </div>
-                                    <div className="view-responses">
-                                        <div className="text">View All Responses</div>
-                                        <ChevronRightIcon/>
-                                    </div>
-                                </div>
-                            }
-                            {
-                                containerClass == "write-content-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Views : </div>
-                                        <div className="stat-value">3921</div>
-                                    </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">839</div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    );
-                })}
+                <div className="top-content">
+                    <div className="logo-x-dp">
+                        <img src={basicItems.profileImage ? basicItems.profileImage : "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"} alt="" />
+                    </div>
+                    <div className="name">Riya Bhowmik</div>
+                    <div className="user-name">@RiyaPenguin</div>
+                </div>
+                <div className="content">
+                    <div className="stat">
+                        <div className="stat-value">1238</div>
+                        <div className="stat-name">Subscribers</div>
+                    </div>
+                    <div className="mid-circle"></div>
+                    <div className="stat">
+                        <div className="stat-value">89</div>
+                        <div className="stat-name">Subscribed</div>
+                    </div>
+                </div>
+                <div className="content">
+                    <div className="btn">Share</div>
+                    <div className="btn">Edit Profile</div>
+                </div>
+                <div className="settings">
+                    <div className="title">Settings</div>
+                    <div className="setting-one">
+                        <div className="text">Tutorial / Onboarding Guide</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Change Password</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Change Username</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Update Page</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Email Notification Preferences</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Contact Support</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Report a Bug</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Terms & Conditions</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Privacy Policy</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one">
+                        <div className="text">Share your Stats</div>
+                        <ChevronRightIcon/>
+                    </div>
+                    <div className="setting-one logout">
+                        <div className="text">Logout</div>
+                    </div>
+                </div>
             </div>
 
             <ControlFooter />
@@ -166,70 +125,118 @@ const Container = styled.div`
     }
     
     .main-content{
-        padding: 20px;
+        padding: 30px 20px;
         border-top: 1px solid #343434;
-        padding-top: 0;
 
         strong{
             font-weight: 500;
         }
 
-        .container-basic{
-            padding: 20px;
-            border: 1px solid #343434;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            font-weight: 300;
-            border-radius: 10px;
-            font-weight: 500;
-        }
-
-        .bold-border{
-            margin-top: 20px;
-            background-color: #343434;
-        }
-
-        .stat-1{
+        .top-content{
             display: flex;
             align-items: center;
-            margin-top: 15px;
+            flex-direction: column;
+            // justify-content: space-between;
 
-            .icon{
-                height: 8px;
+            .logo-x-dp{
+                height: 120px;
                 aspect-ratio: 1/1;
+                overflow: hidden;
                 border-radius: 50%;
-                background-color: orange;
+                /* border: 2px solid white; */
+                border: 2px solid #313231;
+
+                img{
+                    width: 100%;
+                }
+            }
+            
+            .name{
+                margin: 20px 0 10px 0;
+                font-size: 1.5rem;
+                font-weight: 500;
+                color: white;
+            }
+
+            .user-name{
+                font-size: 0.85rem;
+                font-weight: 300;
+                letter-spacing: 0.1rem;
+                color: #d1d1d1;
+            }
+        }
+
+        .content{
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+            margin: 30px 0;
+
+            gap: 15px;
+
+            .mid-circle{
+                height: 5px;
+                aspect-ratio: 1/1;
+                background-color: #343434;
+                /* margin: 0 10px; */
+                border-radius: 50%;
             }
             
             .stat{
-                font-size: 0.85rem;
-                font-weight: 300;
-                margin: 0 15px 0 10px;
-            }
-            
-            .stat-value{
+                display: flex;
+                /* flex-direction: column; */
+                align-items: center;    
                 font-size: 0.85rem;
                 font-weight: 500;
-                letter-spacing: 0.15rem;
+    
+                .stat-name{
+                    /* font-weight: 200; */
+                    margin-left: 5px;
+                }
+                
+                .stat-value{
+                    /* font-weight: 500; */
+                    letter-spacing: 0.2rem;
+                }
+            }
+
+            .btn{
+                font-size: 0.75rem;
+                padding: 10px 15px;
+                border-radius: 10px;
+                background-color: #343434;
+                color: white;
+                letter-spacing: 0.05rem;
             }
         }
 
-        .view-responses{
-            width: 100%;
-            border-radius: 10px;
-            margin-top: 25px;
-            background-color: transparent;
-            border: 1px solid #fff;
-            padding: 15px;
-            color: white;
-            text-decoration: none;
-            /* text-align: center; */
-            font-size: 0.75rem;
-            font-weight: 300;
+        .settings{
+            .title{
+                font-size: 1rem;
+                font-weight: 500;
+                border-bottom: 1px solid #343434;
+                padding: 20px 0;
+            }
+            
+            .setting-one{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 20px 0;
+                border-bottom: 1px solid #343434;
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+
+                .text{
+                    font-size: 0.85rem;
+                    font-weight: 200;
+                }
+            }
+
+            .logout{
+                .text{
+                    color: #f97b7b;
+                }
+            }
         }
     }
 `
