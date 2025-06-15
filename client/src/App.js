@@ -5,7 +5,6 @@ import styled from "styled-components";
 import Landing from "./Screens/Landing";
 import UserArya from "./Screens/UserArya";
 import TemplateTesting from "./Screens/TemplateTesting";
-import LandingPage from "./Screens/LandingPage";
 import Dashboard from "./Screens/Dashboard";
 import GetAnswers1 from "./Screens/GetAnswers1";
 import VoteAnswer from "./Screens/VoteAnswer";
@@ -38,7 +37,7 @@ const App = () => {
     <Container>
       <Routes>
         {/* <Route path="/" element={<LandingPage />} /> */}
-        <Route path="/" element={<UserProfile />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/brand" element={<BrandProfile />} />
         <Route path="/influencer" element={<Influencer />} />
