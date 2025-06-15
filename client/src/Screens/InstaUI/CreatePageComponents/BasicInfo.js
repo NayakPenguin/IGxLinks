@@ -326,7 +326,7 @@ const BasicInfo = () => {
             {cropModalOpen && (
                 <ModalOverlay>
                     <ModalContent>
-                        <h3>Crop your profile picture (Square 1:1)</h3>
+                        {/* <h3>Crop your profile picture (Square 1:1)</h3>  */}
                         {imageSrc && (
                             <div style={{ width: '100%', maxWidth: '500px' }}>
                                 <ReactCrop
@@ -957,7 +957,7 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1200;
 `;
 
 const ModalContent = styled.div`
@@ -967,6 +967,7 @@ const ModalContent = styled.div`
   max-width: 90%;
   max-height: 90%;
   overflow: auto;
+  z-index: 1200;
 `;
 
 const ModalActions = styled.div`
@@ -974,6 +975,7 @@ const ModalActions = styled.div`
   justify-content: flex-end;
   margin-top: 20px;
   gap: 10px;
+  z-index: 1200;
 
   button {
     padding: 8px 16px;

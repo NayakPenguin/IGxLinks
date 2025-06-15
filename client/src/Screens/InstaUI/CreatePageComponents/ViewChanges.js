@@ -34,6 +34,11 @@ import Publish from "../../../Components/Publish";
 
 const AllSocialMediaPlatforms = [
     {
+        "id": "mail",
+        "name": "Mail",
+        "iconUrl": "https://images.seeklogo.com/logo-png/37/1/gmail-icon-logo-png_seeklogo-379374.png"
+    },
+    {
         "id": "instagram",
         "name": "Instagram",
         "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png"
@@ -77,6 +82,21 @@ const AllSocialMediaPlatforms = [
         "id": "threads",
         "name": "Threads",
         "iconUrl": "https://cbx-prod.b-cdn.net/COLOURBOX65108147.jpg?width=800&height=800&quality=70"
+    },
+    {
+        "id": "github",
+        "name": "Github",
+        "iconUrl": "https://cdn4.iconfinder.com/data/icons/iconsimple-logotypes/512/github-512.png"
+    },
+    {
+        "id": "leetcode",
+        "name": "Leetcode",
+        "iconUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4h4yf5vhuu8_Dqf5VC1l1tFbIJ88N4H24jg&s"
+    },
+    {
+        "id": "codeforces",
+        "name": "Codeforces",
+        "iconUrl": "https://media2.dev.to/dynamic/image/width=1080,height=1080,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fcer3l19eex0wy900b101.jpg"
     }
 ];
 
