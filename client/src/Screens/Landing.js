@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from 'styled-components';
-import logo from "../Images/logo-main.png"
-import samplePage1 from "../Images/samplePage1.png"
+import logo from "../Images/logo-main.png";
+import samplePage1 from "../Images/samplePage1.png";
+import logo2 from "../Images/logo-bg.png";
+import CallMadeIcon from '@material-ui/icons/CallMade';
+import feature1 from "../Images/Landing/feature1.png";
 
 const Landing = () => {
     return (
@@ -27,12 +30,24 @@ const Landing = () => {
                 <div className="create-your-page-btn">Create your Page</div>
             </div>
             <div className="sample-page">
-                <h2>Explore our Pages</h2>
-                <div className="desc">We are currently divided into 5 Modules, all are helpful for every coder. We have also applied machine learning models for get info about a company and applications web scraping to get you the questions from other website at one place.</div>
+                <h2>Discover the <strong>pages</strong> you can create with IGxLinks.</h2>
+                <div className="desc">
+                    Below are examples from a <strong>Software Developer, Influencer, Student, and Brand</strong> — now it’s your turn to build your own.
+                </div>
                 <img src={samplePage1} alt="" />
                 <div className="link-to-profile">
+                    <img src={logo2} alt="" />
                     <div className="username">igxl.ink/@nayakpenguin</div>
+                    <CallMadeIcon/>
                 </div>
+            </div>
+            <div className="sample-page-2">
+                <h2><strong>Features</strong> — One Link. Endless Possibilities.</h2>
+                <div className="desc">
+                    From <strong>forms</strong> and <strong>polls</strong> to <strong>paid links</strong> and <strong>anonymous replies</strong> — discover the features that make IGxLinks more than just a bio link. 
+                    It's your <strong>most versatile tool</strong> to share, express, and grow.
+                </div>
+                <img src={feature1} alt="" />
             </div>
         </Container>
     )
@@ -116,6 +131,8 @@ const Container = styled.div`
         padding: 60px 30px;
         margin-bottom: 60px;
 
+        max-width: 600px;
+
         /* background-color: #eeffec; */
 
         .tag{
@@ -174,12 +191,105 @@ const Container = styled.div`
         flex-direction: column;
         align-items: center;
 
+        width: 100%;
+
+        h2{
+            max-width: 600px;
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+
+            strong{
+                color: #333;
+                font-weight: 600;
+                background-color: yellow; 
+                padding: 0 10px;
+            }
+        }
+
+        .desc{
+            max-width: 600px;
+            padding: 0 30px;
+            color: #333;
+            font-size: 1rem;
+            font-weight: 200;
+            text-align: center;
+            margin-bottom: 50px;
+
+            i{
+                color: #333;
+                font-weight: 400;
+            }
+
+            strong{
+                color: #333;
+                font-weight: 400;
+            }
+        }
+
+        img{
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .link-to-profile{
+            max-width: 600px;
+            margin-top: 20px;
+
+            border: 1px solid rgb(233, 229, 229);
+            background-color: rgba(255, 255, 255, 0.83);
+            box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 10px 0px;
+
+            padding: 10px 20px;
+            border-radius: 100px;
+
+            display: flex;
+            align-items: center;
+
+            img{
+                width: 30px;
+                border-radius: 50%;
+                margin-right: 10px;
+                margin-left: -5px;
+            }
+
+            .username{
+                font-size: 0.75rem;
+                color: cornflowerblue;
+                font-weight: 500;
+            }
+
+            svg{
+                fill: cornflowerblue;
+                margin-left: 5px;
+                font-size: 1.25rem;
+            }
+        }
+    }
+
+    .sample-page-2{
+        padding: 100px 30px;
+        /* background-color: #d9f4e0; */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 600px;
+
         h2{
             color: #333;
             font-size: 1.5rem;
             font-weight: 600;
             text-align: center;
             margin-bottom: 20px;
+
+            strong{
+                color: #333;
+                font-weight: 600;
+                background-color: yellow; 
+                padding: 0 10px;
+            }
         }
 
         .desc{
@@ -203,22 +313,6 @@ const Container = styled.div`
 
         img{
             width: 100%;
-        }
-
-        .link-to-profile{
-            margin-top: 20px;
-
-            border: 1px solid rgb(233, 229, 229);
-            background-color: rgba(255, 255, 255, 0.83);
-            box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 10px 0px;
-
-            padding: 10px 20px;
-            border-radius: 100px;
-
-            .username{
-                color: cornflowerblue;
-                font-weight: 500;
-            }
         }
     }
 `
