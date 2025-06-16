@@ -31,6 +31,11 @@ import ViewChangeInside from "./Screens/InstaUI/CreatePageComponents/ViewChangeI
 import Notification from "./Screens/InstaUI/Notification/Notification";
 import Engagement from "./Screens/InstaUI/Engagement/Engagement";
 import Profile from "./Screens/InstaUI/Profile/Profile";
+import TermsOfService from "./Screens/InstaUI/OrgLegal/TermsOfService";
+import PrivacyPolicy from "./Screens/InstaUI/OrgLegal/PrivacyPolicy";
+import CookiePolicy from "./Screens/InstaUI/OrgLegal/CookiePolicy";
+import Disclaimer from "./Screens/InstaUI/OrgLegal/Disclaimer";
+import ContentGuidelines from "./Screens/InstaUI/OrgLegal/ContentGuidelines";
 
 const App = () => {
   return (
@@ -55,6 +60,13 @@ const App = () => {
         <Route path="/notification" element={<Notification />} />
         <Route path="/engagement" element={<Engagement />} />
         <Route path="/profile" element={<Profile />} />
+        
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
+        <Route path="/disclaimer" element={<Disclaimer />} />
+        <Route path="/content-guidelines" element={<ContentGuidelines />} />
+
         
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/user/getreplies" element={<GetReplies />} />
