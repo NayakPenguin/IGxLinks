@@ -22,16 +22,16 @@ const Landing = () => {
                     IG x Links
                     {/* <img src={sitename} alt="" /> */}
                 </div>
-                <div className="login-btn">Login</div>
+                <a href="/login" className="login-btn">Login</a>
             </div>
             <div className="top-page">
                 {/* <div className="tag">Minimal Design</div> */}
                 <h1><br /> Share More Than Links. <br /> <strong>Share Yourself.</strong></h1>
-                <h3><i>It’s minimal, emotional, and modern.</i></h3>
+                <h3><i>It’s minimal, expressive, and modern.</i></h3>
                 <h3>
                     IGxLinks lets you turn a single link into your <strong>personal hub</strong> — share <strong>forms, polls, stories, anonymous replies</strong>, <strong>sell or promote products</strong>, <strong>create paid links</strong>, and express everything that makes you <strong>you</strong>. Designed to be <strong>minimalist</strong> — not loud, not cluttered — your page feels like a <strong>sleek app extension</strong> when someone clicks your link. Whether you're a <strong>creator, entrepreneur, student</strong>, or just vibing online — it’s all here, <strong>your way</strong>.
                 </h3>
-                <div className="create-your-page-btn">Create your Page</div>
+                <a href="/page/create" className="create-your-page-btn">Create your Page</a>
             </div>
             <div className="sample-page">
                 <h2>Discover the <strong>pages</strong> you can create with IGxLinks.</h2>
@@ -209,6 +209,8 @@ const Container = styled.div`
             padding: 10px 27.5px;
             font-size: 0.85rem;
             border-radius: 100px;
+            color: white;
+            text-decoration: none;
         }
 
     }
@@ -276,6 +278,8 @@ const Container = styled.div`
             padding: 15px 35px;
             font-size: 0.85rem;
             border-radius: 100px;
+            color: white;
+            text-decoration: none;
         }
     }
 

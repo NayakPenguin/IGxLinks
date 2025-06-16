@@ -36,6 +36,7 @@ import PrivacyPolicy from "./Screens/InstaUI/OrgLegal/PrivacyPolicy";
 import CookiePolicy from "./Screens/InstaUI/OrgLegal/CookiePolicy";
 import Disclaimer from "./Screens/InstaUI/OrgLegal/Disclaimer";
 import ContentGuidelines from "./Screens/InstaUI/OrgLegal/ContentGuidelines";
+import Login from "./Screens/LoginPages/Login";
 
 const App = () => {
   return (
@@ -43,6 +44,9 @@ const App = () => {
       <Routes>
         {/* <Route path="/" element={<LandingPage />} /> */}
         <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+
+
         <Route path="/shop" element={<Shop />} />
         <Route path="/brand" element={<BrandProfile />} />
         <Route path="/influencer" element={<Influencer />} />
