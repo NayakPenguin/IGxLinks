@@ -5,6 +5,10 @@ import samplePage1 from "../Images/samplePage1.png";
 import logo2 from "../Images/logo-bg.png";
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import feature1 from "../Images/Landing/feature1.png";
+import feature2 from "../Images/Landing/feature2.png";
+import feature3 from "../Images/Landing/feature3.png";
+import feature4 from "../Images/Landing/feature4.png";
+import feature5 from "../Images/Landing/feature5.png";
 
 const Landing = () => {
     return (
@@ -48,6 +52,10 @@ const Landing = () => {
                     It's your <strong>most versatile tool</strong> to share, express, and grow.
                 </div>
                 <img src={feature1} alt="" />
+                <img src={feature2} alt="" />
+                <img src={feature3} alt="" />
+                <img src={feature4} alt="" />
+                <img src={feature5} alt="" />
             </div>
         </Container>
     )
@@ -313,6 +321,7 @@ const Container = styled.div`
 
         img{
             width: 100%;
+            margin-bottom: 30px;
         }
     }
 `
