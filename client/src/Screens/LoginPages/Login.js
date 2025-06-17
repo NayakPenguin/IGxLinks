@@ -22,10 +22,30 @@ const Login = () => {
     }
   };
 
+
+  const handleGoogleLogin = () => {
+    window.open("http://localhost:5000/auth/google", "_self"); // opens auth flow
+  };
+
+  useEffect(() => {
+    fetch("http://localhost:5000/auth/me", {
+      credentials: "include", // very important to keep session cookies
+    })
+      .then((res) => res.json())
+      .then((user) => {
+        console.log("Logged in user:", user);
+      })
+      .catch((err) => {
+        console.error("Error fetching user:", err);
+      });
+  }, []);
+
+
+
   return (
     <Container>
       <BackBtn>
-        <a href="/"><ChevronLeftIcon/></a>
+        <a href="/"><ChevronLeftIcon /></a>
       </BackBtn>
       <div className="main-content">
         <div className="top">
@@ -39,7 +59,7 @@ const Login = () => {
           <div className="desc">Sign in or create an account using your email to get started.</div>
         </div>
 
-        <div className="social-login">
+        <div className="social-login" onClick={handleGoogleLogin}>
           <div className="logo">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/800px-Google_%22G%22_logo.svg.png" alt="" />
           </div>
@@ -79,7 +99,7 @@ const Login = () => {
 
         <div className="info">
           <InfoIcon />
-          Your Info is Safe - 
+          Your Info is Safe -
           We only use your email to identify your account. No spam, no sharing — your data is securely stored and locally cached to enhance your experience.
         </div>
 

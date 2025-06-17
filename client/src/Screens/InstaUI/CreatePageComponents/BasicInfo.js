@@ -224,7 +224,6 @@ const BasicInfo = () => {
         }, 'image/jpeg', 1);
     };
 
-
     const renderInput = (field, label, placeholder = "") => (
         <div className="input-container">
             <div className="label">{label}</div>
