@@ -7,6 +7,7 @@ import ErrorIcon from '@material-ui/icons/Error';
 import StorefrontIcon from '@material-ui/icons/Storefront';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import PersonIcon from '@material-ui/icons/Person';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -73,7 +74,7 @@ const AfterLogin = () => {
             setErrorMsg('Username cannot be empty');
             return false;
         }
-        
+
         if (!/^[a-z0-9._]{3,30}$/.test(value)) {
             setIsValidUsername(false);
             setErrorMsg('Only lowercase letters, numbers, ".", "_" allowed. 3–30 chars.');
@@ -117,12 +118,12 @@ const AfterLogin = () => {
             setPage1Error('Username is required');
             return false;
         }
-        
+
         if (isValidUsername !== true) {
             setPage1Error('Please enter a valid username');
             return false;
         }
-        
+
         return true;
     };
 
@@ -161,7 +162,7 @@ const AfterLogin = () => {
         if (!bio.trim()) {
             errors.bio = 'Bio is required';
             isValid = false;
-        } 
+        }
 
         if (!location.trim()) {
             errors.location = 'Location is required';
@@ -288,13 +289,20 @@ const AfterLogin = () => {
             location,
             profilePicture: imageSrcCropped
         };
-        
+
         console.log("Basic Data:", basicData);
         // window.location.href = "page/create";
     };
 
     return (
         <Container>
+            {
+                currentPage > 1 
+                && 
+                <BackBtn onClick={() => setCurrentPage(currentPage - 1)}>
+                    <ChevronLeftIcon />
+                </BackBtn>
+            }
             <div className="pagination">
                 {pages.map((page, index) => (
                     <React.Fragment key={page}>
@@ -402,9 +410,9 @@ const AfterLogin = () => {
                     </div>
                     <div className="input-container">
                         <div className="input-title">Full Name</div>
-                        <input 
-                            type="text" 
-                            placeholder="Enter your full name" 
+                        <input
+                            type="text"
+                            placeholder="Enter your full name"
                             value={fullName}
                             onChange={(e) => {
                                 setFullName(e.target.value);
@@ -420,9 +428,9 @@ const AfterLogin = () => {
                     </div>
                     <div className="input-container">
                         <div className="input-title">Your role or profession</div>
-                        <input 
-                            type="text" 
-                            placeholder="e.g., Student, Software Engineer, Designer, Creator" 
+                        <input
+                            type="text"
+                            placeholder="e.g., Student, Software Engineer, Designer, Creator"
                             value={profession}
                             onChange={(e) => {
                                 setProfession(e.target.value);
@@ -438,9 +446,9 @@ const AfterLogin = () => {
                     </div>
                     <div className="input-container">
                         <div className="input-title">Organization</div>
-                        <input 
-                            type="text" 
-                            placeholder="e.g., Google, Freelance, Self-employed" 
+                        <input
+                            type="text"
+                            placeholder="e.g., Google, Freelance, Self-employed"
                             value={organization}
                             onChange={(e) => {
                                 setOrganization(e.target.value);
@@ -456,9 +464,9 @@ const AfterLogin = () => {
                     </div>
                     <div className="input-container">
                         <div className="input-title">Short Bio</div>
-                        <input 
-                            type="text" 
-                            placeholder="Tell a bit about yourself" 
+                        <input
+                            type="text"
+                            placeholder="Tell a bit about yourself"
                             value={bio}
                             onChange={(e) => {
                                 setBio(e.target.value);
@@ -475,9 +483,9 @@ const AfterLogin = () => {
 
                     <div className="input-container">
                         <div className="input-title">Primary Location</div>
-                        <input 
-                            type="text" 
-                            placeholder="e.g., Delhi, Bangalore" 
+                        <input
+                            type="text"
+                            placeholder="e.g., Delhi, Bangalore"
                             value={location}
                             onChange={(e) => {
                                 setLocation(e.target.value);
@@ -879,4 +887,24 @@ const ModalActions = styled.div`
     background-color: #007bff;
     color: white;
   }
+`;
+
+const BackBtn = styled.div`
+    height: 30px;
+    aspect-ratio: 1/1;
+    border: 1px solid #d1d5db;
+    background-color: rgba(255, 255, 255, 0.83);
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 10px 0px;
+    border-radius: 50%;
+  
+    position: fixed;
+    top: 15px;
+    left: 15px;
+  
+    display: grid;
+    place-items: center;
+  
+    svg{
+      fill: #333;
+    }
 `;
