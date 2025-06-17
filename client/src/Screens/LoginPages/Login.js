@@ -7,51 +7,87 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
 const Login = () => {
   const [showOTP, setShowOTP] = useState(false);
-
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState(Array(6).fill(""));
   const inputRefs = useRef([]);
 
   const handleChange = (e, index) => {
     const value = e.target.value;
+    if (!/^[0-9]?$/.test(value)) return; // Only digits
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
 
-    if (value.length === 1 && index < 5) {
-      inputRefs.current[index + 1].focus();
-    }
-
-    if (value === '' && index > 0) {
-      inputRefs.current[index - 1].focus();
-    }
+    if (value && index < 5) inputRefs.current[index + 1].focus();
+    if (!value && index > 0) inputRefs.current[index - 1].focus();
   };
-
 
   const handleGoogleLogin = () => {
     window.open("http://localhost:5000/auth/google", "_self");
   };
 
-  useEffect(() => {
-    fetch("http://localhost:5000/auth/me", {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(user => {
-        console.log("Logged-in user:", user);
-      });
-  }, []);
-
-
   const handleLogout = async () => {
     try {
       await fetch("http://localhost:5000/auth/logout", {
         method: "GET",
-        credentials: "include", // Important to send the cookie
+        credentials: "include",
       });
-
-      // Optionally, redirect or update state
       console.log("Logged out");
-      window.location.href = "/"; // or navigate to login page
+      window.location.href = "/";
     } catch (err) {
       console.error("Logout failed", err);
     }
   };
+
+  const handleRequestOTP = async () => {
+    if (!email) return alert("Enter your email");
+    const res = await fetch("http://localhost:5000/auth/request-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert("OTP sent to your email");
+      setShowOTP(true);
+    } else {
+      alert(data.message || "Error sending OTP");
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    const fullOtp = otp.join("");
+    if (fullOtp.length !== 6) return alert("Enter all 6 digits of OTP");
+
+    const res = await fetch("http://localhost:5000/auth/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, otp: fullOtp })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert("Logged in successfully!");
+      window.location.href = "/basic-info";
+    } else {
+      alert(data.message || "Invalid OTP");
+    }
+  };
+
+  useEffect(() => {
+  fetch("http://localhost:5000/auth/me", {
+    credentials: "include",
+  })
+    .then(res => res.json())
+    .then(user => {
+      console.log("Logged-in user:", user);
+      if (user && user.email) {
+        window.location.href = "/basic-info";
+      }
+    });
+}, []);
 
   return (
     <Container>
@@ -62,7 +98,6 @@ const Login = () => {
         <div className="top">
           <img src={logo} alt="" />
           IG x Links
-          {/* <img src={sitename} alt="" /> */}
         </div>
 
         <div className="intro">
@@ -79,41 +114,39 @@ const Login = () => {
 
         <h3>OR</h3>
 
-        {/* <h3 onClick={handleLogout}>LOGOUT</h3> */}
-
         <div className="email-entry">
           <div className="input-container">
             <div className="input-name">Email</div>
-            <input type="text" placeholder="Enter your email" />
+            <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
-          {
-            showOTP ? (
-              <>
-                <div className="otp-container">
-                  <div className="input-name">Enter OTP</div>
-                  <div className="otp-inputs">
-                    {Array.from({ length: 6 }).map((_, index) => (
-                      <input
-                        key={index}
-                        type="text"
-                        maxLength="1"
-                        ref={(el) => (inputRefs.current[index] = el)}
-                        onChange={(e) => handleChange(e, index)}
-                      />
-                    ))}
-                  </div>
+          {showOTP ? (
+            <>
+              <div className="otp-container">
+                <div className="input-name">Enter OTP</div>
+                <div className="otp-inputs">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      maxLength="1"
+                      ref={(el) => (inputRefs.current[index] = el)}
+                      value={otp[index]}
+                      onChange={(e) => handleChange(e, index)}
+                    />
+                  ))}
                 </div>
-                <a href="/basic-info" className="next-btn">Submit</a>
-              </>
-            ) : <div onClick={() => setShowOTP(true)} className="next-btn">Continue</div>
-          }
+              </div>
+              <div className="next-btn" onClick={handleVerifyOTP}>Submit</div>
+            </>
+          ) : (
+            <div onClick={handleRequestOTP} className="next-btn">Continue</div>
+          )}
         </div>
 
         <div className="info">
           <InfoIcon />
-          Your Info is Safe -
-          We only use your email to identify your account. No spam, no sharing — your data is securely stored and locally cached to enhance your experience.
+          Your Info is Safe - We only use your email to identify your account. No spam, no sharing — your data is securely stored and locally cached to enhance your experience.
         </div>
 
         <div className="links">
@@ -124,12 +157,11 @@ const Login = () => {
           <a href="/disclaimer">Disclaimer</a>
         </div>
       </div>
-
     </Container>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
 
 const Container = styled.div`
   position: relative;

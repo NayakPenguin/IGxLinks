@@ -16,13 +16,13 @@ router.get(
     const token = generateToken(req.user);
 
     res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day (optional, adjust as needed)
-      domain: "igxl.ink"
-    });
-
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    maxAge: 24 * 60 * 60 * 1000, // 1 day (optional, adjust as needed)
+    domain: "igxl.ink" 
+  });
+    
     res.redirect("http://localhost:3000/basic-info"); // frontend route
   }
 );
