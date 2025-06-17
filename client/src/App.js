@@ -37,6 +37,7 @@ import CookiePolicy from "./Screens/InstaUI/OrgLegal/CookiePolicy";
 import Disclaimer from "./Screens/InstaUI/OrgLegal/Disclaimer";
 import ContentGuidelines from "./Screens/InstaUI/OrgLegal/ContentGuidelines";
 import Login from "./Screens/LoginPages/Login";
+import AfterLogin from "./Screens/LoginPages/AfterLogin";
 
 const App = () => {
   return (
@@ -45,6 +46,7 @@ const App = () => {
         {/* <Route path="/" element={<LandingPage />} /> */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/basic-info" element={<AfterLogin />} />
 
 
         <Route path="/shop" element={<Shop />} />

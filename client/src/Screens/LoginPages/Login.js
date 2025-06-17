@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import logo from "../../Images/logo-main.png";
 import logo2 from "../../Images/logo-bg.png";
 import InfoIcon from '@material-ui/icons/Info';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
 const Login = () => {
   const [showOTP, setShowOTP] = useState(false);
@@ -23,6 +24,9 @@ const Login = () => {
 
   return (
     <Container>
+      <BackBtn>
+        <a href="/"><ChevronLeftIcon/></a>
+      </BackBtn>
       <div className="top">
         <img src={logo} alt="" />
         IG x Links
@@ -50,25 +54,26 @@ const Login = () => {
         </div>
 
         {
-          showOTP &&
-          <div className="otp-container">
-            <div className="input-name">Enter OTP</div>
-            <div className="otp-inputs">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  maxLength="1"
-                  ref={(el) => (inputRefs.current[index] = el)}
-                  onChange={(e) => handleChange(e, index)}
-                />
-              ))}
-            </div>
-          </div>
+          showOTP ? (
+            <>
+              <div className="otp-container">
+                <div className="input-name">Enter OTP</div>
+                <div className="otp-inputs">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      maxLength="1"
+                      ref={(el) => (inputRefs.current[index] = el)}
+                      onChange={(e) => handleChange(e, index)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <a href="/basic-info" className="next-btn">Submit</a>
+            </>
+          ) : <div onClick={() => setShowOTP(true)} className="next-btn">Continue</div>
         }
-
-
-        <div className="next-btn">Continue</div>
       </div>
 
       <div className="info">
@@ -217,6 +222,8 @@ const Container = styled.div`
       font-size: 0.85rem;
 
       background-color: black;
+      color: white;
+      text-decoration: none;
 
       margin-top: 20px;
       border-radius: 100px;
@@ -288,4 +295,26 @@ const Container = styled.div`
     }
   }
 
+`
+
+const BackBtn = styled.div`
+  a{
+    height: 40px;
+    aspect-ratio: 1/1;
+    border: 1px solid #d1d5db;
+    background-color: rgba(255, 255, 255, 0.83);
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 10px 0px;
+    border-radius: 50%;
+  
+    position: fixed;
+    top: 20px;
+    left: 20px;
+  
+    display: grid;
+    place-items: center;
+  
+    svg{
+      fill: #333;
+    }
+  }
 `
