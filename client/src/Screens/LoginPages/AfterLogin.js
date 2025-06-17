@@ -1,28 +1,66 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from 'styled-components';
 import logo from "../../Images/logo-main.png";
-import logo2 from "../../Images/logo-bg.png";
 import InfoIcon from '@material-ui/icons/Info';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import CheckIcon from '@material-ui/icons/Check';
 import ErrorIcon from '@material-ui/icons/Error';
-import { CircularProgress } from "@material-ui/core";
 import StorefrontIcon from '@material-ui/icons/Storefront';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import PersonIcon from '@material-ui/icons/Person';
+
+import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+
+const ASPECT_RATIO = 1;
+const MIN_DIMENSION = 150;
 
 const AfterLogin = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const pages = [1, 2, 3];
 
+    // Username states
     const [usernames, setUsernames] = useState(new Set());
     const [inputUsername, setInputUsername] = useState('');
-    const [isValidUsername, setIsValidUsername] = useState(null); // true, false, null
+    const [isValidUsername, setIsValidUsername] = useState(null);
     const [errorMsg, setErrorMsg] = useState('');
     const [isLoadingUsernameSearch, setIsLoadingUsernameSearch] = useState(false);
+    const [page1Error, setPage1Error] = useState('');
     const typingTimer = useRef(null);
 
+    // Business states
     const [isBusiness, setIsBusiness] = useState(false);
+    const [page2Error, setPage2Error] = useState('');
+
+    // Personal information states
+    const [fullName, setFullName] = useState('');
+    const [profession, setProfession] = useState('');
+    const [organization, setOrganization] = useState('');
+    const [bio, setBio] = useState('');
+    const [location, setLocation] = useState('');
+    const [page3Errors, setPage3Errors] = useState({
+        fullName: '',
+        profession: '',
+        organization: '',
+        bio: '',
+        location: '',
+        profilePicture: ''
+    });
+
+    // Image states
+    const [cropModalOpen, setCropModalOpen] = useState(false);
+    const [imageSrc, setImageSrc] = useState(null);
+    const [imageSrcCropped, setImageSrcCropped] = useState(null);
+    const [crop, setCrop] = useState({
+        unit: '%',
+        width: 50,
+        height: 50,
+        aspect: 1,
+        x: 25,
+        y: 25
+    });
+    const [completedCrop, setCompletedCrop] = useState(null);
+    const imageRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         const fakeData = ['atanu', 'john_doe', 'elon.musk', 'riya12'];
@@ -30,27 +68,32 @@ const AfterLogin = () => {
     }, []);
 
     const validateUsername = (value) => {
-        // Instagram-like rules:
-        // 1. lowercase letters, numbers, underscores, dots allowed
-        // 2. no "__" or ".."
-        // 3. cannot start with "_"
-        // 4. must be 3-30 characters (Instagram allows 30)
-
+        if (!value.trim()) {
+            setIsValidUsername(false);
+            setErrorMsg('Username cannot be empty');
+            return false;
+        }
+        
         if (!/^[a-z0-9._]{3,30}$/.test(value)) {
             setIsValidUsername(false);
             setErrorMsg('Only lowercase letters, numbers, ".", "_" allowed. 3–30 chars.');
+            return false;
         } else if (/^_/.test(value)) {
             setIsValidUsername(false);
             setErrorMsg("Username cannot start with '_'.");
+            return false;
         } else if (value.includes('..') || value.includes('__')) {
             setIsValidUsername(false);
             setErrorMsg("Username cannot contain consecutive '.' or '_'.");
+            return false;
         } else if (usernames.has(value)) {
             setIsValidUsername(false);
             setErrorMsg('This username is already taken.');
+            return false;
         } else {
             setIsValidUsername(true);
             setErrorMsg('');
+            return true;
         }
     };
 
@@ -60,12 +103,194 @@ const AfterLogin = () => {
         setIsLoadingUsernameSearch(true);
         setIsValidUsername(null);
         setErrorMsg('');
+        setPage1Error('');
 
         clearTimeout(typingTimer.current);
         typingTimer.current = setTimeout(() => {
             setIsLoadingUsernameSearch(false);
             if (value.length > 0) validateUsername(value);
         }, 750);
+    };
+
+    const validatePage1 = () => {
+        if (!inputUsername.trim()) {
+            setPage1Error('Username is required');
+            return false;
+        }
+        
+        if (isValidUsername !== true) {
+            setPage1Error('Please enter a valid username');
+            return false;
+        }
+        
+        return true;
+    };
+
+    const validatePage2 = () => {
+        // Business selection is optional (default is false)
+        return true;
+    };
+
+    const validatePage3 = () => {
+        const errors = {
+            fullName: '',
+            profession: '',
+            organization: '',
+            bio: '',
+            location: '',
+            profilePicture: ''
+        };
+
+        let isValid = true;
+
+        if (!fullName.trim()) {
+            errors.fullName = 'Full name is required';
+            isValid = false;
+        }
+
+        if (!profession.trim()) {
+            errors.profession = 'Profession is required';
+            isValid = false;
+        }
+
+        if (!organization.trim()) {
+            errors.organization = 'Organization is required';
+            isValid = false;
+        }
+
+        if (!bio.trim()) {
+            errors.bio = 'Bio is required';
+            isValid = false;
+        } 
+
+        if (!location.trim()) {
+            errors.location = 'Location is required';
+            isValid = false;
+        }
+
+        if (!imageSrcCropped) {
+            errors.profilePicture = 'Profile picture is required';
+            isValid = false;
+        }
+
+        setPage3Errors(errors);
+        return isValid;
+    };
+
+    const handleNextPage = () => {
+        if (currentPage === 1) {
+            if (!validatePage1()) return;
+        } else if (currentPage === 2) {
+            if (!validatePage2()) return;
+        }
+        setCurrentPage(currentPage + 1);
+    };
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            if (!file.type.match('image.(jpeg|jpg|png)')) {
+                setPage3Errors(prev => ({
+                    ...prev,
+                    profilePicture: 'Please select a JPEG/JPG or PNG image'
+                }));
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                setPage3Errors(prev => ({
+                    ...prev,
+                    profilePicture: 'Image size should be less than 5MB'
+                }));
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                setImageSrc(reader.result);
+                setCropModalOpen(true);
+                setPage3Errors(prev => ({
+                    ...prev,
+                    profilePicture: ''
+                }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleCropComplete = (crop) => {
+        setCompletedCrop(crop);
+    };
+
+    const handleSaveCroppedImage = () => {
+        if (!completedCrop || !imageRef.current) return;
+
+        const image = imageRef.current;
+        const canvas = document.createElement('canvas');
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+
+        canvas.width = completedCrop.width;
+        canvas.height = completedCrop.height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(
+            image,
+            completedCrop.x * scaleX,
+            completedCrop.y * scaleY,
+            completedCrop.width * scaleX,
+            completedCrop.height * scaleY,
+            0,
+            0,
+            completedCrop.width,
+            completedCrop.height
+        );
+
+        canvas.toBlob((blob) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => {
+                localStorage.setItem("newLocalImageURL", reader.result);
+                setImageSrcCropped(reader.result);
+                setCropModalOpen(false);
+                setPage3Errors(prev => ({
+                    ...prev,
+                    profilePicture: ''
+                }));
+            };
+        }, 'image/jpeg', 1);
+    };
+
+    const onImageLoad = (e) => {
+        const { width, height } = e.currentTarget;
+        const crop = makeAspectCrop(
+            {
+                unit: "px",
+                width: MIN_DIMENSION,
+            },
+            ASPECT_RATIO,
+            width,
+            height
+        );
+        const centeredCrop = centerCrop(crop, width, height);
+        setCrop(centeredCrop);
+    };
+
+    const handleSubmit = () => {
+        if (!validatePage3()) return;
+
+        const basicData = {
+            username: inputUsername,
+            isBusiness,
+            fullName,
+            profession,
+            organization,
+            bio,
+            location,
+            profilePicture: imageSrcCropped
+        };
+        
+        console.log("Basic Data:", basicData);
+        // window.location.href = "page/create";
     };
 
     return (
@@ -86,8 +311,7 @@ const AfterLogin = () => {
                 IG x Links
             </div>
 
-            {
-                currentPage === 1 &&
+            {currentPage === 1 && (
                 <div className="one-page">
                     <div className="page-content">
                         <div className="page-icon">
@@ -106,8 +330,7 @@ const AfterLogin = () => {
                                     value={inputUsername}
                                     onChange={handleChangeUsername}
                                 />
-                                {
-                                    inputUsername.length > 0 &&
+                                {inputUsername.length > 0 && (
                                     <div className={`iscorrect ${isValidUsername === true ? 'valid' : isValidUsername === false ? 'not-valid' : ''}`}>
                                         {isLoadingUsernameSearch ? (
                                             <img src="https://i.gifer.com/ZKZg.gif" alt="" />
@@ -117,31 +340,30 @@ const AfterLogin = () => {
                                             <ErrorIcon />
                                         ) : null}
                                     </div>
-                                }
+                                )}
                             </div>
                         </div>
 
-                        <div className="next-btn" onClick={() => setCurrentPage(2)}>Next</div>
+                        <div className="next-btn" onClick={handleNextPage}>Next</div>
                     </div>
 
-                    {isValidUsername === false && (
+                    {(isValidUsername === false || page1Error) && (
                         <div className="error-msg">
                             <InfoIcon />
-                            {errorMsg}
+                            {page1Error || errorMsg}
                         </div>
                     )}
                 </div>
-            }
+            )}
 
-            {
-                currentPage === 2 &&
+            {currentPage === 2 && (
                 <div className="one-page">
                     <div className="page-content">
                         <div className="page-icon">
                             <StorefrontIcon />
                         </div>
                         <div className="title">Are you a Business?</div>
-                        <div className="desc">If you're looking to sell or promote your products, we offer business-specific tools including a public feedback box. Most users can simply select 'No' for now — you’ll always have the option to switch later.</div>
+                        <div className="desc">If you're looking to sell or promote your products, we offer business-specific tools including a public feedback box. Most users can simply select 'No' for now — you'll always have the option to switch later.</div>
                     </div>
                     <div className="input-container">
                         <div className="options">
@@ -159,12 +381,17 @@ const AfterLogin = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="next-btn" onClick={() => setCurrentPage(3)}>Next</div>
+                    {page2Error && (
+                        <div className="error-msg">
+                            <InfoIcon />
+                            {page2Error}
+                        </div>
+                    )}
+                    <div className="next-btn" onClick={handleNextPage}>Next</div>
                 </div>
-            }
+            )}
 
-            {
-                currentPage === 3 &&
+            {currentPage === 3 && (
                 <div className="one-page">
                     <div className="page-content">
                         <div className="page-icon">
@@ -175,33 +402,172 @@ const AfterLogin = () => {
                     </div>
                     <div className="input-container">
                         <div className="input-title">Full Name</div>
-                        <input type="text" placeholder="Enter your full name" />
+                        <input 
+                            type="text" 
+                            placeholder="Enter your full name" 
+                            value={fullName}
+                            onChange={(e) => {
+                                setFullName(e.target.value);
+                                setPage3Errors(prev => ({ ...prev, fullName: '' }));
+                            }}
+                        />
+                        {page3Errors.fullName && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {page3Errors.fullName}
+                            </div>
+                        )}
                     </div>
                     <div className="input-container">
                         <div className="input-title">Your role or profession</div>
-                        <input type="text" placeholder="e.g., Student, Software Engineer, Designer, Creator" />
+                        <input 
+                            type="text" 
+                            placeholder="e.g., Student, Software Engineer, Designer, Creator" 
+                            value={profession}
+                            onChange={(e) => {
+                                setProfession(e.target.value);
+                                setPage3Errors(prev => ({ ...prev, profession: '' }));
+                            }}
+                        />
+                        {page3Errors.profession && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {page3Errors.profession}
+                            </div>
+                        )}
                     </div>
                     <div className="input-container">
                         <div className="input-title">Organization</div>
-                        <input type="text" placeholder="e.g., Google, Freelance, Self-employed" />
+                        <input 
+                            type="text" 
+                            placeholder="e.g., Google, Freelance, Self-employed" 
+                            value={organization}
+                            onChange={(e) => {
+                                setOrganization(e.target.value);
+                                setPage3Errors(prev => ({ ...prev, organization: '' }));
+                            }}
+                        />
+                        {page3Errors.organization && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {page3Errors.organization}
+                            </div>
+                        )}
                     </div>
                     <div className="input-container">
                         <div className="input-title">Short Bio</div>
-                        <input type="text" placeholder="Tell a bit about yourself" />
+                        <input 
+                            type="text" 
+                            placeholder="Tell a bit about yourself" 
+                            value={bio}
+                            onChange={(e) => {
+                                setBio(e.target.value);
+                                setPage3Errors(prev => ({ ...prev, bio: '' }));
+                            }}
+                        />
+                        {page3Errors.bio && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {page3Errors.bio}
+                            </div>
+                        )}
                     </div>
 
                     <div className="input-container">
                         <div className="input-title">Primary Location</div>
-                        <input type="text" placeholder="e.g., Delhi, Bangalore" />
+                        <input 
+                            type="text" 
+                            placeholder="e.g., Delhi, Bangalore" 
+                            value={location}
+                            onChange={(e) => {
+                                setLocation(e.target.value);
+                                setPage3Errors(prev => ({ ...prev, location: '' }));
+                            }}
+                        />
+                        {page3Errors.location && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {page3Errors.location}
+                            </div>
+                        )}
                     </div>
 
-                    <div className="next-btn" onClick={() => setCurrentPage(3)}>Next</div>
-                </div>
-            }
+                    {cropModalOpen && (
+                        <ModalOverlay>
+                            <ModalContent>
+                                {imageSrc && (
+                                    <div style={{ width: '100%', maxWidth: '500px' }}>
+                                        <ReactCrop
+                                            src={imageSrc}
+                                            crop={crop}
+                                            onComplete={handleCropComplete}
+                                            onChange={newCrop => setCrop(newCrop)}
+                                            aspect={ASPECT_RATIO}
+                                            minWidth={MIN_DIMENSION}
+                                            ruleOfThirds
+                                            keepSelection
+                                            style={{
+                                                display: 'block',
+                                                maxWidth: '100%',
+                                                margin: '0 auto'
+                                            }}
+                                        >
+                                            <img
+                                                ref={imageRef}
+                                                src={imageSrc}
+                                                alt="Crop me"
+                                                style={{
+                                                    maxWidth: '100%',
+                                                    maxHeight: '70vh',
+                                                    display: 'block'
+                                                }}
+                                                onLoad={onImageLoad}
+                                            />
+                                        </ReactCrop>
+                                    </div>
+                                )}
+                                <ModalActions>
+                                    <button onClick={() => setCropModalOpen(false)}>Cancel</button>
+                                    <button onClick={handleSaveCroppedImage}>Save</button>
+                                </ModalActions>
+                            </ModalContent>
+                        </ModalOverlay>
+                    )}
 
+                    <div className="input-container">
+                        <div className="input-title">Your profile picture</div>
+                        <div className="logo-x-dp">
+                            {imageSrcCropped != null && (
+                                <img
+                                    src={imageSrcCropped}
+                                    alt="Profile"
+                                />
+                            )}
+                            <div className="add-btn" onClick={() => fileInputRef.current.click()}>
+                                Add Image
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    accept="image/jpeg, image/png"
+                                    style={{ display: 'none' }}
+                                />
+                            </div>
+                        </div>
+                        {page3Errors.profilePicture && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {page3Errors.profilePicture}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="next-btn" onClick={handleSubmit}>Submit</div>
+                </div>
+            )}
         </Container>
-    )
-}
+    );
+};
 
 export default AfterLogin;
 
@@ -320,14 +686,14 @@ const Container = styled.div`
     .input-container{
         display: flex;
         flex-direction: column;
-        margin-top: 20px;
+        margin-top: 30px;
         width: 100%;
 
         .input-title{
             color: #333;
             font-size: 0.75rem;
             font-weight: 500;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         input{
@@ -414,6 +780,28 @@ const Container = styled.div`
         }
     } 
 
+    .logo-x-dp{
+        padding: 20px;
+
+        background-color: #f9fafb;
+        border: 1px solid #d1d5db;
+        border-radius: 20px;
+
+        img{
+            width: 100%;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .add-btn{
+            color: #333;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15rem;
+            text-align: center;
+        }   
+    }
+
     .next-btn{
     display: flex;
     align-items: center;
@@ -449,3 +837,46 @@ const Container = styled.div`
     }
   }
 `
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  z-index: 1200;
+`;
+
+const ModalActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 10px;
+  z-index: 1200;
+
+  button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:last-child {
+    background-color: #007bff;
+    color: white;
+  }
+`;
