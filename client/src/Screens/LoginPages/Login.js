@@ -24,23 +24,34 @@ const Login = () => {
 
 
   const handleGoogleLogin = () => {
-    window.open("http://localhost:5000/auth/google", "_self"); // opens auth flow
+    window.open("http://localhost:5000/auth/google", "_self");
   };
 
   useEffect(() => {
     fetch("http://localhost:5000/auth/me", {
-      credentials: "include", // very important to keep session cookies
+      credentials: "include",
     })
-      .then((res) => res.json())
-      .then((user) => {
-        console.log("Logged in user:", user);
-      })
-      .catch((err) => {
-        console.error("Error fetching user:", err);
+      .then(res => res.json())
+      .then(user => {
+        console.log("Logged-in user:", user);
       });
   }, []);
 
 
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:5000/auth/logout", {
+        method: "GET",
+        credentials: "include", // Important to send the cookie
+      });
+
+      // Optionally, redirect or update state
+      console.log("Logged out");
+      window.location.href = "/"; // or navigate to login page
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
 
   return (
     <Container>
@@ -67,6 +78,8 @@ const Login = () => {
         </div>
 
         <h3>OR</h3>
+
+        {/* <h3 onClick={handleLogout}>LOGOUT</h3> */}
 
         <div className="email-entry">
           <div className="input-container">

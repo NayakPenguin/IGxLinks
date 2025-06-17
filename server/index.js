@@ -1,53 +1,33 @@
-// index.js
 const express = require("express");
-const session = require("express-session");
-const passport = require("passport");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const passport = require("passport");
 const dotenv = require("dotenv");
-const path = require("path");
 
 dotenv.config();
 require("./config/passport");
 
 const app = express();
 
-// Middlewares
-app.use(express.json()); // to parse JSON bodies if needed
-
-app.use(
-  cors({
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
-    credentials: true,
-  })
-);
-
-// Session config
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "keyboard cat",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false, // set true if using HTTPS in production
-      httpOnly: true,
-      sameSite: "lax", // change to 'none' + secure: true if using cross-site cookies over HTTPS
-    },
-  })
-);
-
-// Passport setup
+// Middleware
+app.use(cors({
+  origin: "http://localhost:3000", // React frontend
+  credentials: true,
+}));
+app.use(cookieParser());
 app.use(passport.initialize());
-app.use(passport.session());
 
 // Routes
 app.use("/auth", require("./routes/auth"));
+app.use("/auth", require("./routes/testEmail"));
 
+// Test Route
 app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
-// Start server
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server listening at http://localhost:${PORT}`);
+  console.log(`Server listening on http://localhost:${PORT}`);
 });
