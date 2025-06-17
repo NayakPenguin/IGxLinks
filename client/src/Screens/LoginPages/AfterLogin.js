@@ -297,282 +297,284 @@ const AfterLogin = () => {
     return (
         <Container>
             {
-                currentPage > 1 
-                && 
+                currentPage > 1
+                &&
                 <BackBtn onClick={() => setCurrentPage(currentPage - 1)}>
                     <ChevronLeftIcon />
                 </BackBtn>
             }
-            <div className="pagination">
-                {pages.map((page, index) => (
-                    <React.Fragment key={page}>
-                        <div className={`page ${currentPage >= page ? 'curr-or-done' : ''}`}>{page}</div>
-                        {index < pages.length - 1 && (
-                            <div className={`line ${currentPage >= page + 1 ? 'curr-or-done' : ''}`}></div>
-                        )}
-                    </React.Fragment>
-                ))}
-            </div>
+            <div className="main-content">
+                <div className="pagination">
+                    {pages.map((page, index) => (
+                        <React.Fragment key={page}>
+                            <div className={`page ${currentPage >= page ? 'curr-or-done' : ''}`}>{page}</div>
+                            {index < pages.length - 1 && (
+                                <div className={`line ${currentPage >= page + 1 ? 'curr-or-done' : ''}`}></div>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </div>
 
-            <div className="top">
-                <img src={logo} alt="" />
-                IG x Links
-            </div>
+                <div className="top">
+                    <img src={logo} alt="" />
+                    IG x Links
+                </div>
 
-            {currentPage === 1 && (
-                <div className="one-page">
-                    <div className="page-content">
-                        <div className="page-icon">
-                            <AlternateEmailIcon />
+                {currentPage === 1 && (
+                    <div className="one-page">
+                        <div className="page-content">
+                            <div className="page-icon">
+                                <AlternateEmailIcon />
+                            </div>
+
+                            <div className="title">Username</div>
+                            <div className="desc">Enter your preferred username</div>
+                        </div>
+                        <div className="username-entry">
+                            <div className="input-container">
+                                <div className="input-valid">
+                                    <input
+                                        type="text"
+                                        placeholder="Enter preferred username"
+                                        value={inputUsername}
+                                        onChange={handleChangeUsername}
+                                    />
+                                    {inputUsername.length > 0 && (
+                                        <div className={`iscorrect ${isValidUsername === true ? 'valid' : isValidUsername === false ? 'not-valid' : ''}`}>
+                                            {isLoadingUsernameSearch ? (
+                                                <img src="https://i.gifer.com/ZKZg.gif" alt="" />
+                                            ) : isValidUsername === true ? (
+                                                <CheckIcon />
+                                            ) : isValidUsername === false ? (
+                                                <ErrorIcon />
+                                            ) : null}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="next-btn" onClick={handleNextPage}>Next</div>
                         </div>
 
-                        <div className="title">Username</div>
-                        <div className="desc">Enter your preferred username</div>
+                        {(isValidUsername === false || page1Error) && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {page1Error || errorMsg}
+                            </div>
+                        )}
                     </div>
-                    <div className="username-entry">
+                )}
+
+                {currentPage === 2 && (
+                    <div className="one-page">
+                        <div className="page-content">
+                            <div className="page-icon">
+                                <StorefrontIcon />
+                            </div>
+                            <div className="title">Are you a Business?</div>
+                            <div className="desc">If you're looking to sell or promote your products, we offer business-specific tools including a public feedback box. Most users can simply select 'No' for now — you'll always have the option to switch later.</div>
+                        </div>
                         <div className="input-container">
-                            <div className="input-valid">
-                                <input
-                                    type="text"
-                                    placeholder="Enter preferred username"
-                                    value={inputUsername}
-                                    onChange={handleChangeUsername}
-                                />
-                                {inputUsername.length > 0 && (
-                                    <div className={`iscorrect ${isValidUsername === true ? 'valid' : isValidUsername === false ? 'not-valid' : ''}`}>
-                                        {isLoadingUsernameSearch ? (
-                                            <img src="https://i.gifer.com/ZKZg.gif" alt="" />
-                                        ) : isValidUsername === true ? (
-                                            <CheckIcon />
-                                        ) : isValidUsername === false ? (
-                                            <ErrorIcon />
-                                        ) : null}
-                                    </div>
-                                )}
+                            <div className="options">
+                                <div
+                                    className={`opt ${!isBusiness ? 'selected' : ''}`}
+                                    onClick={() => setIsBusiness(false)}
+                                >
+                                    No
+                                </div>
+                                <div
+                                    className={`opt ${isBusiness ? 'selected' : ''}`}
+                                    onClick={() => setIsBusiness(true)}
+                                >
+                                    Yes
+                                </div>
                             </div>
                         </div>
-
+                        {page2Error && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {page2Error}
+                            </div>
+                        )}
                         <div className="next-btn" onClick={handleNextPage}>Next</div>
                     </div>
+                )}
 
-                    {(isValidUsername === false || page1Error) && (
-                        <div className="error-msg">
-                            <InfoIcon />
-                            {page1Error || errorMsg}
+                {currentPage === 3 && (
+                    <div className="one-page">
+                        <div className="page-content">
+                            <div className="page-icon">
+                                <PersonIcon />
+                            </div>
+                            <div className="title">Personal Information</div>
+                            <div className="desc">This information will be used to create your page with IGxLinks.</div>
                         </div>
-                    )}
-                </div>
-            )}
-
-            {currentPage === 2 && (
-                <div className="one-page">
-                    <div className="page-content">
-                        <div className="page-icon">
-                            <StorefrontIcon />
-                        </div>
-                        <div className="title">Are you a Business?</div>
-                        <div className="desc">If you're looking to sell or promote your products, we offer business-specific tools including a public feedback box. Most users can simply select 'No' for now — you'll always have the option to switch later.</div>
-                    </div>
-                    <div className="input-container">
-                        <div className="options">
-                            <div
-                                className={`opt ${!isBusiness ? 'selected' : ''}`}
-                                onClick={() => setIsBusiness(false)}
-                            >
-                                No
-                            </div>
-                            <div
-                                className={`opt ${isBusiness ? 'selected' : ''}`}
-                                onClick={() => setIsBusiness(true)}
-                            >
-                                Yes
-                            </div>
-                        </div>
-                    </div>
-                    {page2Error && (
-                        <div className="error-msg">
-                            <InfoIcon />
-                            {page2Error}
-                        </div>
-                    )}
-                    <div className="next-btn" onClick={handleNextPage}>Next</div>
-                </div>
-            )}
-
-            {currentPage === 3 && (
-                <div className="one-page">
-                    <div className="page-content">
-                        <div className="page-icon">
-                            <PersonIcon />
-                        </div>
-                        <div className="title">Personal Information</div>
-                        <div className="desc">This information will be used to create your page with IGxLinks.</div>
-                    </div>
-                    <div className="input-container">
-                        <div className="input-title">Full Name</div>
-                        <input
-                            type="text"
-                            placeholder="Enter your full name"
-                            value={fullName}
-                            onChange={(e) => {
-                                setFullName(e.target.value);
-                                setPage3Errors(prev => ({ ...prev, fullName: '' }));
-                            }}
-                        />
-                        {page3Errors.fullName && (
-                            <div className="error-msg">
-                                <InfoIcon />
-                                {page3Errors.fullName}
-                            </div>
-                        )}
-                    </div>
-                    <div className="input-container">
-                        <div className="input-title">Your role or profession</div>
-                        <input
-                            type="text"
-                            placeholder="e.g., Student, Software Engineer, Designer, Creator"
-                            value={profession}
-                            onChange={(e) => {
-                                setProfession(e.target.value);
-                                setPage3Errors(prev => ({ ...prev, profession: '' }));
-                            }}
-                        />
-                        {page3Errors.profession && (
-                            <div className="error-msg">
-                                <InfoIcon />
-                                {page3Errors.profession}
-                            </div>
-                        )}
-                    </div>
-                    <div className="input-container">
-                        <div className="input-title">Organization</div>
-                        <input
-                            type="text"
-                            placeholder="e.g., Google, Freelance, Self-employed"
-                            value={organization}
-                            onChange={(e) => {
-                                setOrganization(e.target.value);
-                                setPage3Errors(prev => ({ ...prev, organization: '' }));
-                            }}
-                        />
-                        {page3Errors.organization && (
-                            <div className="error-msg">
-                                <InfoIcon />
-                                {page3Errors.organization}
-                            </div>
-                        )}
-                    </div>
-                    <div className="input-container">
-                        <div className="input-title">Short Bio</div>
-                        <input
-                            type="text"
-                            placeholder="Tell a bit about yourself"
-                            value={bio}
-                            onChange={(e) => {
-                                setBio(e.target.value);
-                                setPage3Errors(prev => ({ ...prev, bio: '' }));
-                            }}
-                        />
-                        {page3Errors.bio && (
-                            <div className="error-msg">
-                                <InfoIcon />
-                                {page3Errors.bio}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="input-container">
-                        <div className="input-title">Primary Location</div>
-                        <input
-                            type="text"
-                            placeholder="e.g., Delhi, Bangalore"
-                            value={location}
-                            onChange={(e) => {
-                                setLocation(e.target.value);
-                                setPage3Errors(prev => ({ ...prev, location: '' }));
-                            }}
-                        />
-                        {page3Errors.location && (
-                            <div className="error-msg">
-                                <InfoIcon />
-                                {page3Errors.location}
-                            </div>
-                        )}
-                    </div>
-
-                    {cropModalOpen && (
-                        <ModalOverlay>
-                            <ModalContent>
-                                {imageSrc && (
-                                    <div style={{ width: '100%', maxWidth: '500px' }}>
-                                        <ReactCrop
-                                            src={imageSrc}
-                                            crop={crop}
-                                            onComplete={handleCropComplete}
-                                            onChange={newCrop => setCrop(newCrop)}
-                                            aspect={ASPECT_RATIO}
-                                            minWidth={MIN_DIMENSION}
-                                            ruleOfThirds
-                                            keepSelection
-                                            style={{
-                                                display: 'block',
-                                                maxWidth: '100%',
-                                                margin: '0 auto'
-                                            }}
-                                        >
-                                            <img
-                                                ref={imageRef}
-                                                src={imageSrc}
-                                                alt="Crop me"
-                                                style={{
-                                                    maxWidth: '100%',
-                                                    maxHeight: '70vh',
-                                                    display: 'block'
-                                                }}
-                                                onLoad={onImageLoad}
-                                            />
-                                        </ReactCrop>
-                                    </div>
-                                )}
-                                <ModalActions>
-                                    <button onClick={() => setCropModalOpen(false)}>Cancel</button>
-                                    <button onClick={handleSaveCroppedImage}>Save</button>
-                                </ModalActions>
-                            </ModalContent>
-                        </ModalOverlay>
-                    )}
-
-                    <div className="input-container">
-                        <div className="input-title">Your profile picture</div>
-                        <div className="logo-x-dp">
-                            {imageSrcCropped != null && (
-                                <img
-                                    src={imageSrcCropped}
-                                    alt="Profile"
-                                />
+                        <div className="input-container">
+                            <div className="input-title">Full Name</div>
+                            <input
+                                type="text"
+                                placeholder="Enter your full name"
+                                value={fullName}
+                                onChange={(e) => {
+                                    setFullName(e.target.value);
+                                    setPage3Errors(prev => ({ ...prev, fullName: '' }));
+                                }}
+                            />
+                            {page3Errors.fullName && (
+                                <div className="error-msg">
+                                    <InfoIcon />
+                                    {page3Errors.fullName}
+                                </div>
                             )}
-                            <div className="add-btn" onClick={() => fileInputRef.current.click()}>
-                                Add Image
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    onChange={handleFileChange}
-                                    accept="image/jpeg, image/png"
-                                    style={{ display: 'none' }}
-                                />
-                            </div>
                         </div>
-                        {page3Errors.profilePicture && (
-                            <div className="error-msg">
-                                <InfoIcon />
-                                {page3Errors.profilePicture}
-                            </div>
-                        )}
-                    </div>
+                        <div className="input-container">
+                            <div className="input-title">Your role or profession</div>
+                            <input
+                                type="text"
+                                placeholder="e.g., Student, Software Engineer, Designer, Creator"
+                                value={profession}
+                                onChange={(e) => {
+                                    setProfession(e.target.value);
+                                    setPage3Errors(prev => ({ ...prev, profession: '' }));
+                                }}
+                            />
+                            {page3Errors.profession && (
+                                <div className="error-msg">
+                                    <InfoIcon />
+                                    {page3Errors.profession}
+                                </div>
+                            )}
+                        </div>
+                        <div className="input-container">
+                            <div className="input-title">Organization</div>
+                            <input
+                                type="text"
+                                placeholder="e.g., Google, Freelance, Self-employed"
+                                value={organization}
+                                onChange={(e) => {
+                                    setOrganization(e.target.value);
+                                    setPage3Errors(prev => ({ ...prev, organization: '' }));
+                                }}
+                            />
+                            {page3Errors.organization && (
+                                <div className="error-msg">
+                                    <InfoIcon />
+                                    {page3Errors.organization}
+                                </div>
+                            )}
+                        </div>
+                        <div className="input-container">
+                            <div className="input-title">Short Bio</div>
+                            <input
+                                type="text"
+                                placeholder="Tell a bit about yourself"
+                                value={bio}
+                                onChange={(e) => {
+                                    setBio(e.target.value);
+                                    setPage3Errors(prev => ({ ...prev, bio: '' }));
+                                }}
+                            />
+                            {page3Errors.bio && (
+                                <div className="error-msg">
+                                    <InfoIcon />
+                                    {page3Errors.bio}
+                                </div>
+                            )}
+                        </div>
 
-                    <div className="next-btn" onClick={handleSubmit}>Submit</div>
-                </div>
-            )}
+                        <div className="input-container">
+                            <div className="input-title">Primary Location</div>
+                            <input
+                                type="text"
+                                placeholder="e.g., Delhi, Bangalore"
+                                value={location}
+                                onChange={(e) => {
+                                    setLocation(e.target.value);
+                                    setPage3Errors(prev => ({ ...prev, location: '' }));
+                                }}
+                            />
+                            {page3Errors.location && (
+                                <div className="error-msg">
+                                    <InfoIcon />
+                                    {page3Errors.location}
+                                </div>
+                            )}
+                        </div>
+
+                        {cropModalOpen && (
+                            <ModalOverlay>
+                                <ModalContent>
+                                    {imageSrc && (
+                                        <div style={{ width: '100%', maxWidth: '500px' }}>
+                                            <ReactCrop
+                                                src={imageSrc}
+                                                crop={crop}
+                                                onComplete={handleCropComplete}
+                                                onChange={newCrop => setCrop(newCrop)}
+                                                aspect={ASPECT_RATIO}
+                                                minWidth={MIN_DIMENSION}
+                                                ruleOfThirds
+                                                keepSelection
+                                                style={{
+                                                    display: 'block',
+                                                    maxWidth: '100%',
+                                                    margin: '0 auto'
+                                                }}
+                                            >
+                                                <img
+                                                    ref={imageRef}
+                                                    src={imageSrc}
+                                                    alt="Crop me"
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '70vh',
+                                                        display: 'block'
+                                                    }}
+                                                    onLoad={onImageLoad}
+                                                />
+                                            </ReactCrop>
+                                        </div>
+                                    )}
+                                    <ModalActions>
+                                        <button onClick={() => setCropModalOpen(false)}>Cancel</button>
+                                        <button onClick={handleSaveCroppedImage}>Save</button>
+                                    </ModalActions>
+                                </ModalContent>
+                            </ModalOverlay>
+                        )}
+
+                        <div className="input-container">
+                            <div className="input-title">Your profile picture</div>
+                            <div className="logo-x-dp">
+                                {imageSrcCropped != null && (
+                                    <img
+                                        src={imageSrcCropped}
+                                        alt="Profile"
+                                    />
+                                )}
+                                <div className="add-btn" onClick={() => fileInputRef.current.click()}>
+                                    Add Image
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                        accept="image/jpeg, image/png"
+                                        style={{ display: 'none' }}
+                                    />
+                                </div>
+                            </div>
+                            {page3Errors.profilePicture && (
+                                <div className="error-msg">
+                                    <InfoIcon />
+                                    {page3Errors.profilePicture}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="next-btn" onClick={handleSubmit}>Submit</div>
+                    </div>
+                )}
+            </div>
         </Container>
     );
 };
@@ -591,6 +593,15 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .main-content{
+    width: 100%;
+    max-width: 500px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
   .pagination{
     width: 100%;

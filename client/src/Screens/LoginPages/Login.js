@@ -27,67 +27,69 @@ const Login = () => {
       <BackBtn>
         <a href="/"><ChevronLeftIcon/></a>
       </BackBtn>
-      <div className="top">
-        <img src={logo} alt="" />
-        IG x Links
-        {/* <img src={sitename} alt="" /> */}
-      </div>
-
-      <div className="intro">
-        <h1>Access Your Account</h1>
-        <div className="desc">Sign in or create an account using your email to get started.</div>
-      </div>
-
-      <div className="social-login">
-        <div className="logo">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/800px-Google_%22G%22_logo.svg.png" alt="" />
-        </div>
-        <div className="text">Continue with Google</div>
-      </div>
-
-      <h3>OR</h3>
-
-      <div className="email-entry">
-        <div className="input-container">
-          <div className="input-name">Email</div>
-          <input type="text" placeholder="Enter your email" />
+      <div className="main-content">
+        <div className="top">
+          <img src={logo} alt="" />
+          IG x Links
+          {/* <img src={sitename} alt="" /> */}
         </div>
 
-        {
-          showOTP ? (
-            <>
-              <div className="otp-container">
-                <div className="input-name">Enter OTP</div>
-                <div className="otp-inputs">
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <input
-                      key={index}
-                      type="text"
-                      maxLength="1"
-                      ref={(el) => (inputRefs.current[index] = el)}
-                      onChange={(e) => handleChange(e, index)}
-                    />
-                  ))}
+        <div className="intro">
+          <h1>Access Your Account</h1>
+          <div className="desc">Sign in or create an account using your email to get started.</div>
+        </div>
+
+        <div className="social-login">
+          <div className="logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/800px-Google_%22G%22_logo.svg.png" alt="" />
+          </div>
+          <div className="text">Continue with Google</div>
+        </div>
+
+        <h3>OR</h3>
+
+        <div className="email-entry">
+          <div className="input-container">
+            <div className="input-name">Email</div>
+            <input type="text" placeholder="Enter your email" />
+          </div>
+
+          {
+            showOTP ? (
+              <>
+                <div className="otp-container">
+                  <div className="input-name">Enter OTP</div>
+                  <div className="otp-inputs">
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        maxLength="1"
+                        ref={(el) => (inputRefs.current[index] = el)}
+                        onChange={(e) => handleChange(e, index)}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <a href="/basic-info" className="next-btn">Submit</a>
-            </>
-          ) : <div onClick={() => setShowOTP(true)} className="next-btn">Continue</div>
-        }
-      </div>
+                <a href="/basic-info" className="next-btn">Submit</a>
+              </>
+            ) : <div onClick={() => setShowOTP(true)} className="next-btn">Continue</div>
+          }
+        </div>
 
-      <div className="info">
-        <InfoIcon />
-        Your Info is Safe - 
-        We only use your email to identify your account. No spam, no sharing — your data is securely stored and locally cached to enhance your experience.
-      </div>
+        <div className="info">
+          <InfoIcon />
+          Your Info is Safe - 
+          We only use your email to identify your account. No spam, no sharing — your data is securely stored and locally cached to enhance your experience.
+        </div>
 
-      <div className="links">
-        <a href="/terms-of-service">Terms of Service</a>
-        <a href="/privacy-policy">Privacy Policy</a>
-        <a href="/cookie-policy">Cookie Policy</a>
-        <a href="/content-guidelines">Content Guidelines</a>
-        <a href="/disclaimer">Disclaimer</a>
+        <div className="links">
+          <a href="/terms-of-service">Terms of Service</a>
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/cookie-policy">Cookie Policy</a>
+          <a href="/content-guidelines">Content Guidelines</a>
+          <a href="/disclaimer">Disclaimer</a>
+        </div>
       </div>
 
     </Container>
@@ -108,6 +110,15 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .main-content{
+    width: 100%;
+    max-width: 500px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
   .top{
       font-size: 1.5rem;
