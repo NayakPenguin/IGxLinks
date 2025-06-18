@@ -37,6 +37,7 @@ app.use("/auth", require("./routes/testEmail"));    // SMTP test
 
 app.use('/basic-info', require('./routes/basicinfo'));
 app.use('/api', require('./routes/upload'));
+app.use('/usernames', require('./routes/usernames'));
 
 // Root test route
 app.get("/", (req, res) => {

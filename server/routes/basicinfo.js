@@ -2,30 +2,55 @@ const express = require('express');
 const router = express.Router();
 const BasicInfo = require('../models/BasicInfo');
 const { authenticateJWT } = require('./auth');
+const AllUsernames = require('../models/AllUsernames');
 
 // Create or Update Basic Info (Protected Route)
+// routes/basicinfo.js
+
 router.post('/', authenticateJWT, async (req, res) => {
   try {
     const { userName, ...updateData } = req.body;
     const userEmail = req.user.email;
 
-    // Check if document exists for this user
+    // Check if document exists
     const existingDoc = await BasicInfo.findOne({ userEmail });
 
-    // If document doesn't exist (first-time creation) and userName is missing
+    // First-time creation validation
     if (!existingDoc && !userName) {
-      return res.status(400).json({ message: 'userName is required for initial setup' });
+      return res.status(400).json({ message: 'Username is required for initial setup' });
     }
 
-    // Prepare update object
+    // Check if username is being changed or set for the first time
+    if (userName && userName !== existingDoc?.userName) {
+      // Check if username already exists in AllUsernames
+      const usernameExists = await AllUsernames.findOne({ username: userName.toLowerCase().trim() });
+      
+      if (usernameExists) {
+        return res.status(400).json({ message: 'Username already taken' });
+      }
+
+      console.log(userEmail);
+
+      // Add to AllUsernames collection
+      await AllUsernames.create({
+        username: userName.toLowerCase().trim(),
+        // userEmail
+      });
+
+      // If updating existing doc, remove old username from AllUsernames
+      if (existingDoc?.userName) {
+        await AllUsernames.deleteOne({ username: existingDoc.userName.toLowerCase().trim() });
+      }
+    }
+
+    // Update BasicInfo
     const updateObj = {
       ...updateData,
       userEmail,
       lastUpdated: Date.now()
     };
 
-    // Only include userName if it was provided OR if it's a new document
-    if (userName || !existingDoc) {
+    if (userName) {
       updateObj.userName = userName;
     }
 
