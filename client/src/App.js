@@ -38,6 +38,7 @@ import Disclaimer from "./Screens/InstaUI/OrgLegal/Disclaimer";
 import ContentGuidelines from "./Screens/InstaUI/OrgLegal/ContentGuidelines";
 import Login from "./Screens/LoginPages/Login";
 import AfterLogin from "./Screens/LoginPages/AfterLogin";
+import BetweenCalcPage from "./Screens/InstaUI/BetweenCalcPage";
 
 const App = () => {
   return (
@@ -47,7 +48,7 @@ const App = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/basic-info" element={<AfterLogin />} />
-
+        <Route path="/wait" element={<BetweenCalcPage />} />
 
         <Route path="/shop" element={<Shop />} />
         <Route path="/brand" element={<BrandProfile />} />

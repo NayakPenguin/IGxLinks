@@ -34,7 +34,7 @@ router.post('/', authenticateJWT, async (req, res) => {
       // Add to AllUsernames collection
       await AllUsernames.create({
         username: userName.toLowerCase().trim(),
-        userEmail
+        userEmail: userEmail ? userEmail : "email-error"
       });
 
       // If updating existing doc, remove old username from AllUsernames

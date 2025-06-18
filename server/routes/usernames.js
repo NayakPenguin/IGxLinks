@@ -14,4 +14,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /usernames/check/:email - check if email exists in AllUsernames collection
+router.get('/check/:email', async (req, res) => {
+  try {
+    const email = decodeURIComponent(req.params.email);
+    const exists = await AllUsernames.exists({ userEmail: email });
+    res.json({ registered: !!exists });
+  } catch (err) {
+    console.error("Failed to check email:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;

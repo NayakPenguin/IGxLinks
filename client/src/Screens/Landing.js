@@ -22,7 +22,7 @@ const Landing = () => {
                     IG x Links
                     {/* <img src={sitename} alt="" /> */}
                 </div>
-                <a href="/login" className="login-btn">Login</a>
+                <a href="/wait" className="login-btn">Login</a>
             </div>
             <div className="top-page">
                 {/* <div className="tag">Minimal Design</div> */}
@@ -31,7 +31,7 @@ const Landing = () => {
                 <h3>
                     IGxLinks lets you turn a single link into your <strong>personal hub</strong> — share <strong>forms, polls, stories, anonymous replies</strong>, <strong>sell or promote products</strong>, <strong>create paid links</strong>, and express everything that makes you <strong>you</strong>. Designed to be <strong>minimalist</strong> — not loud, not cluttered — your page feels like a <strong>sleek app extension</strong> when someone clicks your link. Whether you're a <strong>creator, entrepreneur, student</strong>, or just vibing online — it’s all here, <strong>your way</strong>.
                 </h3>
-                <a href="/page/create" className="create-your-page-btn">Create your Page</a>
+                <a href="/wait" className="create-your-page-btn">Create your Page</a>
             </div>
             <div className="sample-page">
                 <h2>Discover the <strong>pages</strong> you can create with IGxLinks.</h2>

@@ -42,6 +42,31 @@ router.get("/me", authenticateJWT, (req, res) => {
   res.json(req.user);
 });
 
+router.get("/check-session", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    
+    if (!token) {
+      return res.json({ isAuthenticated: false });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ email: decoded.email });
+
+    if (!user) {
+      return res.json({ isAuthenticated: false });
+    }
+
+    res.json({ 
+      isAuthenticated: true,
+      email: user.email
+    });
+    
+  } catch (err) {
+    res.json({ isAuthenticated: false });
+  }
+});
+
 router.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.send({ message: "Logged out" });
