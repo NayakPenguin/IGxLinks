@@ -324,7 +324,6 @@ const AfterLogin = () => {
 
             // 2. Submit basic info
             const basicInfoData = {
-                userEmail: "temp@gmail", // Get from your auth
                 userName: inputUsername,
                 name: fullName,
                 role: profession,
@@ -334,7 +333,7 @@ const AfterLogin = () => {
                 profileImage: imageUrl || 'default_image_url'
             };
 
-            console.log(basicInfoData);
+            // console.log(basicInfoData);
 
             await api.post('/basic-info', basicInfoData);
 

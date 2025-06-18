@@ -5,19 +5,33 @@ const { authenticateJWT } = require('./auth');
 
 // Create or Update Basic Info (Protected Route)
 router.post('/', authenticateJWT, async (req, res) => {
-  console.log(req.body);
   try {
-    const { userEmail, userName, ...updateData } = req.body;
+    const { userName, ...updateData } = req.body;
+    const userEmail = req.user.email;
 
-    // Validate required fields
-    if (!userEmail || !userName) {
-      return res.status(400).json({ message: 'userEmail and userName are required' });
+    // Check if document exists for this user
+    const existingDoc = await BasicInfo.findOne({ userEmail });
+
+    // If document doesn't exist (first-time creation) and userName is missing
+    if (!existingDoc && !userName) {
+      return res.status(400).json({ message: 'userName is required for initial setup' });
     }
 
-    // Upsert the document
+    // Prepare update object
+    const updateObj = {
+      ...updateData,
+      userEmail,
+      lastUpdated: Date.now()
+    };
+
+    // Only include userName if it was provided OR if it's a new document
+    if (userName || !existingDoc) {
+      updateObj.userName = userName;
+    }
+
     const basicInfo = await BasicInfo.findOneAndUpdate(
       { userEmail },
-      { ...updateData, userEmail, userName, lastUpdated: Date.now() },
+      updateObj,
       { new: true, upsert: true }
     );
 
