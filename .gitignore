@@ -13,3 +13,5 @@ flask_backend
 flask_backend/.
 .DS_Store
 .env
+server.zip
+/server.zip

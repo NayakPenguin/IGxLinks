@@ -4,7 +4,7 @@ const sendEmail = require("../utils/sendEmail");
 
 router.get("/test-email", async (req, res) => {
   try {
-    await sendEmail("nayak.primary@gmail.com", "Test Email", "Hello from IGxLinks via Zoho SMTP!");
+    await sendEmail("atanu.nayak03@gmail.com", "Test Email", "Hello from IGxLinks via Zoho SMTP!");
     res.send("Email sent!");
   } catch (err) {
     console.error(err);
