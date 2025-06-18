@@ -36,6 +36,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { trimUrl } from '../../Helpers/trimUrl';
 import { parseRichText } from '../../Helpers/parseRichText';
 import Publish from "../../../Components/Publish";
+import axios from 'axios';
 
 const ITEM_TYPES = {
   SUBGROUP: 'Subgroup',
@@ -207,16 +208,61 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
 };
 
 const CreateYourPage = () => {
-  const [items, setItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem("userContentInfo");
-      if (!saved || saved === "undefined") return initialItems;
-      return JSON.parse(saved);
-    } catch (e) {
-      console.error("Invalid JSON in localStorage for 'userContentInfo':", e);
-      return initialItems;
-    }
-  });
+  const API_URL = process.env.REACT_APP_API_URL;
+  const [items, setItems] = useState([]);
+  const [lastUpdatedIST, setLastUpdatedIST] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/advanced-info/`, {
+          withCredentials: true
+        });
+
+        const publishedData = res.data;
+        const publishedTime = publishedData.lastUpdated;
+
+        console.log(typeof (JSON.parse(publishedData.localStorageData.localSaved)));
+        console.log(typeof (initialItems));
+
+
+        const dateIST = new Date(publishedTime).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true
+        });
+
+
+        setLastUpdatedIST(dateIST);
+        localStorage.setItem("publishedTime", dateIST);
+
+        const saved = localStorage.getItem("userContentInfo");
+        console.log(saved);
+
+        localStorage.setItem("publishedData", JSON.stringify(JSON.parse(publishedData.localStorageData.localSaved)));
+
+        if (!saved || saved === "undefined") {
+          console.log("1");
+          localStorage.setItem("userContentInfo", JSON.stringify(JSON.parse(publishedData.localStorageData.localSaved)));
+          setItems(JSON.parse(publishedData.localStorageData.localSaved)); // Use from API
+          console.log(JSON.parse(publishedData.localStorageData.localSaved));
+        } else {
+          console.log("2");
+          setItems(JSON.parse(saved)); // Use from localStorage
+        }
+      } catch (err) {
+        console.log("3");
+        console.error("Error fetching published data:", err);
+        setItems(initialItems); // fallback to default
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const [newItemData, setNewItemData] = useState({
     title: '',
@@ -243,7 +289,7 @@ const CreateYourPage = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem("userContentInfo", JSON.stringify(items));
+    if (items.length > 0) localStorage.setItem("userContentInfo", JSON.stringify(items));
   }, [items]);
 
   const [itemType, setItemType] = useState(ITEM_TYPES.SUBGROUP);
@@ -345,9 +391,28 @@ const CreateYourPage = () => {
     }
   };
 
+  const checkDataDifference = () => {
+    const savedLocal = localStorage.getItem("userContentInfo");
+    const savedGlobal = localStorage.getItem("publishedData");
+    
+    return savedLocal !== savedGlobal;
+  };
+
+  const [showPublish, setShowPublish] = useState(true);
+
+  useEffect(() => {
+    console.log("checkDataDifference : ", checkDataDifference());
+    
+    if(checkDataDifference() == true) setShowPublish(true);
+    else setShowPublish(false);
+  }, [items])
+
   return (
     <Container>
-      <Publish/>
+      {
+        showPublish && <Publish />
+      }
+
       <div className="main-content">
         <BasicInfo />
         <div className="add-new-item">

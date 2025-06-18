@@ -77,19 +77,7 @@ router.get('/:username', async (req, res) => {
       return res.status(404).json({ message: 'No advanced data available' });
     }
 
-    // Filter sensitive data (example: exclude "private" keys)
-    const publicData = {
-      lastUpdated: advancedInfo.lastUpdated,
-      // Customize based on your app's needs:
-      ...(advancedInfo.localStorageData.theme && { 
-        theme: advancedInfo.localStorageData.theme 
-      }),
-      ...(advancedInfo.localStorageData.publicSettings && {
-        publicSettings: advancedInfo.localStorageData.publicSettings
-      })
-    };
-
-    res.json(publicData);
+    res.json(advancedInfo);
   } catch (err) {
     console.error('Public advanced fetch error:', err);
     res.status(500).json({ message: 'Server error' });

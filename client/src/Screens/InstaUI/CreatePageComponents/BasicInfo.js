@@ -320,6 +320,20 @@ const BasicInfo = () => {
             </div>
         </div>
     );
+
+    const savedPublishedTime = localStorage.getItem("publishedTime");
+    
+    const savedLocal = localStorage.getItem("userContentInfo");
+    const savedGlobal = localStorage.getItem("publishedData");
+
+    const [diffExist, setDiffExist] = useState(true);
+
+    useEffect(() => {
+        if(savedLocal === savedGlobal) {
+            setDiffExist(false);
+        }
+    }, [savedLocal, savedGlobal]);
+
     return (
         <Container>
             {cropModalOpen && (
@@ -407,11 +421,13 @@ const BasicInfo = () => {
                             <div className="done-btn" onClick={handleSave}>Done</div>
                         </div>
                     </ModelConatiner> : null
-            }
+            } 
 
             <div className="top-bar">
                 <div className="left">
-                    <div className="color">Unsaved changes</div><b>Last Published :</b> 25 May 9:16AM
+                    <div className="color">{diffExist ? "Unsaved changes" : "All changes published!"}</div><b>Last Published :</b> {
+                        savedPublishedTime != null ? savedPublishedTime : "Never"
+                }
                 </div>
                 <a href="/page/view-edit" className="view-btn">View</a>
             </div>
@@ -576,7 +592,7 @@ const Container = styled.div`
         .left{
             font-size: 0.65rem;
             font-weight: 200;
-            letter-spacing: 0.07rem;
+            letter-spacing: 0.05rem;
             
             b{
                 font-weight: 500;
