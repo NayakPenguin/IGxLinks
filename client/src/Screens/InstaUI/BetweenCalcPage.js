@@ -5,49 +5,69 @@ import axios from 'axios';
 import logo from "../../Images/logo-main.png";
 
 const BetweenCalcPage = () => {
-  const API_URL = process.env.REACT_APP_API_URL;
-  const navigate = useNavigate();
-  const [status, setStatus] = useState("Checking authentication...");
+    const API_URL = process.env.REACT_APP_API_URL;
+    const navigate = useNavigate();
+    const [status, setStatus] = useState("Checking authentication...");
+    const [fadeOut, setFadeOut] = useState(false);
 
-  useEffect(() => {
-    const checkAuthAndRedirect = async () => {
-      try {
-        // 1. Check session status
-        const { data } = await axios.get(`${API_URL}/auth/check-session`, {
-          withCredentials: true
-        });
+    useEffect(() => {
+        const checkAuthAndRedirect = async () => {
+            try {
+                const fetchUser = async () => {
+                    try {
+                        const res = await fetch(`${API_URL}/auth/me`, {
+                            credentials: "include",
+                        });
 
-        if (!data.id) {
-          return navigate('/login');
-        }
+                        const user = await res.json();
+                        console.log("Logged-in user:", user);
+                        return user;
 
-        // 2. Check username registration
-        const usernameCheck = await axios.get(`${API_URL}/usernames/check/${data.email}`, {
-          withCredentials: true
-        });
+                    } catch (error) {
+                        console.error("Error fetching user:", error);
+                        return null;
+                    }
+                };
 
-        // 3. Redirect based on registration status
-        navigate(usernameCheck.data.registered ? '/page/create' : '/basic-info');
-        
-      } catch (error) {
-        console.error("Auth check error:", error);
-        navigate('/login');
-      }
-    };
+                const data = await fetchUser();
 
-    checkAuthAndRedirect();
-  }, [navigate, API_URL]);
+                if (!data?.email) {
+                    return navigate('/login');
+                }
 
-  return (
-    <Container>
-      <div className="main-content">
-        <img src={logo} alt="Logo" className="logo" />
-        <p>{status}</p>
-      </div>
-    </Container>
-  );
+                const usernameCheck = await axios.get(`${API_URL}/usernames/check/${data.email}`, {
+                    withCredentials: true
+                });
+
+                if (usernameCheck.data.registered) {
+                    setStatus("Creating your dashboard...");
+                    setFadeOut(true);
+                    setTimeout(() => {
+                        navigate('/page/create');
+                    }, 5000); // Wait 5s before redirect
+                } else {
+                    navigate('/basic-info');
+                }
+
+            } catch (error) {
+                console.error("Auth check error:", error);
+                navigate('/login');
+            }
+        };
+
+        checkAuthAndRedirect();
+    }, [navigate, API_URL]);
+
+    return (
+        <Container fadeOut={fadeOut}>
+            <div className="main-content">
+                {
+                    status == "Checking authentication..." ? <p>{status}</p> : <h1>{status}</h1>
+                }
+            </div>
+        </Container>
+    );
 };
-
 
 export default BetweenCalcPage;
 
@@ -55,26 +75,26 @@ const Container = styled.div`
   position: relative;
   min-height: 100vh;
   width: 100vw;
-  background-color: white;
+  background-color: ${({ fadeOut }) => (fadeOut ? 'black' : 'white')};
+  color: ${({ fadeOut }) => (fadeOut ? 'white' : 'black')};
+  transition: background-color 2s cubic-bezier(1,-0.08, 0.74, 0.44), color 2s cubic-bezier(1,-0.08, 0.74, 0.44);
 
   display: flex;
   justify-content: center;
 
-  .main-content{
-    width: 100%;
-    max-width: 500px;
-
-    height: 100px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  .main-content {
+    text-align: center;
+    padding: 50px;
 
     p{
-        color: black;
+        color: #333;
         font-size: 0.85rem;
         font-weight: 500;
     }
+
+    h1 {
+      font-size: 0.85rem;
+        font-weight: 500;
+    }
   }
-`
+`;

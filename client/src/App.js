@@ -40,6 +40,8 @@ import Login from "./Screens/LoginPages/Login";
 import AfterLogin from "./Screens/LoginPages/AfterLogin";
 import BetweenCalcPage from "./Screens/InstaUI/BetweenCalcPage";
 
+import PrivateRoute from './auth/PrivateRoute'; 
+
 const App = () => {
   return (
     <Container>
@@ -57,17 +59,20 @@ const App = () => {
         <Route path="/influencer/shop" element={<NewShop />} />
         <Route path="/basicuser" element={<BasicUser />} />
         <Route path="/basicuser2" element={<BasicUser2 />} />
-        <Route path="/page/create" element={<CreateYourPage />} />
-        <Route path="/page/view-edit" element={<ViewChanges />} />
-        <Route path="/page/meeting/:id" element={<CreateMeetings />} />
-        <Route path="/page/form/:id" element={<CreateForm />} />
-        <Route path="/page/folder/:id" element={<CreateRedirect />} />
-        <Route path="/page/write/:id" element={<CreateWrite />} />
-        <Route path="/page/view-edit/:id" element={<ViewChangeInside />} />
-        <Route path="/notification" element={<Notification />} />
-        <Route path="/engagement" element={<Engagement />} />
-        <Route path="/profile" element={<Profile />} />
         
+        {/* private below  */}
+        <Route path="/page/create" element={<PrivateRoute><CreateYourPage /></PrivateRoute>} />
+        <Route path="/page/view-edit" element={<PrivateRoute><ViewChanges /></PrivateRoute>} />
+        <Route path="/page/meeting/:id" element={<PrivateRoute><CreateMeetings /></PrivateRoute>} />
+        <Route path="/page/form/:id" element={<PrivateRoute><CreateForm /></PrivateRoute>} />
+        <Route path="/page/folder/:id" element={<PrivateRoute><CreateRedirect /></PrivateRoute>} />
+        <Route path="/page/write/:id" element={<PrivateRoute><CreateWrite /></PrivateRoute>} />
+        <Route path="/page/view-edit/:id" element={<PrivateRoute><ViewChangeInside /></PrivateRoute>} />
+        <Route path="/notification" element={<PrivateRoute><Notification /></PrivateRoute>} />
+        <Route path="/engagement" element={<PrivateRoute><Engagement /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        {/* private end */}
+
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/cookie-policy" element={<CookiePolicy />} />
