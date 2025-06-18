@@ -35,6 +35,8 @@ app.use("/auth", require("./routes/auth"));         // Google login
 app.use("/auth", require("./routes/emailAuth"));    // Email OTP login
 app.use("/auth", require("./routes/testEmail"));    // SMTP test
 
+app.use('/basic-info', require('./routes/basicinfo'));
+
 // Root test route
 app.get("/", (req, res) => {
   res.send("🚀 Backend is running!");

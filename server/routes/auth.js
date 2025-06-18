@@ -5,10 +5,8 @@ const generateToken = require("../utils/generateToken");
 
 const router = express.Router();
 
-// 1. Google Login
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-// 2. Google Callback
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
@@ -27,7 +25,6 @@ router.get(
   }
 );
 
-// 3. Authenticated User Info
 const authenticateJWT = (req, res, next) => {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Unauthorized" });
@@ -45,10 +42,10 @@ router.get("/me", authenticateJWT, (req, res) => {
   res.json(req.user);
 });
 
-// 4. Logout
 router.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.send({ message: "Logged out" });
 });
 
+router.authenticateJWT = authenticateJWT; // Attach to router
 module.exports = router;

@@ -61,7 +61,7 @@ router.post("/verify-otp", async (req, res) => {
     // Clear used OTP
     await OtpToken.deleteOne({ email });
 
-    res.json({ message: "Logged in", user: { email: user.email } });
+    res.json({ message: "Logged in", user: { email: user.email }, deleteLaterToken : token });
   } catch (err) {
     console.error("OTP verify error:", err);
     res.status(500).json({ message: "Server error" });
