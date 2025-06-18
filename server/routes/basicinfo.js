@@ -39,4 +39,34 @@ router.get('/', authenticateJWT, async (req, res) => {
   }
 });
 
+router.get('/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    // Find by username (case-insensitive)
+    const basicInfo = await BasicInfo.findOne({ 
+      userName: { $regex: new RegExp(username, 'i') } 
+    });
+
+    if (!basicInfo) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return public-safe data (exclude sensitive fields if needed)
+    const publicData = {
+      userName: basicInfo.userName,
+      name: basicInfo.name,
+      bio: basicInfo.bio,
+      profileImage: basicInfo.profileImage,
+      socialLinks: basicInfo.socialLinks,
+      announcement: basicInfo.announcement
+    };
+
+    res.json(publicData);
+  } catch (err) {
+    console.error('Public fetch error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
