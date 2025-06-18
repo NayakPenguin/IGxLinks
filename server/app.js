@@ -36,6 +36,7 @@ app.use("/auth", require("./routes/emailAuth"));    // Email OTP login
 app.use("/auth", require("./routes/testEmail"));    // SMTP test
 
 app.use('/basic-info', require('./routes/basicinfo'));
+app.use('/api', require('./routes/upload'));
 
 // Root test route
 app.get("/", (req, res) => {

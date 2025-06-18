@@ -5,6 +5,7 @@ const { authenticateJWT } = require('./auth');
 
 // Create or Update Basic Info (Protected Route)
 router.post('/', authenticateJWT, async (req, res) => {
+  console.log(req.body);
   try {
     const { userEmail, userName, ...updateData } = req.body;
 

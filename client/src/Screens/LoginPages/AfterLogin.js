@@ -9,6 +9,9 @@ import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import PersonIcon from '@material-ui/icons/Person';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -16,6 +19,21 @@ const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
 
 const AfterLogin = () => {
+    const API_URL = process.env.REACT_APP_API_URL;
+
+    const api = axios.create({
+        baseURL: API_URL,
+        withCredentials: true,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    // Add these to your existing state declarations
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
+    const navigate = useNavigate(); // Add this with your other hooks
+
     const [currentPage, setCurrentPage] = useState(1);
     const pages = [1, 2, 3];
 
@@ -187,6 +205,8 @@ const AfterLogin = () => {
         setCurrentPage(currentPage + 1);
     };
 
+    const [croppedImageBlob, setCroppedImageBlob] = useState(null);
+
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
@@ -218,6 +238,8 @@ const AfterLogin = () => {
         }
     };
 
+
+
     const handleCropComplete = (crop) => {
         setCompletedCrop(crop);
     };
@@ -247,18 +269,18 @@ const AfterLogin = () => {
         );
 
         canvas.toBlob((blob) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = () => {
-                localStorage.setItem("newLocalImageURL", reader.result);
-                setImageSrcCropped(reader.result);
-                setCropModalOpen(false);
-                setPage3Errors(prev => ({
-                    ...prev,
-                    profilePicture: ''
-                }));
-            };
-        }, 'image/jpeg', 1);
+            // Store the blob for upload
+            setCroppedImageBlob(blob);
+
+            // Create preview URL
+            const previewUrl = URL.createObjectURL(blob);
+            setImageSrcCropped(previewUrl);
+            setCropModalOpen(false);
+            setPage3Errors(prev => ({
+                ...prev,
+                profilePicture: ''
+            }));
+        }, 'image/jpeg', 0.9); // 0.9 quality
     };
 
     const onImageLoad = (e) => {
@@ -276,22 +298,54 @@ const AfterLogin = () => {
         setCrop(centeredCrop);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!validatePage3()) return;
 
-        const basicData = {
-            username: inputUsername,
-            isBusiness,
-            fullName,
-            profession,
-            organization,
-            bio,
-            location,
-            profilePicture: imageSrcCropped
-        };
+        try {
+            setIsSubmitting(true);
 
-        console.log("Basic Data:", basicData);
-        // window.location.href = "page/create";
+            // 1. Upload the cropped image
+            let imageUrl = '';
+            console.log("croppedImageBlob : ", croppedImageBlob);
+
+            if (croppedImageBlob) {
+                const formData = new FormData();
+                formData.append('profile', croppedImageBlob, 'profile.jpg');
+
+                const uploadResponse = await api.post('/api/upload-profile-picture', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                imageUrl = uploadResponse.data.imageUrl;
+                console.log("imageUrl:", imageUrl);
+            }
+
+            // 2. Submit basic info
+            const basicInfoData = {
+                userEmail: "temp@gmail", // Get from your auth
+                userName: inputUsername,
+                name: fullName,
+                role: profession,
+                org: organization,
+                bio,
+                location,
+                profileImage: imageUrl || 'default_image_url'
+            };
+
+            console.log(basicInfoData);
+
+            await api.post('/basic-info', basicInfoData);
+
+            // Redirect after successful submission
+            // navigate(`/${inputUsername}`);
+        } catch (error) {
+            console.error('Submission failed:', error);
+            setSubmitError(error.response?.data?.message || 'Failed to save information');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -571,7 +625,19 @@ const AfterLogin = () => {
                             )}
                         </div>
 
-                        <div className="next-btn" onClick={handleSubmit}>Submit</div>
+                        <div className="next-btn" onClick={handleSubmit} disabled={isSubmitting}>
+                            {isSubmitting ? (
+                                <span>Uploading...</span>
+                            ) : (
+                                <span>Submit</span>
+                            )}
+                        </div>
+                        {submitError && (
+                            <div className="error-msg">
+                                <InfoIcon />
+                                {submitError}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -838,8 +904,6 @@ const Container = styled.div`
     margin-top: 20px;
     border-radius: 100px;
     }
-
-    
 
   .error-msg {
     margin-top: 20px;

@@ -6,6 +6,12 @@ import InfoIcon from '@material-ui/icons/Info';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
 const Login = () => {
+  const API_URL = process.env.REACT_APP_API_URL;
+  useEffect(() => {
+    console.log(API_URL);
+  }, [API_URL]);
+  
+
   const [showOTP, setShowOTP] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(Array(6).fill(""));
@@ -23,12 +29,12 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.open("http://localhost:5000/auth/google", "_self");
+    window.open(`${API_URL}/auth/google`, "_self");
   };
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:5000/auth/logout", {
+      await fetch(`${API_URL}/auth/logout`, {
         method: "GET",
         credentials: "include",
       });
@@ -41,10 +47,10 @@ const Login = () => {
 
   const handleRequestOTP = async () => {
     if (!email) return alert("Enter your email");
-    const res = await fetch("http://localhost:5000/auth/request-otp", {
+    const res = await fetch(`${API_URL}/auth/request-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email }),
     });
 
     const data = await res.json();
@@ -60,11 +66,11 @@ const Login = () => {
     const fullOtp = otp.join("");
     if (fullOtp.length !== 6) return alert("Enter all 6 digits of OTP");
 
-    const res = await fetch("http://localhost:5000/auth/verify-otp", {
+    const res = await fetch(`${API_URL}/auth/verify-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ email, otp: fullOtp })
+      body: JSON.stringify({ email, otp: fullOtp }),
     });
 
     const data = await res.json();
@@ -77,17 +83,17 @@ const Login = () => {
   };
 
   useEffect(() => {
-  fetch("http://localhost:5000/auth/me", {
-    credentials: "include",
-  })
-    .then(res => res.json())
-    .then(user => {
-      console.log("Logged-in user:", user);
-      if (user && user.email) {
-        window.location.href = "/basic-info";
-      }
-    });
-}, []);
+    fetch(`${API_URL}/auth/me`, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(user => {
+        console.log("Logged-in user:", user);
+        if (user && user.email) {
+          window.location.href = "/basic-info";
+        }
+      });
+  }, []);
 
   return (
     <Container>
