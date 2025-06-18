@@ -11,7 +11,7 @@ const allUsernamesSchema = new mongoose.Schema({
   },
   userEmail: {
     type: String,
-    required: false,
+    required: true,
     unique: true
   },
   createdAt: {

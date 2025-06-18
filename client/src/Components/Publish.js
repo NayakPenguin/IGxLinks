@@ -1,18 +1,56 @@
 import React from "react";
 import styled from 'styled-components';
 import PublicIcon from '@material-ui/icons/Public';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const Publish = () => {
+const Publish = ({ userContentInfo }) => {
+  const API_URL = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
+
+  const api = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const publishToDB = async () => {
+    const localSaved = localStorage.getItem("userContentInfo");
+
+    try {
+      if (!localSaved) {
+        console.error("No content data to publish");
+        return;
+      }
+
+      const response = await api.post('/advanced-info', {
+        localStorageData: {
+          localSaved 
+        }
+      });
+
+      console.log("Publish successful:", response.data);
+      // Optional: Show success notification or redirect
+      // navigate('/success');
+    } catch (error) {
+      console.error("Publish failed:", error.response?.data || error.message);
+      // Handle error (show toast, etc.)
+    }
+  };
+
   return (
     <Container>
-        <div className="btn">Push updates
-            <PublicIcon/>
-        </div>
+      <div className="btn" onClick={publishToDB}>
+        Push updates
+        <PublicIcon />
+      </div>
     </Container>
   )
 }
 
-export default Publish
+export default Publish;
 
 const Container = styled.div`
   position: fixed;
