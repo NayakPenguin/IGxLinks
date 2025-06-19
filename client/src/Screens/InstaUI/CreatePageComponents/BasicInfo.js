@@ -10,80 +10,17 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { parseRichText } from '../../Helpers/parseRichText';
 import axios from 'axios';
+import { AllSocialMediaPlatforms } from '../../../constants/socialMediaPlatforms';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
 
-const AllSocialMediaPlatforms = [
-    {
-        "id": "mail",
-        "name": "Mail",
-        "iconUrl": "https://images.seeklogo.com/logo-png/37/1/gmail-icon-logo-png_seeklogo-379374.png"
-    },
-    {
-        "id": "instagram",
-        "name": "Instagram",
-        "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png"
-    },
-    {
-        "id": "youtube",
-        "name": "YouTube",
-        "iconUrl": "https://www.svgrepo.com/show/416500/youtube-circle-logo.svg"
-    },
-    {
-        "id": "snapchat",
-        "name": "SnapChat",
-        "iconUrl": "https://cdn2.downdetector.com/static/uploads/c/300/f52a5/image11.png"
-    },
-    {
-        "id": "facebook",
-        "name": "Facebook",
-        "iconUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Facebook_f_logo_%282021%29.svg/2048px-Facebook_f_logo_%282021%29.svg.png"
-    },
-    {
-        "id": "twitter",
-        "name": "Twitter (X)",
-        "iconUrl": "https://img.freepik.com/free-vector/new-2023-twitter-logo-x-icon-design_1017-45418.jpg?semt=ais_hybrid&w=740"
-    },
-    {
-        "id": "linkedin",
-        "name": "LinkedIn",
-        "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/960px-LinkedIn_logo_initials.png"
-    },
-    {
-        "id": "tiktok",
-        "name": "TikTok",
-        "iconUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQP0N3zvG1w5AohL7rpXml844HBmbINcRx0oDSCMCrpiT55vOV8ILlUzTV78Q6na5tPjxs&usqp=CAU"
-    },
-    {
-        "id": "pinterest",
-        "name": "Pinterest",
-        "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/0/08/Pinterest-logo.png"
-    },
-    {
-        "id": "threads",
-        "name": "Threads",
-        "iconUrl": "https://cbx-prod.b-cdn.net/COLOURBOX65108147.jpg?width=800&height=800&quality=70"
-    },
-    {
-        "id": "github",
-        "name": "Github",
-        "iconUrl": "https://cdn4.iconfinder.com/data/icons/iconsimple-logotypes/512/github-512.png"
-    },
-    {
-        "id": "leetcode",
-        "name": "Leetcode",
-        "iconUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4h4yf5vhuu8_Dqf5VC1l1tFbIJ88N4H24jg&s"
-    },
-    {
-        "id": "codeforces",
-        "name": "Codeforces",
-        "iconUrl": "https://media2.dev.to/dynamic/image/width=1080,height=1080,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fcer3l19eex0wy900b101.jpg"
-    }
-];
 
 const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const API_URL = process.env.REACT_APP_API_URL;
+
     const [basicData, setBasicData] = useState({
         name: "",
         role: "",
@@ -98,6 +35,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
             isVisible: true
         }
     });
+
     const [modelOpen, setModelOpen] = useState(false);
     const [editingField, setEditingField] = useState(null);
     const [cropModalOpen, setCropModalOpen] = useState(false);
@@ -117,6 +55,13 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const [filteredPlatforms, setFilteredPlatforms] = useState(AllSocialMediaPlatforms);
     const [isAnnouncementEditing, setIsAnnouncementEditing] = useState(false);
 
+
+    const [announcementData, setAnnouncementData] = useState({
+        title: "Announcement Title",
+        description: "This is your announcement description",
+        isVisible: true
+    });
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -124,6 +69,15 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                     withCredentials: true
                 });
                 setBasicData(res.data);
+                console.log("res.data : ", res.data);
+
+                if (res.data.announcement) {
+                    setAnnouncementData({
+                        title: res.data.announcement.title || "Announcement Title",
+                        description: res.data.announcement.description || "This is your announcement description",
+                        isVisible: res.data.announcement.isVisible !== false // default to true if not specified
+                    });
+                }
             } catch (err) {
                 console.error("Error fetching basic data:", err);
             }
@@ -144,7 +98,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         await axios.post(`${API_URL}/basic-info/`, updatedData, {
             withCredentials: true
         });
-        setDiffCreated(true);
+        // setDiffCreated(true);
     };
 
     const handleFileChange = (e) => {
@@ -200,15 +154,33 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                     withCredentials: true
                 });
                 setCropModalOpen(false);
-                setDiffCreated(true);
+                // setDiffCreated(true);
             };
         }, 'image/jpeg', 1);
     };
 
     const handleInputChange = (platformId, value) => {
-        const updatedLinks = basicData.socialLinks.map(link =>
-            link.platformId === platformId ? { ...link, url: value } : link
+        // Check if this platform already exists in socialLinks
+        const existingLinkIndex = basicData.socialLinks.findIndex(
+            link => link.platformId === platformId
         );
+
+        let updatedLinks;
+
+        if (existingLinkIndex >= 0) {
+            updatedLinks = basicData.socialLinks.map(link =>
+                link.platformId === platformId ? { ...link, profileUrl: value } : link
+            );
+        } else {
+            updatedLinks = [
+                ...basicData.socialLinks,
+                {
+                    platformId,
+                    profileUrl: value,
+                }
+            ];
+        }
+
         setBasicData({ ...basicData, socialLinks: updatedLinks });
     };
 
@@ -217,21 +189,21 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
             withCredentials: true
         });
         setModelOpen(false);
-        setDiffCreated(true);
+        // setDiffCreated(true);
     };
 
     const toggleAnnouncementVisibility = async () => {
         const updatedAnnouncement = {
             ...basicData.announcement,
-            // isVisible: !basicData.announcement.isVisible
-            isVisible: true
+            isVisible: basicData.announcement ? !basicData.announcement.isVisible : !announcementData.isVisible
         };
+        setAnnouncementData(updatedAnnouncement);
         const updatedData = { ...basicData, announcement: updatedAnnouncement };
         setBasicData(updatedData);
         await axios.post(`${API_URL}/basic-info/`, updatedData, {
             withCredentials: true
         });
-        setDiffCreated(true);
+        // setDiffCreated(true);
     };
 
     const handleAnnouncementChange = async (field, value) => {
@@ -239,12 +211,13 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
             ...basicData.announcement,
             [field]: value
         };
+        setAnnouncementData(updatedAnnouncement);
         const updatedData = { ...basicData, announcement: updatedAnnouncement };
         setBasicData(updatedData);
         await axios.post(`${API_URL}/basic-info/`, updatedData, {
             withCredentials: true
         });
-        setDiffCreated(true);
+        // setDiffCreated(true);
     };
 
     const onImageLoad = (e) => {
@@ -280,22 +253,44 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         </div>
     );
 
-    const renderAnnouncementInput = (field, label, placeholder = "") => (
-        <div className="input-container">
-            <div className="label-inside">{label}</div>
-            <div className="input-line">
-                <input
-                    className="input-basic"
-                    type="text"
-                    placeholder={placeholder}
-                    value={basicData.announcement[field] || ""}
-                    onChange={(e) => handleAnnouncementChange(field, e.target.value)}
-                />
-            </div>
-        </div>
-    );
-
     const savedPublishedTime = localStorage.getItem("publishedTime");
+
+    const [editingPlatforms, setEditingPlatforms] = useState({});
+    const [platformValues, setPlatformValues] = useState({});
+
+    useEffect(() => {
+        if (basicData.socialLinks) {
+            const initialValues = {};
+            basicData.socialLinks.forEach(link => {
+                initialValues[link.platformId] = link.url;
+            });
+            setPlatformValues(initialValues);
+        }
+    }, [basicData.socialLinks]);
+
+    const handlePlatformClick = (platformId) => {
+        setEditingPlatforms(prev => ({
+            ...prev,
+            [platformId]: true
+        }));
+    };
+
+    const handlePlatformBlur = (platformId) => {
+        setEditingPlatforms(prev => ({
+            ...prev,
+            [platformId]: false
+        }));
+
+        if (platformValues[platformId]) {
+            handleInputChange(platformId, platformValues[platformId]);
+        }
+
+        console.log('====================================');
+        console.log(platformId, platformValues[platformId]);
+        console.log(basicData.socialLinks);
+        console.log('====================================');
+    };
+
 
     return (
         <Container>
@@ -358,20 +353,59 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                             </div>
                         </div>
                         <div className="all-social-medias">
-                            {filteredPlatforms.map(platform => (
-                                <div className="one-social-media" key={platform.id}>
-                                    <div className="icon">
-                                        <img src={platform.iconUrl} alt={platform.name} />
+                            {filteredPlatforms.map(platform => {
+                                const currentValue = platformValues[platform.id] || '';
+                                const isEditing = editingPlatforms[platform.id];
+
+                                return (
+                                    <div className="one-social-media" key={platform.id}>
+                                        <div className="icon">
+                                            {
+                                                currentValue && <div className="added-icon"><CheckCircleIcon/></div>
+                                                // true && <div className="added-icon"><CheckCircleIcon/></div>
+                                            }
+                                            <img src={platform.iconUrl} alt={platform.name} />
+                                        </div>
+
+                                        {isEditing ? (
+                                            <input
+                                                type="text"
+                                                className="input-basic"
+                                                placeholder={`${platform.name} username/URL`}
+                                                value={currentValue}
+                                                onChange={(e) => setPlatformValues(prev => ({
+                                                    ...prev,
+                                                    [platform.id]: e.target.value
+                                                }))}
+                                                onBlur={() => handlePlatformBlur(platform.id)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        handlePlatformBlur(platform.id);
+                                                    }
+                                                }}
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            <div className="social-info" onClick={() => handlePlatformClick(platform.id)}>
+                                                <div className="social-name">{platform.name}</div>
+                                                {currentValue &&
+                                                    <div className="social-value">
+                                                        <a
+                                                            href={platform.id === 'mail' ? `mailto:${currentValue}` : currentValue}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            {currentValue.length > 18 ? `${currentValue.substring(0, 15)}...` : currentValue}
+                                                        </a>
+                                                    </div>
+                                                }
+                                                <ChevronRightIcon />
+                                            </div>
+                                        )}
                                     </div>
-                                    <input
-                                        type="text"
-                                        className="input-basic"
-                                        placeholder={`${platform.name} username/URL`}
-                                        value={basicData.socialLinks.find(l => l.platformId === platform.id)?.url || ''}
-                                        onChange={(e) => handleInputChange(platform.id, e.target.value)}
-                                    />
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                         <div className="done-btn" onClick={handleSave}>Done</div>
                     </div>
@@ -441,7 +475,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
 
                 <div className="socials">
                     {basicData.socialLinks.slice(0, 4).map((link, idx) => (
-                        <div key={idx} className="social-icon light">
+                        <div key={idx} className="social-icon">
                             <img src={AllSocialMediaPlatforms.find(p => p.id === link.platformId)?.iconUrl} alt="" />
                         </div>
                     ))}
@@ -450,6 +484,71 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                     </div>
                 </div>
             </div>
+            <PinnedAnnouncement>
+                {!isAnnouncementEditing && (
+                    <div className="edit-btn" onClick={() => {
+                        setIsAnnouncementEditing(true);
+                        handleAnnouncementChange('isVisible', true);
+                    }}>
+                        <CreateIcon />
+                    </div>
+                )}
+
+                <div className="change-visibility" onClick={toggleAnnouncementVisibility}>
+                    {announcementData.isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                    <div className="text">
+                        Click to {announcementData.isVisible ? "hide" : "show"}
+                    </div>
+                </div>
+
+                <div className="label">
+                    <svg viewBox="0 0 24 24" height="16" width="16" preserveAspectRatio="xMidYMid meet" fill="none">
+                        <path d="M16 5V12L17.7 13.7C17.8 13.8 17.875 13.9125 17.925 14.0375C17.975 14.1625 18 14.2917 18 14.425V15C18 15.2833 17.9042 15.5208 17.7125 15.7125C17.5208 15.9042 17.2833 16 17 16H13V21.85C13 22.1333 12.9042 22.3708 12.7125 22.5625C12.5208 22.7542 12.2833 22.85 12 22.85C11.7167 22.85 11.4792 22.7542 11.2875 22.5625C11.0958 22.3708 11 22.1333 11 21.85V16H7C6.71667 16 6.47917 15.9042 6.2875 15.7125C6.09583 15.5208 6 15.2833 6 15V14.425C6 14.2917 6.025 14.1625 6.075 14.0375C6.125 13.9125 6.2 13.8 6.3 13.7L8 12V5C7.71667 5 7.47917 4.90417 7.2875 4.7125C7.09583 4.52083 7 4.28333 7 4C7 3.71667 7.09583 3.47917 7.2875 3.2875C7.47917 3.09583 7.71667 3 8 3H16C16.2833 3 16.5208 3.09583 16.7125 3.2875C16.9042 3.47917 17 3.71667 17 4C17 4.28333 16.9042 4.52083 16.7125 4.7125C16.5208 4.90417 16.2833 5 16 5ZM8.85 14H15.15L14 12.85V5H10V12.85L8.85 14Z" fill="currentColor"></path>
+                    </svg>
+                    Pinned Announcement
+                </div>
+
+                {announcementData.isVisible && (
+                    <div>
+                        {isAnnouncementEditing ? (
+                            <>
+                                <div className="input-container">
+                                    <div className="label-inside">Title</div>
+                                    <div className="input-line">
+                                        <input
+                                            className="input-basic"
+                                            type="text"
+                                            placeholder="Announcement title"
+                                            value={announcementData.title || ""}
+                                            onChange={(e) => handleAnnouncementChange('title', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="input-container">
+                                    <div className="label-inside">Description</div>
+                                    <div className="input-line">
+                                        <input
+                                            className="input-basic"
+                                            type="text"
+                                            placeholder="Announcement description"
+                                            value={announcementData.description || ""}
+                                            onChange={(e) => handleAnnouncementChange('description', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="done-btn" onClick={() => setIsAnnouncementEditing(false)}>
+                                    Done
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="title">{parseRichText(announcementData.title || "")}</div>
+                                <div className="desc">{parseRichText(announcementData.description || "")}</div>
+                            </>
+                        )}
+                    </div>
+                )}
+            </PinnedAnnouncement>
         </Container>
     );
 };
@@ -803,11 +902,32 @@ const ModelConatiner = styled.div`
             margin-top: 10px;
 
             .one-social-media{
+                padding-right: 5px;
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
                 margin-top: 20px;
 
+                
+                
                 .icon{
+                    position: relative;
+
+                    .added-icon{
+                        position: absolute;
+                        right: -5px;
+                        top: -5px;
+                        background-color: white;
+                        height: 1.25rem;
+                        width: 1.25rem;
+                        border-radius: 100%;
+    
+                        svg{
+                            font-size: 1.25rem;
+                            fill: yellowgreen;
+                        }
+                    }
+
                     img{
                         height: 25px;
                         border-radius: 100px;
@@ -838,6 +958,30 @@ const ModelConatiner = styled.div`
                     letter-spacing: 0.1rem;
                     transition: outline 125ms ease, letter-spacing 125ms ease;
                 }
+
+                .social-info{
+                    height: 50px;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    flex: 1;
+
+                    .social-name{
+                        font-size: 0.85rem;
+                        font-weight: 200;
+                        margin-left: 20px;
+                    }
+
+                    .social-value{
+                        font-size: 0.75rem;
+                        font-weight: 500;
+                        margin-left: 10px;
+                        flex: 1;
+                    }
+                }
+
             }
         }
 

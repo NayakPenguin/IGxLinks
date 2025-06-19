@@ -223,6 +223,7 @@ const CreateYourPage = () => {
         const publishedTime = publishedData.lastUpdated;
 
         console.log(typeof (JSON.parse(publishedData.localStorageData.localSaved)));
+        console.log((JSON.parse(publishedData.localStorageData.localSaved)));
         console.log(typeof (initialItems));
 
 
@@ -289,7 +290,10 @@ const CreateYourPage = () => {
   });
 
   useEffect(() => {
-    if (items.length > 0) localStorage.setItem("userContentInfo", JSON.stringify(items));
+    if (items.length > 0) {
+      console.log(4);
+      localStorage.setItem("userContentInfo", JSON.stringify(items));
+    }
   }, [items]);
 
   const [itemType, setItemType] = useState(ITEM_TYPES.SUBGROUP);
