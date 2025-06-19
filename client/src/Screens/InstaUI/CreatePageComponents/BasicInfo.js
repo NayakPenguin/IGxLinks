@@ -82,36 +82,24 @@ const AllSocialMediaPlatforms = [
     }
 ];
 
-const BasicInfo = ({diffCreated, setDiffCreated}) => {
+const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const API_URL = process.env.REACT_APP_API_URL;
-
-    useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/basic-info/`, {
-          withCredentials: true
-        });
-
-        const basicData = res.data;
-        console.log(basicData);
-      } catch (err) {
-        console.error("Error fetching basic data:", err);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-    const [modelOpen, setModelOpen] = useState(false);
-    const [editingField, setEditingField] = useState(null);
-    const [formData, setFormData] = useState({
+    const [basicData, setBasicData] = useState({
         name: "",
         role: "",
         org: "",
         bio: "",
         location: "",
-        profileImage: "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"
+        profileImage: "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png",
+        socialLinks: [],
+        announcement: {
+            title: "Announcement Title",
+            description: "This is your announcement description",
+            isVisible: true
+        }
     });
+    const [modelOpen, setModelOpen] = useState(false);
+    const [editingField, setEditingField] = useState(null);
     const [cropModalOpen, setCropModalOpen] = useState(false);
     const [imageSrc, setImageSrc] = useState(null);
     const [crop, setCrop] = useState({
@@ -125,32 +113,22 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
     const [completedCrop, setCompletedCrop] = useState(null);
     const imageRef = useRef(null);
     const fileInputRef = useRef(null);
-
     const [searchTerm, setSearchTerm] = useState('');
-    const [socialLinks, setSocialLinks] = useState({});
-    const [activeSocialLinks, setActiveSocialLinks] = useState([]);
     const [filteredPlatforms, setFilteredPlatforms] = useState(AllSocialMediaPlatforms);
+    const [isAnnouncementEditing, setIsAnnouncementEditing] = useState(false);
 
     useEffect(() => {
-        const savedData = localStorage.getItem('userBasicInfo');
-        if (savedData) {
-            const parsed = JSON.parse(savedData);
-            setFormData(parsed.formData || {});
-            setSocialLinks(parsed.socialLinks || {});
-            setActiveSocialLinks(parsed.activeSocialLinks || []);
-            setAnnouncementData(parsed.announcementData || {
-                title: "Announcement Title",
-                description: "This is your announcement description",
-                isVisible: true
-            });
-        }
-        else {
-            const initialLinks = {};
-            AllSocialMediaPlatforms.forEach(platform => {
-                initialLinks[platform.id] = '';
-            });
-            setSocialLinks(initialLinks);
-        }
+        const fetchData = async () => {
+            try {
+                const res = await axios.get(`${API_URL}/basic-info/`, {
+                    withCredentials: true
+                });
+                setBasicData(res.data);
+            } catch (err) {
+                console.error("Error fetching basic data:", err);
+            }
+        };
+        fetchData();
     }, []);
 
     useEffect(() => {
@@ -160,36 +138,20 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
         setFilteredPlatforms(filtered);
     }, [searchTerm]);
 
-    const saveToLocalStorage = () => {
-        const data = {
-            formData,
-            socialLinks,
-            activeSocialLinks,
-            announcementData
-        };
-        localStorage.setItem('userBasicInfo', JSON.stringify(data));
-    };
-
-    const handleChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
-
-    const handleDone = () => {
-        setEditingField(null);
-        saveToLocalStorage();
+    const handleChange = async (field, value) => {
+        const updatedData = { ...basicData, [field]: value };
+        setBasicData(updatedData);
+        await axios.post(`${API_URL}/basic-info/`, updatedData, {
+            withCredentials: true
+        });
+        setDiffCreated(true);
     };
 
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
-            if (!file.type.match('image.(jpeg|jpg|png)')) {
-                alert('Please select a JPEG/JPG or PNG image');
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Image size should be less than 5MB');
-                return;
-            }
+            if (!file.type.match('image.(jpeg|jpg|png)')) return;
+            if (file.size > 5 * 1024 * 1024) return;
 
             const reader = new FileReader();
             reader.onload = () => {
@@ -232,35 +194,58 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
             const reader = new FileReader();
             reader.readAsDataURL(blob);
             reader.onloadend = () => {
-                console.log("Cropped Image URL:", reader.result); // ✅ Console log added here
-                localStorage.setItem("newLocalImageURL", reader.result);
-                setFormData(prev => {
-                    const updated = { ...prev, profileImage: reader.result };
-                    setTimeout(() => saveToLocalStorage(), 0);
-                    return updated;
+                const updatedData = { ...basicData, profileImage: reader.result };
+                setBasicData(updatedData);
+                axios.post(`${API_URL}/basic-info/`, updatedData, {
+                    withCredentials: true
                 });
                 setCropModalOpen(false);
+                setDiffCreated(true);
             };
         }, 'image/jpeg', 1);
     };
 
-    const renderInput = (field, label, placeholder = "") => (
-        <div className="input-container">
-            <div className="label">{label}</div>
-            <div className="input-line">
-                <input
-                    className="input-basic"
-                    type="text"
-                    placeholder={placeholder}
-                    value={formData[field]}
-                    onChange={(e) => handleChange(field, e.target.value)}
-                />
-                <div className="done-btn" onClick={handleDone}>
-                    <DoneIcon />
-                </div>
-            </div>
-        </div>
-    );
+    const handleInputChange = (platformId, value) => {
+        const updatedLinks = basicData.socialLinks.map(link =>
+            link.platformId === platformId ? { ...link, url: value } : link
+        );
+        setBasicData({ ...basicData, socialLinks: updatedLinks });
+    };
+
+    const handleSave = async () => {
+        await axios.post(`${API_URL}/basic-info/`, basicData, {
+            withCredentials: true
+        });
+        setModelOpen(false);
+        setDiffCreated(true);
+    };
+
+    const toggleAnnouncementVisibility = async () => {
+        const updatedAnnouncement = {
+            ...basicData.announcement,
+            // isVisible: !basicData.announcement.isVisible
+            isVisible: true
+        };
+        const updatedData = { ...basicData, announcement: updatedAnnouncement };
+        setBasicData(updatedData);
+        await axios.post(`${API_URL}/basic-info/`, updatedData, {
+            withCredentials: true
+        });
+        setDiffCreated(true);
+    };
+
+    const handleAnnouncementChange = async (field, value) => {
+        const updatedAnnouncement = {
+            ...basicData.announcement,
+            [field]: value
+        };
+        const updatedData = { ...basicData, announcement: updatedAnnouncement };
+        setBasicData(updatedData);
+        await axios.post(`${API_URL}/basic-info/`, updatedData, {
+            withCredentials: true
+        });
+        setDiffCreated(true);
+    };
 
     const onImageLoad = (e) => {
         const { width, height } = e.currentTarget;
@@ -277,54 +262,23 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
         setCrop(centeredCrop);
     };
 
-    const handleInputChange = (platformId, value) => {
-        setSocialLinks(prev => ({
-            ...prev,
-            [platformId]: value
-        }));
-    };
-
-    const handleSave = () => {
-        const updatedLinks = AllSocialMediaPlatforms
-            .filter(platform => socialLinks[platform.id]?.trim() !== '')
-            .map(platform => ({
-                ...platform,
-                url: socialLinks[platform.id]
-            }));
-
-        setActiveSocialLinks(updatedLinks);
-        setModelOpen(false);
-        saveToLocalStorage();
-    };
-
-    const [isAnnouncementEditing, setIsAnnouncementEditing] = useState(false);
-    const [announcementData, setAnnouncementData] = useState(
-        JSON.parse(localStorage.getItem('announcementData')) || {
-            title: "Announcement Title",
-            description: "This is your announcement description",
-            isVisible: true
-        }
+    const renderInput = (field, label, placeholder = "") => (
+        <div className="input-container">
+            <div className="label">{label}</div>
+            <div className="input-line">
+                <input
+                    className="input-basic"
+                    type="text"
+                    placeholder={placeholder}
+                    value={basicData[field] || ""}
+                    onChange={(e) => handleChange(field, e.target.value)}
+                />
+                <div className="done-btn" onClick={() => setEditingField(null)}>
+                    <DoneIcon />
+                </div>
+            </div>
+        </div>
     );
-
-    useEffect(() => {
-        saveToLocalStorage();
-    }, [announcementData]);
-
-    const toggleAnnouncementVisibility = () => {
-        setAnnouncementData(prev => ({
-            ...prev,
-            isVisible: !prev.isVisible
-        }));
-    };
-
-    const handleAnnouncementChange = (field, value) => {
-        setAnnouncementData(prev => ({ ...prev, [field]: value }));
-    };
-
-    const handleAnnouncementDone = () => {
-        setIsAnnouncementEditing(false);
-        saveToLocalStorage();
-    };
 
     const renderAnnouncementInput = (field, label, placeholder = "") => (
         <div className="input-container">
@@ -334,7 +288,7 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
                     className="input-basic"
                     type="text"
                     placeholder={placeholder}
-                    value={announcementData[field]}
+                    value={basicData.announcement[field] || ""}
                     onChange={(e) => handleAnnouncementChange(field, e.target.value)}
                 />
             </div>
@@ -348,14 +302,13 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
             {cropModalOpen && (
                 <ModalOverlay>
                     <ModalContent>
-                        {/* <h3>Crop your profile picture (Square 1:1)</h3>  */}
                         {imageSrc && (
                             <div style={{ width: '100%', maxWidth: '500px' }}>
                                 <ReactCrop
                                     src={imageSrc}
                                     crop={crop}
                                     onComplete={handleCropComplete}
-                                    onChange={newCrop => setCrop(newCrop)}
+                                    onChange={setCrop}
                                     aspect={ASPECT_RATIO}
                                     minWidth={MIN_DIMENSION}
                                     ruleOfThirds
@@ -375,11 +328,8 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
                                             maxHeight: '70vh',
                                             display: 'block'
                                         }}
-
                                         onLoad={onImageLoad}
                                     />
-
-
                                 </ReactCrop>
                             </div>
                         )}
@@ -391,52 +341,47 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
                 </ModalOverlay>
             )}
 
-            {
-                modelOpen ?
-                    <ModelConatiner>
-                        <div className="model-closer" onClick={() => setModelOpen(false)}></div>
-                        <div className="model">
-                            <div className="model-title">Add or Edit your social media profile pages</div>
-
-                            <div className="search-bar">
-                                <input
-                                    type="text"
-                                    placeholder="Search social media"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                                <div className="search-btn">
-                                    <SearchIcon />
-                                </div>
+            {modelOpen && (
+                <ModelConatiner>
+                    <div className="model-closer" onClick={() => setModelOpen(false)}></div>
+                    <div className="model">
+                        <div className="model-title">Add or Edit your social media profile pages</div>
+                        <div className="search-bar">
+                            <input
+                                type="text"
+                                placeholder="Search social media"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <div className="search-btn">
+                                <SearchIcon />
                             </div>
-
-                            <div className="all-social-medias">
-                                {filteredPlatforms.map(platform => (
-                                    <div className="one-social-media" key={platform.id}>
-                                        <div className="icon">
-                                            <img src={platform.iconUrl} alt={platform.name} />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            className="input-basic"
-                                            placeholder={`${platform.name} username/URL`}
-                                            value={socialLinks[platform.id] || ''}
-                                            onChange={(e) => handleInputChange(platform.id, e.target.value)}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="done-btn" onClick={handleSave}>Done</div>
                         </div>
-                    </ModelConatiner> : null
-            } 
+                        <div className="all-social-medias">
+                            {filteredPlatforms.map(platform => (
+                                <div className="one-social-media" key={platform.id}>
+                                    <div className="icon">
+                                        <img src={platform.iconUrl} alt={platform.name} />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        className="input-basic"
+                                        placeholder={`${platform.name} username/URL`}
+                                        value={basicData.socialLinks.find(l => l.platformId === platform.id)?.url || ''}
+                                        onChange={(e) => handleInputChange(platform.id, e.target.value)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="done-btn" onClick={handleSave}>Done</div>
+                    </div>
+                </ModelConatiner>
+            )}
 
             <div className="top-bar">
                 <div className="left">
-                    <div className="color">{diffCreated ? "Unsaved changes" : "All changes published!"}</div><b>Last Published :</b> {
-                        savedPublishedTime != null ? savedPublishedTime : "Never"
-                }
+                    <div className="color">{diffCreated ? "Unsaved changes" : "All changes published!"}</div>
+                    <b>Last Published :</b> {savedPublishedTime != null ? savedPublishedTime : "Never"}
                 </div>
                 <a href="/page/view-edit" className="view-btn">Preview</a>
             </div>
@@ -444,7 +389,7 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
             <div className="user-data">
                 <div className="logo-x-dp">
                     <img
-                        src={formData.profileImage}
+                        src={basicData.profileImage}
                         alt="Profile"
                     />
                     <div className="add-btn" onClick={() => fileInputRef.current.click()}>
@@ -459,104 +404,52 @@ const BasicInfo = ({diffCreated, setDiffCreated}) => {
                     </div>
                 </div>
 
-                {/* Rest of your existing code... */}
-                {/* Name */}
                 {editingField === "name"
                     ? renderInput("name", "Your Name", "Enter your name")
                     : <div className="name" onClick={() => setEditingField("name")}>
-                        {formData.name || "Your Name"} <CreateIcon />
+                        {basicData.name || "Your Name"} <CreateIcon />
                     </div>
                 }
 
-                {/* Role */}
                 {editingField === "role"
                     ? renderInput("role", "Your Role", "Enter your role")
                     : <div className="about-header" onClick={() => setEditingField("role")}>
-                        {formData.role || "Your Role"} <CreateIcon />
+                        {basicData.role || "Your Role"} <CreateIcon />
                     </div>
                 }
 
-                {/* Organization */}
                 {editingField === "org"
                     ? renderInput("org", "Your Organization", "Enter your organization")
                     : <div className="about-header" onClick={() => setEditingField("org")}>
-                        {formData.org || "Your Organisation"} <CreateIcon />
+                        {basicData.org || "Your Organisation"} <CreateIcon />
                     </div>
                 }
 
-                {/* Bio */}
                 {editingField === "bio"
                     ? renderInput("bio", "Your Bio", "Tell us about yourself")
                     : <div className="about-desc" onClick={() => setEditingField("bio")}>
-                        {formData.bio || "Your bio"} <CreateIcon />
+                        {basicData.bio || "Your bio"} <CreateIcon />
                     </div>
                 }
 
-                {/* Location */}
                 {editingField === "location"
                     ? renderInput("location", "Your Location", "Enter your location")
                     : <div className="about-location" onClick={() => setEditingField("location")}>
-                        {formData.location || "Your Location"} <CreateIcon />
+                        {basicData.location || "Your Location"} <CreateIcon />
                     </div>
                 }
 
                 <div className="socials">
-                    {[
-                        "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png",
-                        "https://www.svgrepo.com/show/416500/youtube-circle-logo.svg",
-                        "https://cdn2.downdetector.com/static/uploads/c/300/f52a5/image11.png",
-                        "https://downloadr2.apkmirror.com/wp-content/uploads/2020/10/91/5f9b61e42640e.png"
-                    ].map((src, idx) => (
+                    {basicData.socialLinks.slice(0, 4).map((link, idx) => (
                         <div key={idx} className="social-icon light">
-                            <img src={src} alt="" />
+                            <img src={AllSocialMediaPlatforms.find(p => p.id === link.platformId)?.iconUrl} alt="" />
                         </div>
                     ))}
-                    <div className="social-icon" onClick={setModelOpen}>
+                    <div className="social-icon" onClick={() => setModelOpen(true)}>
                         <CreateIcon />
                     </div>
                 </div>
             </div>
-
-            <PinnedAnnouncement>
-                {
-                    isAnnouncementEditing ? null : <div className="edit-btn" onClick={() => {setIsAnnouncementEditing(true); setAnnouncementData(prev => ({ ...prev, isVisible: true }));}}>
-                        <CreateIcon />
-                    </div>
-                }
-                
-                <div className="change-visibility" onClick={() => {
-                    toggleAnnouncementVisibility();
-                }}>
-                    {announcementData.isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                    <div className="text">
-                        Click to {announcementData.isVisible ? "hide" : "show"}
-                    </div>
-                </div>
-
-                <div className="label">
-                    <svg viewBox="0 0 24 24" height="16" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>pin-refreshed</title><path d="M16 5V12L17.7 13.7C17.8 13.8 17.875 13.9125 17.925 14.0375C17.975 14.1625 18 14.2917 18 14.425V15C18 15.2833 17.9042 15.5208 17.7125 15.7125C17.5208 15.9042 17.2833 16 17 16H13V21.85C13 22.1333 12.9042 22.3708 12.7125 22.5625C12.5208 22.7542 12.2833 22.85 12 22.85C11.7167 22.85 11.4792 22.7542 11.2875 22.5625C11.0958 22.3708 11 22.1333 11 21.85V16H7C6.71667 16 6.47917 15.9042 6.2875 15.7125C6.09583 15.5208 6 15.2833 6 15V14.425C6 14.2917 6.025 14.1625 6.075 14.0375C6.125 13.9125 6.2 13.8 6.3 13.7L8 12V5C7.71667 5 7.47917 4.90417 7.2875 4.7125C7.09583 4.52083 7 4.28333 7 4C7 3.71667 7.09583 3.47917 7.2875 3.2875C7.47917 3.09583 7.71667 3 8 3H16C16.2833 3 16.5208 3.09583 16.7125 3.2875C16.9042 3.47917 17 3.71667 17 4C17 4.28333 16.9042 4.52083 16.7125 4.7125C16.5208 4.90417 16.2833 5 16 5ZM8.85 14H15.15L14 12.85V5H10V12.85L8.85 14Z" fill="currentColor"></path></svg>
-                    Pinned Announcement
-                </div>
-
-                {announcementData.isVisible && (
-                    <div>
-                        {isAnnouncementEditing ? (
-                            <>
-                                {renderAnnouncementInput("title", "Title")}
-                                {renderAnnouncementInput("description", "Description")}
-                                <div className="done-btn" onClick={handleAnnouncementDone}>
-                                    Done
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="title">{parseRichText(announcementData.title)}</div>
-                                <div className="desc">{parseRichText(announcementData.description)}</div>
-                            </>
-                        )}
-                    </div>
-                )}
-            </PinnedAnnouncement>
         </Container>
     );
 };

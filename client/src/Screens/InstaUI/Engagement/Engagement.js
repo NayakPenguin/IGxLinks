@@ -186,7 +186,13 @@ const Container = styled.div`
 
         .bold-border{
             margin-top: 20px;
-            background-color: #343434;
+            margin-bottom: 20px;
+            background-color: transparent;
+            padding: 0px;
+            border: none;
+            font-size: 1.15rem;
+            font-weight: 500;
+            border-radius: 10px;
         }
 
         .stat-1{
