@@ -182,6 +182,9 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         }
 
         setBasicData({ ...basicData, socialLinks: updatedLinks });
+        console.log('====================================');
+        console.log(updatedLinks);
+        console.log('====================================');
     };
 
     const handleSave = async () => {
@@ -262,7 +265,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         if (basicData.socialLinks) {
             const initialValues = {};
             basicData.socialLinks.forEach(link => {
-                initialValues[link.platformId] = link.url;
+                initialValues[link.platformId] = link.profileUrl;
             });
             setPlatformValues(initialValues);
         }
