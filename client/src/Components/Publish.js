@@ -6,13 +6,15 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import WarningIcon from '@material-ui/icons/Warning';
+import CallMadeIcon from '@material-ui/icons/CallMade';
 
-const Publish = ({ userContentInfo }) => {
+const Publish = () => {
   const [publishStatus, setPublishStatus] = useState(null);
-  const [isPublished, setIsPublished] = useState(false);
+  const [highlightTopBar, setHighlightTopBar] = useState(false);
+  const [username, setUsername] = useState("Not-Found");
+  
 
   const API_URL = process.env.REACT_APP_API_URL;
-  const navigate = useNavigate();
 
   const api = axios.create({
     baseURL: API_URL,
@@ -38,12 +40,17 @@ const Publish = ({ userContentInfo }) => {
 
     try {
       const basicData = JSON.parse(localBasic);
+      setUsername(basicData.userName);
       const contentData = JSON.parse(localContent);
 
       await Promise.all([
-        api.post('/basic-info/', basicData),
+        api.post('/basic-info/', {
+          ...basicData,
+          lastUpdated: Date.now()
+        }),
         api.post('/advanced-info', {
-          localStorageData: { ...contentData }
+          localStorageData: { ...contentData },
+          lastUpdated: Date.now()
         })
       ]);
 
@@ -51,7 +58,10 @@ const Publish = ({ userContentInfo }) => {
       setPublishStatus('success');
 
       setTimeout(() => setPublishStatus(null), 5000);
-      setTimeout(() => window.location.reload(), 5000);
+      setHighlightTopBar(true);
+      setTimeout(() => setHighlightTopBar(false), 5000);
+
+      // setTimeout(() => window.location.reload(), 5000);
     } catch (error) {
       console.error("Publishing failed:", error.response?.data || error.message);
       setPublishStatus('error');
@@ -77,6 +87,14 @@ const Publish = ({ userContentInfo }) => {
           <>Push updates <PublicIcon /></>
         )}
       </div>
+      {
+        highlightTopBar && <div className="pre-top-bar">
+          <a href={`/p/${username}`} target="_blank">
+            Visit your live public page
+            <CallMadeIcon />
+          </a>
+        </div>
+      }
     </Container>
   );
 };
@@ -93,6 +111,43 @@ const Container = styled.div`
   justify-content: center;
   
   z-index: 1002;
+
+  .pre-top-bar{
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      z-index: 100;
+
+      border-bottom: 1px solid #313231;
+
+      height: 40px;
+      width: 100vw;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      padding: 0 30px;
+
+      background-color: #92b419;
+      /* background-color: #000; */
+
+      a{
+          display: flex;
+          align-items: center;
+          font-size: 0.75rem;
+          font-weight: 500;
+
+          color: white;
+          text-decoration: none;
+
+          svg{
+              font-size: 1rem;
+              margin-left: 5px;
+          }
+
+      }
+  }
 
   .btn {
     padding: 10px 25px;

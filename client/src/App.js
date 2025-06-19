@@ -41,6 +41,8 @@ import AfterLogin from "./Screens/LoginPages/AfterLogin";
 import BetweenCalcPage from "./Screens/InstaUI/BetweenCalcPage";
 
 import PrivateRoute from './auth/PrivateRoute'; 
+import ViewProfile from "./Screens/InstaUI/ViewProfile";
+import ViewProfileInsideControl from "./Screens/InstaUI/ViewProfileInside/ViewProfileInsideControl";
 
 const App = () => {
   return (
@@ -51,6 +53,9 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/basic-info" element={<AfterLogin />} />
         <Route path="/wait" element={<BetweenCalcPage />} />
+        <Route path="/p/:username" element={<ViewProfile />} />
+        <Route path="/p/:username/:id" element={<ViewProfileInsideControl />} />
+
 
         <Route path="/shop" element={<Shop />} />
         <Route path="/brand" element={<BrandProfile />} />

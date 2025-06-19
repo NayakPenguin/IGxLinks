@@ -4,7 +4,6 @@ const BasicInfo = require('../models/BasicInfo');
 const { authenticateJWT } = require('./auth');
 const AllUsernames = require('../models/AllUsernames');
 
-// Create or Update Basic Info (Protected Route)
 // routes/basicinfo.js
 
 router.post('/', authenticateJWT, async (req, res) => {

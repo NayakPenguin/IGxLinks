@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from 'styled-components'
 import CallMadeIcon from '@material-ui/icons/CallMade';
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
-import AttachFileIcon from '@material-ui/icons/AttachFile';
+import { useParams } from 'react-router-dom';
 
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import ControlFooter from "../../Components/ControlFooter";
+import CheckIcon from '@material-ui/icons/Check';
 import BookmarkBorderOutlinedIcon from '@material-ui/icons/BookmarkBorderOutlined';
 import NotificationsNoneOutlinedIcon from '@material-ui/icons/NotificationsNoneOutlined';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
@@ -16,30 +12,61 @@ import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 import BookmarkIcon from '@material-ui/icons/Bookmark';
 import EventAvailableIcon from '@material-ui/icons/EventAvailable';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
-
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
-import InstagramIcon from '@material-ui/icons/Instagram';
-import CheckIcon from '@material-ui/icons/Check';
-import FlagIcon from '@material-ui/icons/Flag';
-
-import basicUser2Dp from "../../Images/basicUser2Dp.png"
-import influencerproduct1 from "../../Images/influencerproduct1.png"
-import influencerproduct2 from "../../Images/influencerproduct2.png"
-import influencerproduct3 from "../../Images/influencerproduct3.png"
-import influencerproduct4 from "../../Images/influencerproduct4.png"
-import influencerproduct5 from "../../Images/influencerproduct5.png"
-import influencerproduct6 from "../../Images/influencerproduct6.png"
-
-import WhatsAppIcon from '@material-ui/icons/WhatsApp';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { CircularProgress } from "@material-ui/core";
+import axios from "axios";
 
-const BasicUser2 = () => {
+import { AllSocialMediaPlatforms } from "../../constants/socialMediaPlatforms";
+import { parseRichText } from '../Helpers/parseRichText';
+
+const API_URL = process.env.REACT_APP_API_URL;
+
+const api = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
+const ViewProfile = () => {
+    const { username } = useParams();
+    const [profileData, setProfileData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!username) {
+            console.warn("⚠️ No username provided, skipping profile fetch.");
+            return;
+        }
+
+        const fetchProfile = async () => {
+            setLoading(true);
+            setError(null);
+            console.log(`📡 Fetching profile for username: ${username}`);
+
+            try {
+                const res = await api.get(`/all-info/${username}`);
+                console.log("✅ Profile fetched successfully:", res.data);
+                setProfileData(res.data);
+                
+                
+
+            } catch (err) {
+                console.error("❌ Failed to fetch profile:", err.message, err);
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, [username]);
+
     const [modelOpen, setModelOpen] = useState(false);
     const [notificationModelOpen, setNotificationModelOpen] = useState(false);
     const [subscribed, setSubscribed] = useState(false);
-    const [upvoted, setUpvoted] = useState(0); // 0 - not voted, -1 green, +1 red
     const [showDone, setShowDone] = useState(false);
     const [exitAnimation, setExitAnimation] = useState(false);
     const [notificationText, setNotificationText] = useState("");
@@ -86,22 +113,6 @@ const BasicUser2 = () => {
         };
     }, [modelOpen]);
 
-    const handleVote = (newValue) => {
-        setSavedProduct(false);
-        setNotificationModelOpen(false);
-        setUpvoted(newValue);
-
-        if (newValue === -1) {
-            setNotificationText("You voted Somya as a green flag!");
-        } else if (newValue === 1) {
-            setNotificationText("You voted Somya as a red flag!");
-        } else {
-            setNotificationText("Your vote has been removed!");
-        }
-
-        setNotificationModelOpen(true);
-    };
-
     const handleSubscription = () => {
         setSavedProduct(false);
         // setNotificationModelOpen(false);
@@ -118,79 +129,9 @@ const BasicUser2 = () => {
         setNotificationModelOpen(true);
     }
 
-    const handleSave = () => {
-        if (savedProduct) {
-            setSavedProduct(!savedProduct);
-            setNotificationText("Removed from Saved");
-            setNotificationModelOpen(true);
-        }
-        else {
-            setSavedProduct(!savedProduct);
-            setNotificationText("Saved to Bookmarked Products");
-            setNotificationModelOpen(true);
-        }
-    }
 
     return (
         <Container>
-            {
-                modelOpen ?
-                    <ModelConatiner>
-                        <div className="model-closer" onClick={() => setModelOpen(false)}></div>
-                        <div className="model">
-                            <div className="shop-model-items">
-                                <div className="left"><img src={influencerproduct1} alt="" /></div>
-                                <div className="right">
-                                    <div className="tags">
-                                        <div className="tag">Best seller</div>
-                                    </div>
-                                    <div className="title">
-                                        White Graphic Sports Jersey Tshirt
-                                    </div>
-                                    <div className="brand">
-                                        Brand - <b>@newme.asia</b>
-                                    </div>
-                                    <div className="promo">
-                                        My promo code for 30% off - <b>SOMY</b> <FileCopyOutlinedIcon />
-                                    </div>
-                                    <div className="promo">
-                                        <i>
-                                            Avg price with my promo comes becomes around
-                                            <div className="price-container">
-                                                <div className="main-price"><span>₹</span>1,399</div>
-                                                <div className="old-price"><div className="strike">Avg Selling Price : ₹1,999</div> (30% off)</div>
-                                            </div>
-                                        </i>
-                                    </div>
-                                    {/* <div className="reviews">
-                                    <StarsWrapper>
-                                        {renderStars(4.3)}
-                                    </StarsWrapper>
-                                    <div className="review-info">4.3 (38 Users)</div>
-                                </div> */}
-                                    {/* <div className="price">
-                                    <div className="main-price"><span>₹</span>669</div>
-                                    <div className="old-price"><div className="strike">M.R.P  : ₹3,396</div> (80% off)</div>
-                                </div> */}
-                                    <div className="btns">
-                                        <div className="svg-container svg-2">
-                                            <svg aria-label="Reels" class="x1lliihq x1n2onr6 x5n08af" fill="#333" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Reels</title><line fill="none" stroke="#333" stroke-linejoin="round" stroke-width="2" x1="2.049" x2="21.95" y1="7.002" y2="7.002"></line><line fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="13.504" x2="16.362" y1="2.001" y2="7.002"></line><line fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="7.207" x2="10.002" y1="2.11" y2="7.002"></line><path d="M2 12.001v3.449c0 2.849.698 4.006 1.606 4.945.94.908 2.098 1.607 4.946 1.607h6.896c2.848 0 4.006-.699 4.946-1.607.908-.939 1.606-2.096 1.606-4.945V8.552c0-2.848-.698-4.006-1.606-4.945C19.454 2.699 18.296 2 15.448 2H8.552c-2.848 0-4.006.699-4.946 1.607C2.698 4.546 2 5.704 2 8.552Z" fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M9.763 17.664a.908.908 0 0 1-.454-.787V11.63a.909.909 0 0 1 1.364-.788l4.545 2.624a.909.909 0 0 1 0 1.575l-4.545 2.624a.91.91 0 0 1-.91 0Z" fill-rule="evenodd"></path></svg>
-                                        </div>
-                                        <div className="svg-container svg-2" style={{ "marginLeft": "10px" }}>
-                                            <svg aria-label="Share Post" class="x1lliihq x1n2onr6 x5n08af" fill="#333" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Share Post</title><line fill="none" stroke="#333" stroke-linejoin="round" stroke-width="2" x1="22" x2="9.218" y1="3" y2="10.083"></line><polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="#333" stroke-linejoin="round" stroke-width="2"></polygon></svg>
-                                        </div>
-                                        <a href="https://newme.asia/product/white-graphic-sports-jersey-tshirt?srsltid=AfmBOooC-e1QTAD72Bq9zdyw4nH5vDSARUP55s--_b_Qd2leAkw7J0w_" className="buy-btn">Shop Now <CallMadeIcon /></a>
-                                        <div className="svg-container" onClick={() => handleSave()}>
-                                            {
-                                                savedProduct ? <BookmarkIcon /> : <BookmarkBorderOutlinedIcon />
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ModelConatiner> : null
-            }
             {
                 notificationModelOpen ?
                     <NotificationModelConatiner exit={exitAnimation}>
@@ -214,195 +155,146 @@ const BasicUser2 = () => {
                         </div>
                     </NotificationModelConatiner> : null
             }
-            <div className="main-content">
-                <Subscribe>
-                    {/*  */}
+            {
+                profileData &&
+                <div className="main-content">
+                    <Subscribe>
+                        {/*  */}
+                        {
+                            subscribed ? (
+                                <div className="subscribe-btn subscribed" onClick={() => handleSubscription()}>
+                                    <NotificationsActiveIcon />
+                                </div>
+                            ) : (
+                                <div className="subscribe-btn" onClick={() => handleSubscription()}>
+                                    <NotificationsNoneOutlinedIcon />
+                                </div>
+                            )
+                        }
+                    </Subscribe>
+                    <div className="user-data">
+                        <div className="logo-x-dp">
+                            <img src={profileData.basicInfo.profileImage} alt="" />
+                        </div>
+                        <div className="name">{profileData.basicInfo.name}</div>
+                        <div className="about-header">{profileData.basicInfo.role} @{profileData.basicInfo.org}</div>
+                        <div className="about-desc">{profileData.basicInfo.bio}</div>
+                        <div className="about-location"><RoomIcon /> {profileData.basicInfo.location}</div>
+
+                        <div className="socials">
+                            {profileData.basicInfo.socialLinks?.map((link) => {
+                                const platform = AllSocialMediaPlatforms.find(p => p.id === link.platformId);
+                                if (!platform || !link.profileUrl) return null;
+
+                                return (
+                                    <a
+                                        key={link._id}
+                                        href={link.profileUrl.startsWith("http") ? link.profileUrl : `https://${link.profileUrl}`}
+                                        className="social-icon"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <img
+                                            src={link.iconUrl || platform.iconUrl}
+                                            alt={platform.name}
+                                            onError={(e) => {
+                                                e.target.src = platform.iconUrl;
+                                            }}
+                                        />
+                                    </a>
+                                );
+                            })}
+                        </div>
+                    </div>
+
                     {
-                        subscribed ? (
-                            <div className="subscribe-btn subscribed" onClick={() => handleSubscription()}>
-                                <NotificationsActiveIcon />
+                        profileData.basicInfo.announcement.isVisible &&
+                        <PinnedAnnouncement>
+                            <div className="label">
+                                <svg viewBox="0 0 24 24" height="16" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>pin-refreshed</title><path d="M16 5V12L17.7 13.7C17.8 13.8 17.875 13.9125 17.925 14.0375C17.975 14.1625 18 14.2917 18 14.425V15C18 15.2833 17.9042 15.5208 17.7125 15.7125C17.5208 15.9042 17.2833 16 17 16H13V21.85C13 22.1333 12.9042 22.3708 12.7125 22.5625C12.5208 22.7542 12.2833 22.85 12 22.85C11.7167 22.85 11.4792 22.7542 11.2875 22.5625C11.0958 22.3708 11 22.1333 11 21.85V16H7C6.71667 16 6.47917 15.9042 6.2875 15.7125C6.09583 15.5208 6 15.2833 6 15V14.425C6 14.2917 6.025 14.1625 6.075 14.0375C6.125 13.9125 6.2 13.8 6.3 13.7L8 12V5C7.71667 5 7.47917 4.90417 7.2875 4.7125C7.09583 4.52083 7 4.28333 7 4C7 3.71667 7.09583 3.47917 7.2875 3.2875C7.47917 3.09583 7.71667 3 8 3H16C16.2833 3 16.5208 3.09583 16.7125 3.2875C16.9042 3.47917 17 3.71667 17 4C17 4.28333 16.9042 4.52083 16.7125 4.7125C16.5208 4.90417 16.2833 5 16 5ZM8.85 14H15.15L14 12.85V5H10V12.85L8.85 14Z" fill="currentColor"></path></svg>
+                                Pinned Announcement
                             </div>
-                        ) : (
-                            <div className="subscribe-btn" onClick={() => handleSubscription()}>
-                                <NotificationsNoneOutlinedIcon />
-                            </div>
-                        )
+                            <b>{profileData.basicInfo.announcement.title}</b>
+                            {profileData.basicInfo.announcement.description}
+                        </PinnedAnnouncement>
                     }
-                </Subscribe>
-                <div className="user-data">
-                    <div className="logo-x-dp">
-                        <img src={basicUser2Dp} alt="" />
-                    </div>
-                    <div className="name">Atanu Nayak</div>
-                    <div className="about-header">Software Developer @Samsung</div>
-                    <div className="about-desc">I develop software that scales.</div>
-                    <div className="about-location"><RoomIcon /> Kol/Blr</div>
 
-                    {/* <div className="main-btns">
-                        <div className="btn-1 trans">30K page views</div>
-                        <div className="btn-1">Subscribe</div>
-                    </div> */}
+                    <div className="group">
+                        {profileData.advancedInfo.localStorageData && Object.values(profileData.advancedInfo.localStorageData).map((item) => {
+                            const { id, type, title, url } = item;
 
-                    <div className="socials">
-                        <div className="social-icon">
-                            <img src="https://cdn1.iconfinder.com/data/icons/logotypes/32/circle-linkedin-512.png" alt="" />
-                        </div>
-                        <div className="social-icon">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png" alt="" />
-                        </div>
-                        <div className="social-icon">
-                            <img src="https://images.crunchbase.com/image/upload/c_pad,f_auto,q_auto:eco,dpr_1/83facdeba5b924cb3b1a" alt="" />
-                        </div>
-                        <div className="social-icon">
-                            <img src="https://downloadr2.apkmirror.com/wp-content/uploads/2020/10/91/5f9b61e42640e.png" alt="" />
-                        </div>
-                        <div className="social-icon">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/2048px-Instagram_logo_2022.svg.png" alt="" />
-                        </div>
+                            switch (type) {
+                                case "Subgroup":
+                                    return (
+                                        <div key={id} className="group-name-container">
+                                            <div className="group-name-container-line"></div>
+                                            <div className="group-name">{parseRichText(title)}</div>
+                                            <div className="group-name-container-line"></div>
+                                        </div>
+                                    );
+
+                                case "Redirect Link":
+                                    return (
+                                        <a key={id} href={url.startsWith("http") ? url : `https://${url}`} className="link1" target="_blank" rel="noopener noreferrer">
+                                            <div>{parseRichText(title)}</div>
+                                            <div className="link-circle">
+                                                <CallMadeIcon />
+                                            </div>
+                                        </a>
+                                    );
+
+                                case "Anonymous Replies":
+                                    return (
+                                        <a key={id} href={`/p/${profileData.basicInfo.userName}/${id}`} className="link1">
+                                            <div>{parseRichText(title)}</div>
+                                            <div className="link-circle">
+                                                <svg
+                                                    viewBox="-20.4 -20.4 64.8 64.8"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="#ffffff"
+                                                    stroke="#ffffff"
+                                                >
+                                                    <g strokeWidth="1.2" fill="none" fillRule="evenodd">
+                                                        <g fill="#ffffff" fillRule="nonzero">
+                                                            <path d="M17.5,11.75 C20.1233526,11.75 22.25,13.8766474 22.25,16.5 C22.25,19.1233526 20.1233526,21.25 17.5,21.25 C15.4019872,21.25 13.6216629,19.8898135 12.9927596,18.0031729 L11.0072404,18.0031729 C10.3783371,19.8898135 8.59801283,21.25 6.5,21.25 C3.87664744,21.25 1.75,19.1233526 1.75,16.5 C1.75,13.8766474 3.87664744,11.75 6.5,11.75 C8.9545808,11.75 10.9743111,13.6118164 11.224028,16.0002862 L12.775972,16.0002862 C13.0256889,13.6118164 15.0454192,11.75 17.5,11.75 Z M6.5,13.75 C4.98121694,13.75 3.75,14.9812169 3.75,16.5 C3.75,18.0187831 4.98121694,19.25 6.5,19.25 C8.01878306,19.25 9.25,18.0187831 9.25,16.5 C9.25,14.9812169 8.01878306,13.75 6.5,13.75 Z M17.5,13.75 C15.9812169,13.75 14.75,14.9812169 14.75,16.5 C14.75,18.0187831 15.9812169,19.25 17.5,19.25 C19.0187831,19.25 20.25,18.0187831 20.25,16.5 C20.25,14.9812169 19.0187831,13.75 17.5,13.75 Z M15.5119387,3 C16.7263613,3 17.7969992,3.79658742 18.145961,4.95979331 L19.1520701,8.31093387 C19.944619,8.44284508 20.7202794,8.59805108 21.4790393,8.77658283 C22.0166428,8.90307776 22.3499121,9.44143588 22.2234172,9.9790393 C22.0969222,10.5166428 21.5585641,10.8499121 21.0209607,10.7234172 C18.2654221,10.0750551 15.258662,9.75 12,9.75 C8.74133802,9.75 5.73457794,10.0750551 2.97903933,10.7234172 C2.44143588,10.8499121 1.90307776,10.5166428 1.77658283,9.9790393 C1.6500879,9.44143588 1.98335721,8.90307776 2.52096067,8.77658283 C3.27940206,8.59812603 4.05472975,8.4429754 4.8469317,8.31110002 L5.85403902,4.95979331 C6.20300079,3.79658742 7.2736387,3 8.4880613,3 L15.5119387,3 Z" />
+                                                        </g>
+                                                    </g>
+                                                </svg>
+                                            </div>
+                                        </a>
+                                    );
+
+                                case "Meeting Scheduler":
+                                    return (
+                                        <a key={id} href={`/p/${profileData.basicInfo.userName}/${id}`} className="link1">
+                                            <div>{parseRichText(title)}</div>
+                                            <div className="link-circle">
+                                                <EventAvailableIcon />
+                                            </div>
+                                        </a>
+                                    );
+
+                                default:
+                                    return (
+                                        <a key={id} href={`/p/${profileData.basicInfo.userName}/${id}`} className="link1">
+                                            <div>{parseRichText(title)}</div>
+                                            <div className="link-circle">
+                                                <ChevronRightIcon />
+                                            </div>
+                                        </a>
+                                    );
+                            }
+                        })}
                     </div>
+
                 </div>
-
-                {/* <RedorGreenFlag>
-                    <div className="info">
-                        61% votes for <b>green flag <FlagIcon /></b> as a person
-                    </div>
-
-                    <div className={upvoted === -1 ? "vote-btn voted" : "vote-btn"}
-                        onClick={() => handleVote(upvoted === -1 ? 0 : -1)}>
-                        <ArrowDropUpIcon />
-                    </div>
-
-                    <div className="box">
-                        <div className="left">Green Flag <FlagIcon /></div>
-                        <div className="right">🚩</div>
-                    </div>
-
-                    <div className={upvoted === 1 ? "vote-btn voted" : "vote-btn"}
-                        onClick={() => handleVote(upvoted === 1 ? 0 : 1)}>
-                        <ArrowDropUpIcon />
-                    </div>
-                </RedorGreenFlag> */}
-
-                <PinnedAnnouncement>
-                    <div className="label">
-                        <svg viewBox="0 0 24 24" height="16" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>pin-refreshed</title><path d="M16 5V12L17.7 13.7C17.8 13.8 17.875 13.9125 17.925 14.0375C17.975 14.1625 18 14.2917 18 14.425V15C18 15.2833 17.9042 15.5208 17.7125 15.7125C17.5208 15.9042 17.2833 16 17 16H13V21.85C13 22.1333 12.9042 22.3708 12.7125 22.5625C12.5208 22.7542 12.2833 22.85 12 22.85C11.7167 22.85 11.4792 22.7542 11.2875 22.5625C11.0958 22.3708 11 22.1333 11 21.85V16H7C6.71667 16 6.47917 15.9042 6.2875 15.7125C6.09583 15.5208 6 15.2833 6 15V14.425C6 14.2917 6.025 14.1625 6.075 14.0375C6.125 13.9125 6.2 13.8 6.3 13.7L8 12V5C7.71667 5 7.47917 4.90417 7.2875 4.7125C7.09583 4.52083 7 4.28333 7 4C7 3.71667 7.09583 3.47917 7.2875 3.2875C7.47917 3.09583 7.71667 3 8 3H16C16.2833 3 16.5208 3.09583 16.7125 3.2875C16.9042 3.47917 17 3.71667 17 4C17 4.28333 16.9042 4.52083 16.7125 4.7125C16.5208 4.90417 16.2833 5 16 5ZM8.85 14H15.15L14 12.85V5H10V12.85L8.85 14Z" fill="currentColor"></path></svg>
-                        Pinned Announcement
-                    </div>
-                    <b>Open to Work</b>
-                    Open to backend-heavy SDE 2 positions at product-based companies.
-                </PinnedAnnouncement>
-
-                <div className="group">
-                    <div className="group-name-container">
-                        <div className="group-name-container-line"></div>
-                        <div className="group-name">Professional 💼</div>
-                        <div className="group-name-container-line"></div>
-                    </div>
-
-                    <div className="link1">
-                        <div>View my Resume - <b>Software Developer • 2 YOE</b></div>
-                        <div className="link-circle">
-                            <CallMadeIcon />
-                        </div>
-                    </div>
-
-
-                    <div className="link1">
-                        <div>Want a Referral? Fill the Form with Your <b>Experience, Opening Link etc</b></div>
-                        <div className="link-circle">
-                            <ChevronRightIcon />
-                        </div>
-                    </div>
-
-                    <div className="link1">
-                        <div>Schedule a One-on-One Meeting</div>
-                        <div className="link-circle">
-                            <EventAvailableIcon />
-                        </div>
-                    </div>
-
-                    <a href="/influencer/form" className="link1">
-                        <div>Invite Me for an Interview</div>
-                        <div className="link-circle">
-                            <ChevronRightIcon />
-                        </div>
-                    </a>
-
-                    <div className="link1">
-                        <div>Explore My Past Projects</div>
-                        <div className="link-circle">
-                            <ChevronRightIcon />
-                        </div>
-                    </div>
-
-                    <div className="link1">
-                        <div>Collaborate on a Project - Share your Idea</div>
-                        <div className="link-circle">
-                            <ChevronRightIcon />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="group">
-                    <div className="group-name-container">
-                        <div className="group-name-container-line"></div>
-                        <div className="group-name">Paid Servies</div>
-                        <div className="group-name-container-line"></div>
-                    </div>
-
-                    <div className="link1">
-                        <div className="paid-circle">
-                            <MonetizationOnIcon />
-                        </div>
-                        <div>Top <b>200 Leetcode Questions</b> - One needs to Solve</div>
-                        <div className="link-circle">
-                            <ChevronRightIcon />
-                        </div>
-                    </div>
-
-                    <div className="link1">
-                        <div className="paid-circle">
-                            <MonetizationOnIcon />
-                        </div>
-                        <div><b>Mock Interview</b> - 45 Mins/2 Questions - with feedback</div>
-                        <div className="link-circle">
-                            <ChevronRightIcon />
-                        </div>
-                    </div>
-                </div>
-
-
-                <div className="group">
-                    <div className="group-name-container">
-                        <div className="group-name-container-line"></div>
-                        <div className="group-name">About me</div>
-                        <div className="group-name-container-line"></div>
-                    </div>
-                    <div className="link1">
-                        <div>🧸 22 Years of Me – My Story So Far/Timeline</div>
-                        <div className="link-circle">
-                            <ChevronRightIcon />
-                        </div>
-                    </div>
-                    <div className="link1">
-                        <div>🎧 Music Taste? Basically My Personality <b>Spotify</b></div>
-                        <div className="link-circle">
-                            <CallMadeIcon />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="share-my-page">
-                    {/* igonel.ink/somyakodan_ */}
-                </div>
-            </div>
-
-            <ControlFooter />
+            }
         </Container>
     )
 }
 
-export default BasicUser2;
+export default ViewProfile
 
 const Container = styled.div`
     width: 100vw;
@@ -425,6 +317,7 @@ const Container = styled.div`
     align-items: center;
     
     .main-content{
+        width: 100%;
         max-width: 500px;
     }
 
@@ -705,14 +598,6 @@ const Container = styled.div`
                 font-weight: 500;
             }
         }
-    }
-
-    .share-my-page{
-        height: 20px;
-        /* margin: 60px 0 30px 0;
-        font-size: 0.75rem;
-        color: cornflowerblue;
-        text-align: center; */
     }
 `
 
@@ -1181,6 +1066,7 @@ const NotificationModelConatiner = styled.div`
 `;
 
 const PinnedAnnouncement = styled.div`
+    width: 100%;
     margin-top: 100px;
     margin-bottom: -20px;
     padding: 15px;

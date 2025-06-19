@@ -13,6 +13,7 @@ import axios from 'axios';
 import { AllSocialMediaPlatforms } from '../../../constants/socialMediaPlatforms';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CallMadeIcon from '@material-ui/icons/CallMade';
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
@@ -274,7 +275,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
 
     useEffect(() => {
         handleSaveLocally();
-    }, [basicData])
+    }, [basicData]);
 
     const toggleAnnouncementVisibility = async () => {
         const updatedAnnouncement = {
@@ -339,7 +340,24 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         </div>
     );
 
-    const savedPublishedTime = localStorage.getItem("publishedTime");
+    function formatTimestampToIST(dateStr) {
+        if (!dateStr) return "";
+
+        const options = {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        };
+
+        const date = new Date(dateStr);
+        return date.toLocaleString("en-IN", options);
+    }
+
+    const savedPublishedTime = formatTimestampToIST(basicData.lastUpdated);
 
     const [editingPlatforms, setEditingPlatforms] = useState({});
     const [platformValues, setPlatformValues] = useState({});
@@ -493,10 +511,17 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                 </ModelConatiner>
             )}
 
+            <div className="pre-top-bar">
+                <a href={`/p/${basicData.userName}`} target="_blank">
+                    Visit your live public page
+                    <CallMadeIcon />
+                </a>
+            </div>
+
             <div className="top-bar">
                 <div className="left">
-                    <div className="color">{diffCreated ? "Unsaved changes" : "All changes published!"}</div>
-                    <b>Last Published :</b> {savedPublishedTime != null ? savedPublishedTime : "Never"}
+                    {/* <div className="color">{diffCreated ? "Unsaved changes" : "All changes published!"}</div> */}
+                    <b>Last Published :</b> <br /> {savedPublishedTime != null ? savedPublishedTime : "Never"}
                 </div>
                 <a href="/page/view-edit" className="view-btn">Preview</a>
             </div>
@@ -637,9 +662,46 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
 export default BasicInfo;
 
 const Container = styled.div`
-    .top-bar{
+    .pre-top-bar{
         position: fixed;
         top: 0px;
+        left: 0px;
+        z-index: 100;
+
+        border-bottom: 1px solid #313231;
+
+        height: 40px;
+        width: 100vw;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        padding: 0 30px;
+
+        /* background-color: #92b419; */
+        background-color: #000;
+
+        a{
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+
+            color: white;
+            text-decoration: none;
+
+            svg{
+                font-size: 1rem;
+                margin-left: 5px;
+            }
+
+        }
+    }
+
+    .top-bar{
+        position: fixed;
+        top: 40px;
         left: 0px;
         z-index: 100;
 
@@ -701,6 +763,7 @@ const Container = styled.div`
         align-items: center;
         position: relative;
         margin-bottom: 40px;
+        margin-top: 40px;
         
         .logo-x-dp{
             height: 120px;

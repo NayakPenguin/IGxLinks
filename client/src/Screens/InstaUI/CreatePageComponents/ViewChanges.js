@@ -299,10 +299,6 @@ const ViewChanges = () => {
                     </a>
                 </BackBtn>
 
-
-                {/* PROBLEM AREA START */}
-
-
                 <div className="user-data">
                     <div className="logo-x-dp">
                         <img src={userEditData.Basic.profileImage ? userEditData.Basic.profileImage : "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"} alt="" />
@@ -346,14 +342,6 @@ const ViewChanges = () => {
                         </PinnedAnnouncement>
                     ) : null
                 }
-
-
-                {/* PROBLEM AREA END */}
-
-
-
-
-
 
 
                 <div className="group">

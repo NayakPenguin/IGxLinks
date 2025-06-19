@@ -4,6 +4,8 @@ const AdvancedInfo = require('../models/AdvancedInfo');
 const { authenticateJWT } = require('./auth');
 const BasicInfo = require('../models/BasicInfo'); // For username validation
 
+// routes/advancedinfo.js
+
 // Create or Update AdvancedInfo (Protected Route)
 router.post('/', authenticateJWT, async (req, res) => {
   try {
