@@ -21,6 +21,8 @@ const MIN_DIMENSION = 150;
 const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const API_URL = process.env.REACT_APP_API_URL;
 
+    const [dBdata, setDBdata] = useState(null);
+
     const [basicData, setBasicData] = useState({
         name: "",
         role: "",
@@ -69,6 +71,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                     withCredentials: true
                 });
                 setBasicData(res.data);
+                setDBdata(res.data);
                 console.log("res.data : ", res.data);
 
                 if (res.data.announcement) {
@@ -78,6 +81,8 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                         isVisible: res.data.announcement.isVisible !== false // default to true if not specified
                     });
                 }
+
+                localStorage.setItem("userBasicInfo", JSON.stringify(res.data));
             } catch (err) {
                 console.error("Error fetching basic data:", err);
             }
@@ -95,9 +100,10 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const handleChange = async (field, value) => {
         const updatedData = { ...basicData, [field]: value };
         setBasicData(updatedData);
-        await axios.post(`${API_URL}/basic-info/`, updatedData, {
-            withCredentials: true
-        });
+        handleSaveLocally();
+        // await axios.post(`${API_URL}/basic-info/`, updatedData, {
+        //     withCredentials: true
+        // });
         // setDiffCreated(true);
     };
 
@@ -150,9 +156,9 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
             reader.onloadend = () => {
                 const updatedData = { ...basicData, profileImage: reader.result };
                 setBasicData(updatedData);
-                axios.post(`${API_URL}/basic-info/`, updatedData, {
-                    withCredentials: true
-                });
+                // axios.post(`${API_URL}/basic-info/`, updatedData, {
+                //     withCredentials: true
+                // });
                 setCropModalOpen(false);
                 // setDiffCreated(true);
             };
@@ -182,9 +188,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         }
 
         setBasicData({ ...basicData, socialLinks: updatedLinks });
-        console.log('====================================');
-        console.log(updatedLinks);
-        console.log('====================================');
+        handleSaveLocally();
     };
 
     const handleSave = async () => {
@@ -195,6 +199,30 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         // setDiffCreated(true);
     };
 
+    const handleSaveLocally = async () => {
+        try {
+            localStorage.setItem("userBasicInfo", JSON.stringify(basicData));
+            
+            
+            const existingData = JSON.parse(localStorage.getItem("userBasicInfo"));
+
+            // Compare stringified versions for deep equality
+            const isDifferent = JSON.stringify(dBdata) !== JSON.stringify(existingData);
+ 
+            if (isDifferent) {
+                setDiffCreated(true);
+            }
+            
+            setModelOpen(false);
+        } catch (error) {
+            console.error("Failed to save to localStorage:", error);
+        }
+    };
+
+    useEffect(() => {
+        handleSaveLocally();
+    }, [basicData])
+
     const toggleAnnouncementVisibility = async () => {
         const updatedAnnouncement = {
             ...basicData.announcement,
@@ -203,9 +231,10 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         setAnnouncementData(updatedAnnouncement);
         const updatedData = { ...basicData, announcement: updatedAnnouncement };
         setBasicData(updatedData);
-        await axios.post(`${API_URL}/basic-info/`, updatedData, {
-            withCredentials: true
-        });
+        handleSaveLocally();
+        // await axios.post(`${API_URL}/basic-info/`, updatedData, {
+        //     withCredentials: true
+        // });
         // setDiffCreated(true);
     };
 
@@ -217,9 +246,10 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         setAnnouncementData(updatedAnnouncement);
         const updatedData = { ...basicData, announcement: updatedAnnouncement };
         setBasicData(updatedData);
-        await axios.post(`${API_URL}/basic-info/`, updatedData, {
-            withCredentials: true
-        });
+        handleSaveLocally();
+        // await axios.post(`${API_URL}/basic-info/`, updatedData, {
+        //     withCredentials: true
+        // });
         // setDiffCreated(true);
     };
 
@@ -249,7 +279,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                     value={basicData[field] || ""}
                     onChange={(e) => handleChange(field, e.target.value)}
                 />
-                <div className="done-btn" onClick={() => setEditingField(null)}>
+                <div className="done-btn" onClick={() => {setEditingField(null); handleSaveLocally();}}>
                     <DoneIcon />
                 </div>
             </div>
@@ -287,11 +317,6 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         if (platformValues[platformId]) {
             handleInputChange(platformId, platformValues[platformId]);
         }
-
-        console.log('====================================');
-        console.log(platformId, platformValues[platformId]);
-        console.log(basicData.socialLinks);
-        console.log('====================================');
     };
 
 
@@ -364,7 +389,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                                     <div className="one-social-media" key={platform.id}>
                                         <div className="icon">
                                             {
-                                                currentValue && <div className="added-icon"><CheckCircleIcon/></div>
+                                                currentValue && <div className="added-icon"><CheckCircleIcon /></div>
                                                 // true && <div className="added-icon"><CheckCircleIcon/></div>
                                             }
                                             <img src={platform.iconUrl} alt={platform.name} />
@@ -410,7 +435,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                                 );
                             })}
                         </div>
-                        <div className="done-btn" onClick={handleSave}>Done</div>
+                        <div className="done-btn" onClick={handleSaveLocally}>Done</div>
                     </div>
                 </ModelConatiner>
             )}
@@ -477,7 +502,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                 }
 
                 <div className="socials">
-                    {basicData.socialLinks.slice(0, 4).map((link, idx) => (
+                    {basicData.socialLinks.map((link, idx) => (
                         <div key={idx} className="social-icon">
                             <img src={AllSocialMediaPlatforms.find(p => p.id === link.platformId)?.iconUrl} alt="" />
                         </div>

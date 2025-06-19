@@ -22,47 +22,43 @@ const Publish = ({ userContentInfo }) => {
     }
   });
 
-
   const publishToDB = async () => {
-    if (publishStatus === 'publishing') return; // prevent double-click
+    if (publishStatus === 'publishing') return;
 
     setPublishStatus('publishing');
-    const localSaved = localStorage.getItem("userContentInfo");
+
+    const localContent = localStorage.getItem("userContentInfo");
+    const localBasic = localStorage.getItem("userBasicInfo");
+
+    if (!localContent || !localBasic) {
+      console.error("Missing data in localStorage");
+      setPublishStatus('error');
+      return;
+    }
 
     try {
-      if (!localSaved) {
-        console.error("No content data to publish");
-        setPublishStatus('error');
-        return;
-      }
+      const basicData = JSON.parse(localBasic);
+      const contentData = JSON.parse(localContent);
 
-      const response = await api.post('/advanced-info', {
-        localStorageData: { localSaved }
-      });
+      await Promise.all([
+        api.post('/basic-info/', basicData),
+        api.post('/advanced-info', {
+          localStorageData: { ...contentData }
+        })
+      ]);
 
-      console.log("Publish successful:", response.data);
+      console.log("Both basic and content data published successfully.");
       setPublishStatus('success');
 
-      setTimeout(() => {
-        setPublishStatus(null);
-      }, 5000);
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
+      setTimeout(() => setPublishStatus(null), 5000);
+      setTimeout(() => window.location.reload(), 5000);
     } catch (error) {
-      console.error("Publish failed:", error.response?.data || error.message);
+      console.error("Publishing failed:", error.response?.data || error.message);
       setPublishStatus('error');
 
-      setTimeout(() => {
-        setPublishStatus(null);
-      }, 5000);
-
-
+      setTimeout(() => setPublishStatus(null), 5000);
     }
   };
-
-
 
   return (
     <Container>
@@ -81,10 +77,9 @@ const Publish = ({ userContentInfo }) => {
           <>Push updates <PublicIcon /></>
         )}
       </div>
-
     </Container>
-  )
-}
+  );
+};
 
 export default Publish;
 
