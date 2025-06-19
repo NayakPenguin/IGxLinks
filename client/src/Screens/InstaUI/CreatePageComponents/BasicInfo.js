@@ -9,6 +9,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { parseRichText } from '../../Helpers/parseRichText';
+import axios from 'axios';
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
@@ -81,7 +82,26 @@ const AllSocialMediaPlatforms = [
     }
 ];
 
-const BasicInfo = () => {
+const BasicInfo = ({diffCreated, setDiffCreated}) => {
+    const API_URL = process.env.REACT_APP_API_URL;
+
+    useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/basic-info/`, {
+          withCredentials: true
+        });
+
+        const basicData = res.data;
+        console.log(basicData);
+      } catch (err) {
+        console.error("Error fetching basic data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
     const [modelOpen, setModelOpen] = useState(false);
     const [editingField, setEditingField] = useState(null);
     const [formData, setFormData] = useState({
@@ -322,17 +342,6 @@ const BasicInfo = () => {
     );
 
     const savedPublishedTime = localStorage.getItem("publishedTime");
-    
-    const savedLocal = localStorage.getItem("userContentInfo");
-    const savedGlobal = localStorage.getItem("publishedData");
-
-    const [diffExist, setDiffExist] = useState(true);
-
-    useEffect(() => {
-        if(savedLocal === savedGlobal) {
-            setDiffExist(false);
-        }
-    }, [savedLocal, savedGlobal]);
 
     return (
         <Container>
@@ -425,11 +434,11 @@ const BasicInfo = () => {
 
             <div className="top-bar">
                 <div className="left">
-                    <div className="color">{diffExist ? "Unsaved changes" : "All changes published!"}</div><b>Last Published :</b> {
+                    <div className="color">{diffCreated ? "Unsaved changes" : "All changes published!"}</div><b>Last Published :</b> {
                         savedPublishedTime != null ? savedPublishedTime : "Never"
                 }
                 </div>
-                <a href="/page/view-edit" className="view-btn">View</a>
+                <a href="/page/view-edit" className="view-btn">Preview</a>
             </div>
 
             <div className="user-data">
@@ -609,6 +618,7 @@ const Container = styled.div`
             text-decoration: none;
             font-weight: 200;
             letter-spacing: 0.07rem;
+            margin-left: 5px;
         }
     }
 

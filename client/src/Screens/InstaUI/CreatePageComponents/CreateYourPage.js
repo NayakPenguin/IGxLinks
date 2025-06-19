@@ -398,23 +398,25 @@ const CreateYourPage = () => {
     return savedLocal !== savedGlobal;
   };
 
-  const [showPublish, setShowPublish] = useState(true);
+  const [diffCreated, setDiffCreated] = useState(true);
 
   useEffect(() => {
     console.log("checkDataDifference : ", checkDataDifference());
     
-    if(checkDataDifference() == true) setShowPublish(true);
-    else setShowPublish(false);
+    if(checkDataDifference() == true) {
+      setDiffCreated(true);
+    }
+    else setDiffCreated(false);
   }, [items])
 
   return (
     <Container>
       {
-        showPublish && <Publish />
+        diffCreated && <Publish />
       }
 
       <div className="main-content">
-        <BasicInfo />
+        <BasicInfo diffCreated={diffCreated} setDiffCreated={setDiffCreated}/>
         <div className="add-new-item">
           <div className="selector">
             <div
