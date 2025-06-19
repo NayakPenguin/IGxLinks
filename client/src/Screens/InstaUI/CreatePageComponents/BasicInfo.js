@@ -66,29 +66,82 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const res = await axios.get(`${API_URL}/basic-info/`, {
-                    withCredentials: true
-                });
-                setBasicData(res.data);
-                setDBdata(res.data);
-                console.log("res.data : ", res.data);
+            console.log("🔄 Starting BasicInfo fetch...");
 
-                if (res.data.announcement) {
-                    setAnnouncementData({
-                        title: res.data.announcement.title || "Announcement Title",
-                        description: res.data.announcement.description || "This is your announcement description",
-                        isVisible: res.data.announcement.isVisible !== false // default to true if not specified
-                    });
+            // Ensure API_URL is correctly loaded
+            console.log("🌍 API_URL:", API_URL);
+
+            try {
+                const saved = localStorage.getItem("userBasicInfo");
+
+                if (saved && saved !== "undefined" && saved !== "null") {
+                    console.log("🔧 Found saved data in localStorage, attempting to parse...");
+
+                    try {
+                        const parsedSaved = JSON.parse(saved);
+
+                        if (parsedSaved && typeof parsedSaved === "object") {
+                            console.log("✅ Successfully parsed localStorage data");
+                            setBasicData(parsedSaved);
+                            setDBdata(parsedSaved);
+
+                            if (parsedSaved.announcement) {
+                                setAnnouncementData({
+                                    title: parsedSaved.announcement.title || "Announcement Title",
+                                    description: parsedSaved.announcement.description || "This is your announcement description",
+                                    isVisible: parsedSaved.announcement.isVisible !== false
+                                });
+                            }
+
+                            return; // ✅ Done using localStorage data
+                        } else {
+                            console.warn("⚠️ Parsed localStorage data is not a valid object");
+                        }
+                    } catch (e) {
+                        console.error("❌ Failed to parse localStorage data:", e);
+                    }
+                } else {
+                    console.log("📭 No valid localStorage data found. Proceeding to fetch from API...");
                 }
 
-                localStorage.setItem("userBasicInfo", JSON.stringify(res.data));
-            } catch (err) {
-                console.error("Error fetching basic data:", err);
+                // Step 2: API Fallback
+                try {
+                    console.log("🌐 Fetching basicData from API...");
+                    const res = await axios.get(`${API_URL}/basic-info/`, {
+                        withCredentials: true,
+                        timeout: 10000 // Optional: prevents indefinite hangs
+                    });
+
+                    console.log("📦 API Response:", res.data);
+
+                    setBasicData(res.data);
+                    setDBdata(res.data);
+
+                    if (res.data.announcement) {
+                        setAnnouncementData({
+                            title: res.data.announcement.title || "Announcement Title",
+                            description: res.data.announcement.description || "This is your announcement description",
+                            isVisible: res.data.announcement.isVisible !== false
+                        });
+                    }
+
+                    localStorage.setItem("userBasicInfo", JSON.stringify(res.data));
+                    console.log("✅ Successfully saved basicData to localStorage from API");
+
+                } catch (apiError) {
+                    console.error("❌ Error fetching from API:", apiError.message, apiError);
+                }
+
+            } catch (outerError) {
+                console.error("💥 Unexpected fetch failure:", outerError);
             }
+
+            console.log("✅ BasicInfo fetch process completed.");
         };
+
         fetchData();
     }, []);
+
 
     useEffect(() => {
         const filtered = AllSocialMediaPlatforms.filter(platform =>
@@ -202,17 +255,17 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const handleSaveLocally = async () => {
         try {
             localStorage.setItem("userBasicInfo", JSON.stringify(basicData));
-            
-            
+
+
             const existingData = JSON.parse(localStorage.getItem("userBasicInfo"));
 
             // Compare stringified versions for deep equality
             const isDifferent = JSON.stringify(dBdata) !== JSON.stringify(existingData);
- 
+
             if (isDifferent) {
                 setDiffCreated(true);
             }
-            
+
             setModelOpen(false);
         } catch (error) {
             console.error("Failed to save to localStorage:", error);
@@ -279,7 +332,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                     value={basicData[field] || ""}
                     onChange={(e) => handleChange(field, e.target.value)}
                 />
-                <div className="done-btn" onClick={() => {setEditingField(null); handleSaveLocally();}}>
+                <div className="done-btn" onClick={() => { setEditingField(null); handleSaveLocally(); }}>
                     <DoneIcon />
                 </div>
             </div>

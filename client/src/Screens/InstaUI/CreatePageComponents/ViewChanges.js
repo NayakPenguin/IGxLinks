@@ -118,9 +118,7 @@ const ViewChanges = () => {
     });
 
     useEffect(() => {
-        console.log('====================================');
-        console.log(userEditData);
-        console.log('====================================');
+        console.log("userEditData : ", userEditData);
     }, [userEditData]);
 
     useEffect(() => {
@@ -170,11 +168,11 @@ const ViewChanges = () => {
 
         if (subscribed == false) {
             setSubscribed(!subscribed);
-            setNotificationText(`Now you will be notified by ${userEditData.Basic.formData.name ? userEditData.Basic.formData.name : "Your Name"}'s content!`);
+            setNotificationText(`Now you will be notified by ${userEditData.Basic.name ? userEditData.Basic.name : "Your Name"}'s content!`);
         }
         else {
             setSubscribed(!subscribed);
-            setNotificationText(`You unsubsribed to  ${userEditData.Basic.formData.name ? userEditData.Basic.formData.name : "Your Name"}!`);
+            setNotificationText(`You unsubsribed to  ${userEditData.Basic.name ? userEditData.Basic.name : "Your Name"}!`);
         }
 
         setNotificationModelOpen(true);
@@ -277,8 +275,8 @@ const ViewChanges = () => {
                     </NotificationModelConatiner> : null
             }
 
-            <Publish/>
-        
+            <Publish />
+
             <div className="main-content">
                 <Subscribe>
                     {/*  */}
@@ -296,52 +294,67 @@ const ViewChanges = () => {
                 </Subscribe>
                 <BackBtn>
                     <a href="/page/create">
-                        <ChevronLeftIcon/>
+                        <ChevronLeftIcon />
                         Back to Edit
                     </a>
                 </BackBtn>
+
+
+                {/* PROBLEM AREA START */}
+
+
                 <div className="user-data">
                     <div className="logo-x-dp">
-                        <img src={userEditData.ImageURL ? userEditData.ImageURL : "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"} alt="" />
+                        <img src={userEditData.Basic.profileImage ? userEditData.Basic.profileImage : "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"} alt="" />
                     </div>
-                    <div className="name">{userEditData.Basic.formData.name ? userEditData.Basic.formData.name : "Your Name"}</div>
-                    <div className="about-header">{userEditData.Basic.formData.role && userEditData.Basic.formData.org ? `${userEditData.Basic.formData.role} @${userEditData.Basic.formData.org}` : "Role @Organisation"}</div>
-                    <div className="about-desc">{userEditData.Basic.formData.bio ? userEditData.Basic.formData.bio : "Your Bio"}</div>
-                    <div className="about-location"><RoomIcon /> {userEditData.Basic.formData.location ? userEditData.Basic.formData.location : "Your Location Here"}</div>
+                    <div className="name">{userEditData.Basic.name ? userEditData.Basic.name : "Your Name"}</div>
+                    <div className="about-header">{userEditData.Basic.role && userEditData.Basic.org ? `${userEditData.Basic.role} @${userEditData.Basic.org}` : "Role @Organisation"}</div>
+                    <div className="about-desc">{userEditData.Basic.bio ? userEditData.Basic.bio : "Your Bio"}</div>
+                    <div className="about-location"><RoomIcon /> {userEditData.Basic.location ? userEditData.Basic.location : "Your Location Here"}</div>
 
-                    {/* <div className="main-btns">
-                        <div className="btn-1 trans">30K page views</div>
-                        <div className="btn-1">Subscribe</div>
-                    </div> */}
                     <div className="socials">
-                        {userEditData.Basic.socialLinks && (
-                            Object.entries(userEditData.Basic.socialLinks)
-                                .filter(([key, value]) => value.trim() !== "")
-                                .map(([key, value]) => {
-                                    const platform = AllSocialMediaPlatforms.find(p => p.id === key);
+                        {Array.isArray(userEditData.Basic.socialLinks) &&
+                            userEditData.Basic.socialLinks
+                                .filter(link => link.profileUrl && link.profileUrl.trim() !== "")
+                                .map(link => {
+                                    const platform = AllSocialMediaPlatforms.find(p => p.id === link.platformId);
                                     return platform ? (
-                                        <a key={key} href={value} className="social-icon" target="_blank" rel="noopener noreferrer">
+                                        <a
+                                            key={link._id || link.platformId}
+                                            href={link.profileUrl.startsWith("http") ? link.profileUrl : `https://${link.profileUrl}`}
+                                            className="social-icon"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
                                             <img src={platform.iconUrl} alt={platform.name} />
                                         </a>
                                     ) : null;
-                                })
-                        )}
+                                })}
                     </div>
 
                 </div>
 
                 {
-                    userEditData.Basic.announcementData.isVisible ? (
+                    userEditData.Basic.announcement.isVisible ? (
                         <PinnedAnnouncement>
                             <div className="label">
                                 <svg viewBox="0 0 24 24" height="16" width="16" preserveAspectRatio="xMidYMid meet" class="" fill="none"><title>pin-refreshed</title><path d="M16 5V12L17.7 13.7C17.8 13.8 17.875 13.9125 17.925 14.0375C17.975 14.1625 18 14.2917 18 14.425V15C18 15.2833 17.9042 15.5208 17.7125 15.7125C17.5208 15.9042 17.2833 16 17 16H13V21.85C13 22.1333 12.9042 22.3708 12.7125 22.5625C12.5208 22.7542 12.2833 22.85 12 22.85C11.7167 22.85 11.4792 22.7542 11.2875 22.5625C11.0958 22.3708 11 22.1333 11 21.85V16H7C6.71667 16 6.47917 15.9042 6.2875 15.7125C6.09583 15.5208 6 15.2833 6 15V14.425C6 14.2917 6.025 14.1625 6.075 14.0375C6.125 13.9125 6.2 13.8 6.3 13.7L8 12V5C7.71667 5 7.47917 4.90417 7.2875 4.7125C7.09583 4.52083 7 4.28333 7 4C7 3.71667 7.09583 3.47917 7.2875 3.2875C7.47917 3.09583 7.71667 3 8 3H16C16.2833 3 16.5208 3.09583 16.7125 3.2875C16.9042 3.47917 17 3.71667 17 4C17 4.28333 16.9042 4.52083 16.7125 4.7125C16.5208 4.90417 16.2833 5 16 5ZM8.85 14H15.15L14 12.85V5H10V12.85L8.85 14Z" fill="currentColor"></path></svg>
                                 Pinned Announcement
                             </div>
-                            <div className="title">{userEditData.Basic.announcementData.title}</div>
-                            <div className="desc">{parseRichText(userEditData.Basic.announcementData.description)}</div>
+                            <div className="title">{userEditData.Basic.announcement.title}</div>
+                            <div className="desc">{parseRichText(userEditData.Basic.announcement.description)}</div>
                         </PinnedAnnouncement>
                     ) : null
                 }
+
+
+                {/* PROBLEM AREA END */}
+
+
+
+
+
+
 
                 <div className="group">
                     {userEditData.Content && userEditData.Content.map((item) => {

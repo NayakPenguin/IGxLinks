@@ -215,21 +215,21 @@ const CreateYourPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("=== Starting data fetch process ===");
+        // console.log("=== Starting data fetch process ===");
 
         // 1. First check localStorage
-        console.log("[1] Checking localStorage for userContentInfo...");
+        // console.log("[1] Checking localStorage for userContentInfo...");
         const saved = localStorage.getItem("userContentInfo");
 
         if (saved && saved !== "undefined" && saved !== "null") {
           try {
-            console.log("Found localStorage data:", saved);
+            // console.log("Found localStorage data:", saved);
             const parsedSaved = JSON.parse(saved);
 
             if (Array.isArray(parsedSaved)) {
-              console.log("Successfully parsed localStorage data. Using this data.");
+              // console.log("Successfully parsed localStorage data. Using this data.");
               setItems(parsedSaved);
-              console.log("Using localStorage data instead of API call.");
+              // console.log("Using localStorage data instead of API call.");
               return;
             } else {
               console.warn("Parsed localStorage data is not an array. Falling back to API.");
@@ -238,24 +238,24 @@ const CreateYourPage = () => {
             console.warn("LocalStorage data exists but couldn't parse it. Will try API instead.", e);
           }
         } else {
-          console.log("No valid localStorage data found. Moving to API check.");
+          // console.log("No valid localStorage data found. Moving to API check.");
         }
 
         // 2. If no localStorage data, check API
-        console.log("[2] Making API call to fetch published data...");
+        // console.log("[2] Making API call to fetch published data...");
         const res = await axios.get(`${API_URL}/advanced-info/`, {
           withCredentials: true
         });
 
         const publishedData = res.data;
-        console.log("API response received:", publishedData);
+        // console.log("API response received:", publishedData);
 
         const apiContent = publishedData.localStorageData;
-        console.log("Extracted API content:", apiContent);
+        // console.log("Extracted API content:", apiContent);
 
         if (apiContent) {
           try {
-            console.log("Attempting to parse API content...");
+            // console.log("Attempting to parse API content...");
 
             const parsedApiData =
               typeof apiContent === "string" ? JSON.parse(apiContent) : apiContent;
@@ -270,16 +270,16 @@ const CreateYourPage = () => {
               Object.keys(parsedApiData).every(k => !isNaN(k))
             ) {
               finalData = Object.values(parsedApiData);
-              console.log("Converted object with numeric keys to array:", finalData);
+              // console.log("Converted object with numeric keys to array:", finalData);
             } else {
               console.warn("API data is not a valid array or numeric-keyed object.");
               throw new Error("Invalid API data format");
             }
 
-            console.log("Successfully parsed API data:", finalData);
+            // console.log("Successfully parsed API data:", finalData);
 
             setItems(finalData);
-            console.log("Updating localStorage with API data...");
+            // console.log("Updating localStorage with API data...");
             localStorage.setItem("userContentInfo", JSON.stringify(finalData));
 
             return; // ✅ prevent fallback from running
@@ -289,20 +289,20 @@ const CreateYourPage = () => {
         }
 
         // 3. Fallback to initialItems if both above fail
-        console.log("[3] No valid data found. Falling back to initialItems.");
-        console.log("Setting initial items:", initialItems);
+        // console.log("[3] No valid data found. Falling back to initialItems.");
+        // console.log("Setting initial items:", initialItems);
         setItems(initialItems);
-        console.log("Updating localStorage with initial items.");
+        // console.log("Updating localStorage with initial items.");
         localStorage.setItem("userContentInfo", JSON.stringify(initialItems));
 
       } catch (err) {
         console.error("[ERROR] Failed to fetch data:", err);
-        console.log("Using initialItems as final fallback.");
+        // console.log("Using initialItems as final fallback.");
         setItems(initialItems);
         localStorage.setItem("userContentInfo", JSON.stringify(initialItems));
       }
 
-      console.log("=== Data fetch process completed ===");
+      // console.log("=== Data fetch process completed ===");
     };
 
     fetchData();
@@ -318,7 +318,7 @@ const CreateYourPage = () => {
 
     if (Array.isArray(items)) {
       localStorage.setItem("userContentInfo", JSON.stringify(items));
-      console.log("✅ localStorage updated from items change");
+      // console.log("✅ localStorage updated from items change");
     } else {
       console.warn("❌ Tried to save to localStorage but items is not an array:", items);
     }
@@ -464,7 +464,7 @@ const CreateYourPage = () => {
   const [diffCreated, setDiffCreated] = useState(true);
 
   useEffect(() => {
-    console.log("checkDataDifference : ", checkDataDifference());
+    // console.log("checkDataDifference : ", checkDataDifference());
 
     if (checkDataDifference() == true) {
       setDiffCreated(true);
