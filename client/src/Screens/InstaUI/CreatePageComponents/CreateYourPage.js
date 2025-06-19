@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import {
   DndContext,
@@ -215,55 +215,114 @@ const CreateYourPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("=== Starting data fetch process ===");
+
+        // 1. First check localStorage
+        console.log("[1] Checking localStorage for userContentInfo...");
+        const saved = localStorage.getItem("userContentInfo");
+
+        if (saved && saved !== "undefined" && saved !== "null") {
+          try {
+            console.log("Found localStorage data:", saved);
+            const parsedSaved = JSON.parse(saved);
+
+            if (Array.isArray(parsedSaved)) {
+              console.log("Successfully parsed localStorage data. Using this data.");
+              setItems(parsedSaved);
+              console.log("Using localStorage data instead of API call.");
+              return;
+            } else {
+              console.warn("Parsed localStorage data is not an array. Falling back to API.");
+            }
+          } catch (e) {
+            console.warn("LocalStorage data exists but couldn't parse it. Will try API instead.", e);
+          }
+        } else {
+          console.log("No valid localStorage data found. Moving to API check.");
+        }
+
+        // 2. If no localStorage data, check API
+        console.log("[2] Making API call to fetch published data...");
         const res = await axios.get(`${API_URL}/advanced-info/`, {
           withCredentials: true
         });
 
         const publishedData = res.data;
-        const publishedTime = publishedData.lastUpdated;
+        console.log("API response received:", publishedData);
 
-        console.log(typeof (JSON.parse(publishedData.localStorageData.localSaved)));
-        console.log((JSON.parse(publishedData.localStorageData.localSaved)));
-        console.log(typeof (initialItems));
+        const apiContent = publishedData.localStorageData;
+        console.log("Extracted API content:", apiContent);
 
+        if (apiContent) {
+          try {
+            console.log("Attempting to parse API content...");
 
-        const dateIST = new Date(publishedTime).toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true
-        });
+            const parsedApiData =
+              typeof apiContent === "string" ? JSON.parse(apiContent) : apiContent;
 
+            let finalData = [];
 
-        setLastUpdatedIST(dateIST);
-        localStorage.setItem("publishedTime", dateIST);
+            if (Array.isArray(parsedApiData)) {
+              finalData = parsedApiData;
+            } else if (
+              parsedApiData !== null &&
+              typeof parsedApiData === "object" &&
+              Object.keys(parsedApiData).every(k => !isNaN(k))
+            ) {
+              finalData = Object.values(parsedApiData);
+              console.log("Converted object with numeric keys to array:", finalData);
+            } else {
+              console.warn("API data is not a valid array or numeric-keyed object.");
+              throw new Error("Invalid API data format");
+            }
 
-        const saved = localStorage.getItem("userContentInfo");
-        console.log(saved);
+            console.log("Successfully parsed API data:", finalData);
 
-        localStorage.setItem("publishedData", JSON.stringify(JSON.parse(publishedData.localStorageData.localSaved)));
+            setItems(finalData);
+            console.log("Updating localStorage with API data...");
+            localStorage.setItem("userContentInfo", JSON.stringify(finalData));
 
-        if (!saved || saved === "undefined") {
-          console.log("1");
-          localStorage.setItem("userContentInfo", JSON.stringify(JSON.parse(publishedData.localStorageData.localSaved)));
-          setItems(JSON.parse(publishedData.localStorageData.localSaved)); // Use from API
-          console.log(JSON.parse(publishedData.localStorageData.localSaved));
-        } else {
-          console.log("2");
-          setItems(JSON.parse(saved)); // Use from localStorage
+            return; // ✅ prevent fallback from running
+          } catch (e) {
+            console.error("API data exists but couldn't parse it. Will use initial items.", e);
+          }
         }
+
+        // 3. Fallback to initialItems if both above fail
+        console.log("[3] No valid data found. Falling back to initialItems.");
+        console.log("Setting initial items:", initialItems);
+        setItems(initialItems);
+        console.log("Updating localStorage with initial items.");
+        localStorage.setItem("userContentInfo", JSON.stringify(initialItems));
+
       } catch (err) {
-        console.log("3");
-        console.error("Error fetching published data:", err);
-        setItems(initialItems); // fallback to default
+        console.error("[ERROR] Failed to fetch data:", err);
+        console.log("Using initialItems as final fallback.");
+        setItems(initialItems);
+        localStorage.setItem("userContentInfo", JSON.stringify(initialItems));
       }
+
+      console.log("=== Data fetch process completed ===");
     };
 
     fetchData();
   }, []);
+
+  const isFirstRun = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false; // Skip first run
+      return;
+    }
+
+    if (Array.isArray(items)) {
+      localStorage.setItem("userContentInfo", JSON.stringify(items));
+      console.log("✅ localStorage updated from items change");
+    } else {
+      console.warn("❌ Tried to save to localStorage but items is not an array:", items);
+    }
+  }, [items]);
 
   const [newItemData, setNewItemData] = useState({
     title: '',
@@ -289,12 +348,12 @@ const CreateYourPage = () => {
     sundayTimes: ''
   });
 
-  useEffect(() => {
-    if (items.length > 0) {
-      console.log(4);
-      localStorage.setItem("userContentInfo", JSON.stringify(items));
-    }
-  }, [items]);
+  // useEffect(() => {
+  //   if (items.length > 0) {
+  //     console.log(4);
+  //     localStorage.setItem("userContentInfo", JSON.stringify(items));
+  //   }
+  // }, [items]);
 
   const [itemType, setItemType] = useState(ITEM_TYPES.SUBGROUP);
   const [editingId, setEditingId] = useState(null);
@@ -398,7 +457,7 @@ const CreateYourPage = () => {
   const checkDataDifference = () => {
     const savedLocal = localStorage.getItem("userContentInfo");
     const savedGlobal = localStorage.getItem("publishedData");
-    
+
     return savedLocal !== savedGlobal;
   };
 
@@ -406,8 +465,8 @@ const CreateYourPage = () => {
 
   useEffect(() => {
     console.log("checkDataDifference : ", checkDataDifference());
-    
-    if(checkDataDifference() == true) {
+
+    if (checkDataDifference() == true) {
       setDiffCreated(true);
     }
     else setDiffCreated(false);
@@ -420,7 +479,7 @@ const CreateYourPage = () => {
       }
 
       <div className="main-content">
-        <BasicInfo diffCreated={diffCreated} setDiffCreated={setDiffCreated}/>
+        <BasicInfo diffCreated={diffCreated} setDiffCreated={setDiffCreated} />
         <div className="add-new-item">
           <div className="selector">
             <div
