@@ -10,25 +10,40 @@ const BasicInfo = require('../models/BasicInfo'); // For username validation
 router.post('/', authenticateJWT, async (req, res) => {
   try {
     const { localStorageData } = req.body;
-    const userEmail = req.user.email; // From JWT
+    const userEmail = req.user.email; // Extracted from JWT
 
-    // Optional: Verify user exists in BasicInfo first
-    const user = await BasicInfo.findOne({ userEmail });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found in BasicInfo' });
+    // console.log("▶️ POST /advancedinfo called");
+    // console.log("📩 Extracted userEmail from JWT:", userEmail);
+
+    if (!userEmail) {
+      console.warn("❌ Missing userEmail in JWT");
+      return res.status(400).json({ message: 'Missing userEmail from token' });
     }
 
-    // Update or create AdvancedInfo
+    // Step 1: Check user exists in BasicInfo
+    // console.log("🔍 Searching for user in BasicInfo...");
+    const user = await BasicInfo.findOne({ userEmail });
+
+    if (!user) {
+      console.warn(`❌ No BasicInfo found for email: ${userEmail}`);
+      return res.status(404).json({ message: 'User not found in BasicInfo' });
+    }
+    // console.log("✅ BasicInfo found for user:", user.userName || userEmail);
+
+    // Step 2: Upsert AdvancedInfo
+    // console.log("📦 Upserting AdvancedInfo...");
     const advancedInfo = await AdvancedInfo.findOneAndUpdate(
       { userEmail },
-      { localStorageData, lastUpdated: Date.now() },
+      { $set: { localStorageData, lastUpdated: Date.now(), userEmail } },
       { new: true, upsert: true, runValidators: true }
     );
 
+    // console.log("✅ AdvancedInfo saved/updated successfully");
     res.json(advancedInfo);
+    
   } catch (err) {
-    console.error('AdvancedInfo save error:', err);
-    res.status(500).json({ 
+    console.error("🔥 AdvancedInfo save error:", err);
+    res.status(500).json({
       message: err.message || 'Server error',
       ...(err.errors && { errors: err.errors }) // Mongoose validation errors
     });
