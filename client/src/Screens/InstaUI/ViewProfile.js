@@ -42,22 +42,57 @@ const ViewProfile = () => {
         }
 
         const fetchProfile = async () => {
+            console.log("🟡 Starting profile fetch process...");
             setLoading(true);
             setError(null);
-            console.log(`📡 Fetching profile for username: ${username}`);
 
+            const lastClick = localStorage.getItem("lastClick");
+            const now = Date.now();
+
+            console.log("🕒 Current timestamp:", now);
+            console.log("🧠 lastClick from localStorage:", lastClick);
+
+            const within5Seconds =
+                lastClick && now - parseInt(lastClick, 10) <= 5000;
+
+            const profileDataRaw = localStorage.getItem("profileDataSave");
+
+            if (within5Seconds && profileDataRaw) {
+                console.log("📦 Using cached profileDataSave from localStorage (within 5s)");
+                try {
+                    const parsed = JSON.parse(profileDataRaw);
+                    setProfileData(parsed);
+                } catch (parseErr) {
+                    console.error("❌ Failed to parse profileDataSave:", parseErr);
+                    localStorage.removeItem("profileDataSave");
+                    console.warn("🧹 Corrupted localStorage entry removed.");
+                    fetchFromAPI();
+                } finally {
+                    setLoading(false);
+                    console.log("✅ Finished with localStorage path.");
+                }
+                return;
+            }
+
+            console.log("🌐 Cached data expired or missing, making API request...");
+            fetchFromAPI();
+        };
+
+        const fetchFromAPI = async () => {
             try {
                 const res = await api.get(`/all-info/${username}`);
-                console.log("✅ Profile fetched successfully:", res.data);
-                setProfileData(res.data);
-                
-                
+                console.log("✅ Profile fetched successfully from API:", res.data);
 
+                setProfileData(res.data);
+                localStorage.setItem("profileDataSave", JSON.stringify(res.data));
+                localStorage.setItem("lastClick", Date.now().toString());
+                console.log("💾 Cached new profile data and updated lastClick.");
             } catch (err) {
-                console.error("❌ Failed to fetch profile:", err.message, err);
+                console.error("❌ Failed to fetch profile from API:", err.message, err);
                 setError(err);
             } finally {
                 setLoading(false);
+                console.log("✅ Finished with API path.");
             }
         };
 
@@ -220,73 +255,70 @@ const ViewProfile = () => {
                     }
 
                     <div className="group">
-                        {profileData.advancedInfo.localStorageData && Object.values(profileData.advancedInfo.localStorageData).map((item) => {
-                            const { id, type, title, url } = item;
+                        {profileData.advancedInfo.localStorageData &&
+                            Object.values(profileData.advancedInfo.localStorageData).map((item) => {
+                                const { id, type, title, url } = item;
 
-                            switch (type) {
-                                case "Subgroup":
-                                    return (
-                                        <div key={id} className="group-name-container">
-                                            <div className="group-name-container-line"></div>
-                                            <div className="group-name">{parseRichText(title)}</div>
-                                            <div className="group-name-container-line"></div>
-                                        </div>
-                                    );
+                                const handleClick = () => {
+                                    localStorage.setItem("lastClick", Date.now().toString());
+                                    console.log(`🕒 lastClick updated at ${new Date().toISOString()}`);
+                                };
 
-                                case "Redirect Link":
-                                    return (
-                                        <a key={id} href={url.startsWith("http") ? url : `https://${url}`} className="link1" target="_blank" rel="noopener noreferrer">
-                                            <div>{parseRichText(title)}</div>
-                                            <div className="link-circle">
-                                                <CallMadeIcon />
+                                switch (type) {
+                                    case "Subgroup":
+                                        return (
+                                            <div key={id} className="group-name-container" onClick={handleClick}>
+                                                <div className="group-name-container-line"></div>
+                                                <div className="group-name">{parseRichText(title)}</div>
+                                                <div className="group-name-container-line"></div>
                                             </div>
-                                        </a>
-                                    );
+                                        );
 
-                                case "Anonymous Replies":
-                                    return (
-                                        <a key={id} href={`/p/${profileData.basicInfo.userName}/${id}`} className="link1">
-                                            <div>{parseRichText(title)}</div>
-                                            <div className="link-circle">
-                                                <svg
-                                                    viewBox="-20.4 -20.4 64.8 64.8"
-                                                    version="1.1"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="#ffffff"
-                                                    stroke="#ffffff"
-                                                >
-                                                    <g strokeWidth="1.2" fill="none" fillRule="evenodd">
-                                                        <g fill="#ffffff" fillRule="nonzero">
-                                                            <path d="M17.5,11.75 C20.1233526,11.75 22.25,13.8766474 22.25,16.5 C22.25,19.1233526 20.1233526,21.25 17.5,21.25 C15.4019872,21.25 13.6216629,19.8898135 12.9927596,18.0031729 L11.0072404,18.0031729 C10.3783371,19.8898135 8.59801283,21.25 6.5,21.25 C3.87664744,21.25 1.75,19.1233526 1.75,16.5 C1.75,13.8766474 3.87664744,11.75 6.5,11.75 C8.9545808,11.75 10.9743111,13.6118164 11.224028,16.0002862 L12.775972,16.0002862 C13.0256889,13.6118164 15.0454192,11.75 17.5,11.75 Z M6.5,13.75 C4.98121694,13.75 3.75,14.9812169 3.75,16.5 C3.75,18.0187831 4.98121694,19.25 6.5,19.25 C8.01878306,19.25 9.25,18.0187831 9.25,16.5 C9.25,14.9812169 8.01878306,13.75 6.5,13.75 Z M17.5,13.75 C15.9812169,13.75 14.75,14.9812169 14.75,16.5 C14.75,18.0187831 15.9812169,19.25 17.5,19.25 C19.0187831,19.25 20.25,18.0187831 20.25,16.5 C20.25,14.9812169 19.0187831,13.75 17.5,13.75 Z M15.5119387,3 C16.7263613,3 17.7969992,3.79658742 18.145961,4.95979331 L19.1520701,8.31093387 C19.944619,8.44284508 20.7202794,8.59805108 21.4790393,8.77658283 C22.0166428,8.90307776 22.3499121,9.44143588 22.2234172,9.9790393 C22.0969222,10.5166428 21.5585641,10.8499121 21.0209607,10.7234172 C18.2654221,10.0750551 15.258662,9.75 12,9.75 C8.74133802,9.75 5.73457794,10.0750551 2.97903933,10.7234172 C2.44143588,10.8499121 1.90307776,10.5166428 1.77658283,9.9790393 C1.6500879,9.44143588 1.98335721,8.90307776 2.52096067,8.77658283 C3.27940206,8.59812603 4.05472975,8.4429754 4.8469317,8.31110002 L5.85403902,4.95979331 C6.20300079,3.79658742 7.2736387,3 8.4880613,3 L15.5119387,3 Z" />
-                                                        </g>
-                                                    </g>
-                                                </svg>
-                                            </div>
-                                        </a>
-                                    );
+                                    case "Redirect Link":
+                                        return (
+                                            <a
+                                                key={id}
+                                                href={url.startsWith("http") ? url : `https://${url}`}
+                                                className="link1"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                onClick={handleClick}
+                                            >
+                                                <div>{parseRichText(title)}</div>
+                                                <div className="link-circle">
+                                                    <CallMadeIcon />
+                                                </div>
+                                            </a>
+                                        );
 
-                                case "Meeting Scheduler":
-                                    return (
-                                        <a key={id} href={`/p/${profileData.basicInfo.userName}/${id}`} className="link1">
-                                            <div>{parseRichText(title)}</div>
-                                            <div className="link-circle">
-                                                <EventAvailableIcon />
-                                            </div>
-                                        </a>
-                                    );
-
-                                default:
-                                    return (
-                                        <a key={id} href={`/p/${profileData.basicInfo.userName}/${id}`} className="link1">
-                                            <div>{parseRichText(title)}</div>
-                                            <div className="link-circle">
-                                                <ChevronRightIcon />
-                                            </div>
-                                        </a>
-                                    );
-                            }
-                        })}
+                                    case "Anonymous Replies":
+                                    case "Meeting Scheduler":
+                                    default:
+                                        return (
+                                            <a
+                                                key={id}
+                                                href={`/p/${profileData.basicInfo.userName}/${id}`}
+                                                className="link1"
+                                                onClick={handleClick}
+                                            >
+                                                <div>{parseRichText(title)}</div>
+                                                <div className="link-circle">
+                                                    {
+                                                        type === "Anonymous Replies" ? (
+                                                            <svg /* [SVG ICON HERE] */ />
+                                                        ) : type === "Meeting Scheduler" ? (
+                                                            <EventAvailableIcon />
+                                                        ) : (
+                                                            <ChevronRightIcon />
+                                                        )
+                                                    }
+                                                </div>
+                                            </a>
+                                        );
+                                }
+                            })}
                     </div>
+
 
                 </div>
             }

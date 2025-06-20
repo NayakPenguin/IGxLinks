@@ -16,33 +16,79 @@ const ViewProfileInsideControl = () => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log("🌐 Fetching advanced info for:", username);
-        const res = await axios.get(`${API_URL}/advanced-info/${username}`);
-        const raw = res.data?.localStorageData;
+  const fetchData = async () => {
+    console.log("🟡 Starting fetchData useEffect...");
+
+    try {
+      const lastClick = localStorage.getItem("lastClick");
+      const profileDataRaw = localStorage.getItem("profileDataSave");
+      const now = Date.now();
+
+      console.log("🕒 Current time:", now);
+      console.log("🧠 lastClick from localStorage:", lastClick);
+      console.log("💾 profileDataSave from localStorage:", profileDataRaw ? "FOUND" : "NOT FOUND");
+
+      console.log("Time Less than 5 sec : ", now - parseInt(lastClick, 10) <= 5000);
+
+      if (
+        lastClick &&
+        profileDataRaw &&
+        now - parseInt(lastClick, 10) <= 5000 // 10 seconds
+      ) {
+        console.log("✅ Using cached profileDataSave from localStorage");
+
+        const parsedProfileData = JSON.parse(profileDataRaw);
+        const raw = parsedProfileData?.advancedInfo?.localStorageData;
+
+        console.log("raw : ", raw);
 
         if (!raw) {
-          console.warn("⚠️ No localStorageData found in response");
+          console.warn("⚠️ profileDataSave.advancedInfo.localStorageData is missing");
           setLoading(false);
           return;
         }
 
-        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        const arrayData = Object.values(parsed); // convert from object with numeric keys
+        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+        const arrayData = Object.values(parsed);
         setItems(arrayData);
-        console.log(arrayData);
-      } catch (error) {
-        console.error("❌ Error fetching advanced info:", error);
-      } finally {
-        setLoading(false);
+
+        console.log("📦 Set items from localStorage:", arrayData);
+      } else {
+        console.log("🌐 Fetching from API as localStorage is invalid or expired:", `${API_URL}/all-info/${username}`);
+        const res = await axios.get(`${API_URL}/all-info/${username}`);
+        const raw = res.data?.advancedInfo?.localStorageData;
+        localStorage.setItem("profileDataSave", JSON.stringify(res.data));
+        console.log("profileDataSave updated");
+
+        if (!raw) {
+          console.warn("⚠️ No localStorageData found in API response");
+          setLoading(false);
+          return;
+        }
+
+        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+        const arrayData = Object.values(parsed);
+        setItems(arrayData);
+
+        console.log("📦 Set items from API:", arrayData);
       }
-    };
+    } catch (error) {
+      console.error("❌ Error during data fetch:", error);
+    } finally {
+      setLoading(false);
+      console.log("✅ fetchData completed");
+    }
+  };
 
-    if (username && id) fetchData();
-  }, [username, id]);
+  if (username && id) {
+    console.log("👤 username and id found:", username, id);
+    fetchData();
+  } else {
+    console.log("❌ username or id missing, skipping fetchData");
+  }
+}, [username, id]);
 
-  if (loading) return <div>Loading...</div>;
+  // if (loading) return <div>Loading...</div>;
 
   const selectedItem = items.find(item => item.id === id);
 

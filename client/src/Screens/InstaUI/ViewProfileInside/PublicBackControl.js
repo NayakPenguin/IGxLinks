@@ -6,11 +6,16 @@ import { useNavigate } from "react-router-dom";
 
 const PublicBackControl = ({username}) => {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    localStorage.setItem("lastClick", Date.now().toString());
+    navigate(`/p/${username}`);
+  };
   
   return (
-    <Container onClick={() => navigate(`/p/${username}`)}>
+    <Container onClick={handleClick}>
         <ArrowBackIcon />
-        Back to Main Page
+        @{username}
     </Container>
   )
 }
