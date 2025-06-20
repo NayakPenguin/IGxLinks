@@ -43,6 +43,7 @@ import BetweenCalcPage from "./Screens/InstaUI/BetweenCalcPage";
 import PrivateRoute from './auth/PrivateRoute'; 
 import ViewProfile from "./Screens/InstaUI/ViewProfile";
 import ViewProfileInsideControl from "./Screens/InstaUI/ViewProfileInside/ViewProfileInsideControl";
+import MyResponsesPage from "./Testing/MyResponsesPage";
 
 const App = () => {
   return (
@@ -56,6 +57,7 @@ const App = () => {
         <Route path="/p/:username" element={<ViewProfile />} />
         <Route path="/p/:username/:id" element={<ViewProfileInsideControl />} />
 
+        <Route path="/testing/responses" element={<MyResponsesPage />} />
 
         <Route path="/shop" element={<Shop />} />
         <Route path="/brand" element={<BrandProfile />} />

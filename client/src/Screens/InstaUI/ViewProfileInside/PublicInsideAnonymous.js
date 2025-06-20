@@ -1,55 +1,93 @@
-import React, { useState, useEffect, useRef } from "react";
-import styled from 'styled-components'
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import SmsOutlinedIcon from '@material-ui/icons/SmsOutlined';
-import { parseRichText } from '../../Helpers/parseRichText';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { parseRichText } from "../../Helpers/parseRichText";
 import PublicBackControl from "./PublicBackControl";
+import axios from "axios";
 
-const PublicInsideAnonymous = ({data, username}) => {
-    const [replies, setReplies] = useState([]);
-    const [input, setInput] = useState("");
+// Axios instance
+const API_URL = process.env.REACT_APP_API_URL;
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
 
-    console.log(data);
+const PublicInsideAnonymous = ({ data, username }) => {
+  const [input, setInput] = useState("");
+  const [replies, setReplies] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    const handleReply = () => {
-        if (input.trim() !== "") {
-            setReplies([input, ...replies]);
-            setInput("");
-        }
-    };
+  const handleReply = async () => {
+    if (input.trim() === "") return;
 
-    return (
-        <Container>
-            <div className="main-content">
-                <PublicBackControl username={username}></PublicBackControl>
-                <div className="question">{parseRichText(data.question ? data.question : null)}</div>
-                {/* <div className="desc">{data.desc ? data.desc : null}</div> */}
-                <textarea
-                    className="ans-input"
-                    placeholder="Write your anonymous reply here..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                />
-                <div className="main-btns">
-                    <div className="btn-1 trans">Send</div>
-                </div>
+    try {
+      setLoading(true);
 
-                <div className="extra-btns">
-                    {/* <SmsOutlinedIcon className="fadeicon"/> */}
-                    <div className="svg-frd">
-                        <svg aria-label="Share" class="x1lliihq x1n2onr6 xyb1xck" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Share</title><line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2" x1="22" x2="9.218" y1="3" y2="10.083"></line><polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></polygon></svg>
-                    </div>
-                </div>
+      console.log("📤 Submitting anonymous response:", {
+        userContentId: data.id,
+        type: "anonymous",
+        ownerId: data.ownerId,
+        data: { reply: input }
+      });
 
-                {/* <div className="comment-info">
-                    *The page owner has chosen to keep comments private.
-                </div> */}
-            </div>
-        </Container>
-    )
-}
+      const res = await api.post("/response", {
+        userContentId: data.id,
+        type: "anonymous",
+        ownerId: username,
+        data: { reply: input }
+      });
 
-export default PublicInsideAnonymous
+      console.log("✅ Response submitted:", res.data);
+
+      // Optionally update local replies UI
+      setReplies([input, ...replies]);
+      setInput("");
+    } catch (err) {
+      console.error("❌ Failed to submit response:", err);
+      alert("Failed to send response");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Container>
+      <div className="main-content">
+        <PublicBackControl username={username} />
+        <div className="question">
+          {parseRichText(data.question ? data.question : "")}
+        </div>
+
+        <textarea
+          className="ans-input"
+          placeholder="Write your anonymous reply here..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+
+        <div className="main-btns">
+          <div className="btn-1 trans" onClick={handleReply}>
+            {loading ? "Sending..." : "Send"}
+          </div>
+        </div>
+
+        <div className="extra-btns">
+          <div className="svg-frd">
+            <svg aria-label="Share" className="x1lliihq x1n2onr6 xyb1xck" fill="currentColor" height="24" viewBox="0 0 24 24" width="24">
+              <title>Share</title>
+              <line fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" x1="22" x2="9.218" y1="3" y2="10.083" />
+              <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </Container>
+  );
+};
+
+export default PublicInsideAnonymous;
 
 const Container = styled.div`
     width: 100vw;

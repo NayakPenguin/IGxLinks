@@ -238,8 +238,6 @@ const AfterLogin = () => {
         }
     };
 
-
-
     const handleCropComplete = (crop) => {
         setCompletedCrop(crop);
     };

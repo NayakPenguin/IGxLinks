@@ -1,56 +1,106 @@
-import React, { useState, useEffect, useRef } from "react";
-import styled from 'styled-components'
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import SmsOutlinedIcon from '@material-ui/icons/SmsOutlined';
-import { parseRichText } from '../../Helpers/parseRichText';
+import React, { useState } from "react";
+import styled from "styled-components";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import SmsOutlinedIcon from "@material-ui/icons/SmsOutlined";
+import { parseRichText } from "../../Helpers/parseRichText";
 import PublicBackControl from "./PublicBackControl";
+import axios from "axios";
+
+// Axios instance with credentials
+const API_URL = process.env.REACT_APP_API_URL;
+
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
 
 const PublicInsideForm = ({ data, username }) => {
-    const [replies, setReplies] = useState([]);
-    const [input, setInput] = useState("");
+  const [answers, setAnswers] = useState({});
+  const [loading, setLoading] = useState(false);
 
-    console.log(data);
+  const handleInputChange = (title, value) => {
+    setAnswers((prev) => ({ ...prev, [title]: value }));
+  };
 
-    return (
-        <Container>
-            <div className="main-content">
-                <PublicBackControl username={username}></PublicBackControl>
-                <div className="title">{parseRichText(data.titleInside)}</div>
-                <div className="desc">{parseRichText(data.description)}</div>
+  const handleSend = async () => {
+    try {
+      setLoading(true);
 
-                {data.formItems.map((item, key) => {
-                    if (["Text", "Email", "Number"].includes(item.type)) {
-                        return (
-                            <div key={key} className="input-container">
-                                <div className="label">{item.title}</div>
-                                <input className="input-basic" placeholder={item.placeholder} />
-                            </div>
-                        );
-                    } else if (item.type === "Long Answer") {
-                        return (
-                            <div key={key} className="input-container">
-                                <div className="label">{item.title}</div>
-                                <textarea
-                                    className="input-basic"
-                                    placeholder={item.placeholder}
-                                    rows={4}
-                                />
-                            </div>
-                        );
-                    } else {
-                        return null; 
-                    }
-                })}
+      const response = await api.post("/response", {
+        userContentId: data.id,
+        type: "form",
+        ownerId: username,
+        data: {
+          answers: Object.entries(answers).map(([question, answer]) => ({
+            question,
+            answer
+          }))
+        }
+      });
 
-                <div className="main-btns">
-                    <div className="btn-1 trans">Send</div>
-                </div>
-            </div>
-        </Container>
-    )
-}
+      console.log("✅ Response submitted", response.data);
+      alert("Response submitted!");
+      setAnswers({});
+    } catch (err) {
+      console.error("❌ Failed to submit response", err);
+      alert("Failed to send response");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-export default PublicInsideForm
+  return (
+    <Container>
+      <div className="main-content">
+        <PublicBackControl username={username} />
+        <div className="title">{parseRichText(data.titleInside)}</div>
+        <div className="desc">{parseRichText(data.description)}</div>
+
+        {data.formItems.map((item, key) => {
+          if (["Text", "Email", "Number"].includes(item.type)) {
+            return (
+              <div key={key} className="input-container">
+                <div className="label">{item.title}</div>
+                <input
+                  className="input-basic"
+                  placeholder={item.placeholder}
+                  value={answers[item.title] || ""}
+                  onChange={(e) => handleInputChange(item.title, e.target.value)}
+                />
+              </div>
+            );
+          } else if (item.type === "Long Answer") {
+            return (
+              <div key={key} className="input-container">
+                <div className="label">{item.title}</div>
+                <textarea
+                  className="input-basic"
+                  placeholder={item.placeholder}
+                  rows={4}
+                  value={answers[item.title] || ""}
+                  onChange={(e) => handleInputChange(item.title, e.target.value)}
+                />
+              </div>
+            );
+          } else {
+            return null;
+          }
+        })}
+
+        <div className="main-btns">
+          <div className="btn-1 trans" onClick={handleSend}>
+            {loading ? "Sending..." : "Send"}
+          </div>
+        </div>
+      </div>
+    </Container>
+  );
+};
+
+export default PublicInsideForm;
 
 const Container = styled.div`
     width: 100vw;
