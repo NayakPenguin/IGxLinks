@@ -1,7 +1,7 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const dotenv = require("dotenv");
-const User = require("../models/user"); // ✅ Import your User model
+const User = require("../models/user");
 
 dotenv.config();
 
@@ -14,16 +14,27 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ googleId: profile.id });
+        const email = profile.emails?.[0]?.value;
+
+        // Use email as unique identity
+        let user = await User.findOne({ email });
 
         if (!user) {
           user = await User.create({
-            googleId: profile.id,
-            email: profile.emails?.[0]?.value,
+            email,
+            googleId: profile.id, // store it optionally
+            name: profile.displayName,
+            photo: profile.photos?.[0]?.value,
+            provider: "google",
           });
         }
 
-        return done(null, user);
+        return done(null, {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+          photo: user.photo,
+        });
       } catch (err) {
         return done(err, null);
       }
