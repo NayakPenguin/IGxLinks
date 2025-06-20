@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import styled from 'styled-components'
+import styled, { keyframes } from "styled-components";
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import { useParams } from 'react-router-dom';
 
 import CheckIcon from '@material-ui/icons/Check';
-import BookmarkBorderOutlinedIcon from '@material-ui/icons/BookmarkBorderOutlined';
 import NotificationsNoneOutlinedIcon from '@material-ui/icons/NotificationsNoneOutlined';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import RoomIcon from '@material-ui/icons/Room';
-import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
-import BookmarkIcon from '@material-ui/icons/Bookmark';
 import EventAvailableIcon from '@material-ui/icons/EventAvailable';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import CloseIcon from '@material-ui/icons/Close';
 import { CircularProgress } from "@material-ui/core";
 import axios from "axios";
 
@@ -34,6 +31,7 @@ const ViewProfile = () => {
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showAd, setShowAd] = useState(true);
 
     useEffect(() => {
         if (!username) {
@@ -207,6 +205,18 @@ const ViewProfile = () => {
                             )
                         }
                     </Subscribe>
+                    {
+                        showAd == true &&
+                        <CreateYourPageAd>
+                            <div className="close" onClick={() => setShowAd(false)}>
+                                <CloseIcon />
+                            </div>
+                            <a href="/page/create" target="_blank" className="type1">
+                                <b>Join {profileData.basicInfo.name} on IGxLinks</b>
+                                <p>Click to create your account</p>
+                            </a>
+                        </CreateYourPageAd>
+                    }
                     <div className="user-data">
                         <div className="logo-x-dp">
                             <img src={profileData.basicInfo.profileImage} alt="" />
@@ -221,13 +231,22 @@ const ViewProfile = () => {
                                 const platform = AllSocialMediaPlatforms.find(p => p.id === link.platformId);
                                 if (!platform || !link.profileUrl) return null;
 
+                                // Determine correct href
+                                let href = link.profileUrl;
+                                if (link.platformId === "mail") {
+                                    href = `mailto:${link.profileUrl}`;
+                                } else if (!link.profileUrl.startsWith("http")) {
+                                    href = `https://${link.profileUrl}`;
+                                }
+
                                 return (
                                     <a
                                         key={link._id}
-                                        href={link.profileUrl.startsWith("http") ? link.profileUrl : `https://${link.profileUrl}`}
+                                        href={href}
                                         className="social-icon"
                                         target="_blank"
                                         rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
                                     >
                                         <img
                                             src={link.iconUrl || platform.iconUrl}
@@ -319,7 +338,15 @@ const ViewProfile = () => {
                             })}
                     </div>
 
-
+                    {
+                        !showAd &&
+                        <CreateYourPageAd>
+                            <a href="/page/create" target="_blank" className="type2">
+                                <b>Join {profileData.basicInfo.name} on IGxLinks</b>
+                                <p>Click to create your account</p>
+                            </a>
+                        </CreateYourPageAd>
+                    }
                 </div>
             }
         </Container>
@@ -1136,3 +1163,94 @@ const PinnedAnnouncement = styled.div`
         }
     }
 `
+
+const slideIn = keyframes`
+  from {
+    transform: translateX(-110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+`;
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const CreateYourPageAd = styled.div`
+  .type1 {
+    position: fixed;
+    height: 50px;
+    width: 80%;
+    bottom: 24px;
+    left: 10%;
+    z-index: 1000;
+    border-radius: 100px;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 0.7rem;
+    text-decoration: none;
+
+    b {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    animation: ${slideIn} 0.5s ease-out 5s both;
+  }
+
+  .type2{
+    height: 50px;
+    width: 100%;
+
+    margin-top: 40px;
+    margin-bottom: -50px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 0.7rem;
+    text-decoration: none;
+
+    b {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+  }
+
+   .close {
+    position: fixed;
+    height: 40px;
+    aspect-ratio: 1/1;
+    bottom: 29px;
+    right: 7.5%;
+    z-index: 1001;
+    border-radius: 100px;
+    background-color: #232222;
+
+    display: grid;
+    place-items: center;
+
+    opacity: 0;
+    animation: ${fadeIn} 0.1s ease-in 8s forwards;
+  }
+`;
