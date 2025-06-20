@@ -501,11 +501,12 @@ const Container = styled.div`
         
     .group{
         width: 100%;
-        margin-top: 70px;
+        margin-top: 85px;
 
         .group-name-container{
             margin: 30px 0;
             padding: 0 35px;
+            margin-top: 45px;
 
             display: flex;
             align-items: center;
@@ -536,7 +537,7 @@ const Container = styled.div`
             padding: 15px 60px;
             border-radius: 100px;
             color: #e5e5e5;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
 
             display: flex; 
             align-items: center;
