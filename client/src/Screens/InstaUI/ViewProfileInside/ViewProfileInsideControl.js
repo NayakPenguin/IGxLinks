@@ -107,7 +107,7 @@ const ViewProfileInsideControl = () => {
 
   if (!selectedItem) {
     return (
-      <div style={{ padding: "20px", fontSize: "8.5rem", fontWeight: 500 }}>
+      <div style={{ padding: "20px", fontSize: "0.85rem", fontWeight: 500 }}>
         Page not Found
       </div>
     );
