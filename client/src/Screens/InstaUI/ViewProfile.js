@@ -10,8 +10,11 @@ import RoomIcon from '@material-ui/icons/Room';
 import EventAvailableIcon from '@material-ui/icons/EventAvailable';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CloseIcon from '@material-ui/icons/Close';
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress, LinearProgress } from "@material-ui/core";
 import axios from "axios";
+
+import logo from "../../Images/logo-main.png";
+import logo2 from "../../Images/logo-bg.png";
 
 import { AllSocialMediaPlatforms } from "../../constants/socialMediaPlatforms";
 import { parseRichText } from '../Helpers/parseRichText';
@@ -188,11 +191,11 @@ const ViewProfile = () => {
                         </div>
                     </NotificationModelConatiner> : null
             }
+
             {
-                profileData &&
+                profileData ?
                 <div className="main-content">
                     <Subscribe>
-                        {/*  */}
                         {
                             subscribed ? (
                                 <div className="subscribe-btn subscribed" onClick={() => handleSubscription()}>
@@ -342,11 +345,21 @@ const ViewProfile = () => {
                         !showAd &&
                         <CreateYourPageAd>
                             <a href="/page/create" target="_blank" className="type2">
-                                <b>Join {profileData.basicInfo.name} on IGxLinks</b>
-                                <p>Click to create your account</p>
+                                <img src={logo2} alt="" />
+                                <div className="text">
+                                    <b>Powered by IGxLinks</b>
+                                    <p>
+                                        Click to create your account
+                                        <CallMadeIcon/>
+                                    </p>
+                                </div>
                             </a>
                         </CreateYourPageAd>
                     }
+                </div>
+                : 
+                <div className="show-loader">
+                    <LinearProgress />
                 </div>
             }
         </Container>
@@ -374,6 +387,13 @@ const Container = styled.div`
     display: flex;  
     flex-direction: column;
     align-items: center;
+
+    .show-loader{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+    }
     
     .main-content{
         width: 100%;
@@ -462,13 +482,13 @@ const Container = styled.div`
                 justify-content: center;
                 flex-wrap: wrap;
 
+                gap: 10px;
+
                 .social-icon{
-                    height: 35px;
+                    height: 40px;
                     aspect-ratio: 1/1;
                     background-color:rgb(217, 211, 211);
                     border-radius: 50%;
-                    margin: 3.5px;
-
                     padding: 2.5px;
 
                     img{
@@ -1187,7 +1207,7 @@ const fadeIn = keyframes`
 const CreateYourPageAd = styled.div`
   .type1 {
     position: fixed;
-    height: 50px;
+    height: 60px;
     width: 80%;
     bottom: 24px;
     left: 10%;
@@ -1224,9 +1244,26 @@ const CreateYourPageAd = styled.div`
     margin-bottom: -50px;
 
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    img{
+        height: 40px;
+        border-radius: 50%;
+    }
+
+    .text{
+        margin-left: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+
+        svg{
+            font-size: 0.9rem;
+            margin-left: 2.5px;
+        }
+    }
 
     font-size: 0.7rem;
     text-decoration: none;
@@ -1239,9 +1276,9 @@ const CreateYourPageAd = styled.div`
 
    .close {
     position: fixed;
-    height: 40px;
+    height: 45px;
     aspect-ratio: 1/1;
-    bottom: 29px;
+    bottom: 31.5px;
     right: 7.5%;
     z-index: 1001;
     border-radius: 100px;
@@ -1251,6 +1288,6 @@ const CreateYourPageAd = styled.div`
     place-items: center;
 
     opacity: 0;
-    animation: ${fadeIn} 0.1s ease-in 8s forwards;
+    animation: ${fadeIn} 0.1s ease-in 6.5s forwards;
   }
 `;
