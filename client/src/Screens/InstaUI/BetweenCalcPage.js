@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from "../../Images/logo-main.png";
+import { LinearProgress } from "@material-ui/core";
 
 const BetweenCalcPage = () => {
     const API_URL = process.env.REACT_APP_API_URL;
@@ -64,6 +65,15 @@ const BetweenCalcPage = () => {
                 {
                     status == "Checking authentication..." ? <p>{status}</p> : <h1>{status}</h1>
                 }
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100vw",
+                    zIndex: 9999
+                }}>
+                    <LinearProgress />
+                </div>
             </div>
         </Container>
     );

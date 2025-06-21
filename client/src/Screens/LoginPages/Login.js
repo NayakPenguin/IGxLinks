@@ -76,7 +76,7 @@ const Login = () => {
     const data = await res.json();
     if (res.ok) {
       alert("Logged in successfully!");
-      window.location.href = "/basic-info";
+      window.location.href = "/redirect";
     } else {
       alert(data.message || "Invalid OTP");
     }
@@ -90,7 +90,7 @@ const Login = () => {
       .then(user => {
         console.log("Logged-in user:", user);
         if (user && user.email) {
-          window.location.href = "/basic-info";
+          window.location.href = "/redirect";
         }
       });
   }, []);

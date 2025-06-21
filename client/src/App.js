@@ -53,7 +53,7 @@ const App = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/basic-info" element={<AfterLogin />} />
-        <Route path="/wait" element={<BetweenCalcPage />} />
+        <Route path="/redirect" element={<BetweenCalcPage />} />
         <Route path="/p/:username" element={<ViewProfile />} />
         <Route path="/p/:username/:id" element={<ViewProfileInsideControl />} />
 

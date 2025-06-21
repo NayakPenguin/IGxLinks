@@ -57,7 +57,7 @@ router.get(
       });
 
       // Redirect to frontend
-      res.redirect(`${CLIENT_ORIGIN}/basic-info`);
+      res.redirect(`${CLIENT_ORIGIN}/redirect`);
     } catch (error) {
       console.error("OAuth callback error:", error);
       res.status(500).send("OAuth Error");

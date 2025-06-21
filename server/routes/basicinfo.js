@@ -9,6 +9,7 @@ const AllUsernames = require('../models/AllUsernames');
 router.post('/', authenticateJWT, async (req, res) => {
   try {
     const { userName, ...updateData } = req.body;
+    console.log("req.user : ", req.user);
     const userEmail = req.user.email;
 
     // Check if document exists
