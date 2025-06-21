@@ -41,7 +41,7 @@ const PublicInsideForm = ({ data, username }) => {
         }
       });
 
-      console.log("✅ Response submitted", response.data);
+      // console.log("✅ Response submitted", response.data);
       alert("Response submitted!");
       setAnswers({});
     } catch (err) {

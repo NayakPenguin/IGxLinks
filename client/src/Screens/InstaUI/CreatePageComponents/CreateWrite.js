@@ -103,7 +103,7 @@ const CreateWrite = () => {
     };
 
     useEffect(() => {
-        console.log("Updated Write Items:", writeData.writeItems);
+        // console.log("Updated Write Items:", writeData.writeItems);
     }, [writeData.writeItems]);
 
     const handleSaveAndUpdate = () => {

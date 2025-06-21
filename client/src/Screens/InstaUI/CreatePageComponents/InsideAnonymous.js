@@ -10,7 +10,7 @@ const InsideAnonymous = ({data}) => {
     const [replies, setReplies] = useState([]);
     const [input, setInput] = useState("");
 
-    console.log(data);
+    // console.log(data);
 
     const handleReply = () => {
         if (input.trim() !== "") {

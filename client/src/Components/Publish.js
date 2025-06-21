@@ -55,7 +55,7 @@ const Publish = () => {
         })
       ]);
 
-      console.log("Both basic and content data published successfully.");
+      // // console.log("Both basic and content data published successfully.");
       setPublishStatus('success');
 
       setTimeout(() => setPublishStatus(null), 5000);

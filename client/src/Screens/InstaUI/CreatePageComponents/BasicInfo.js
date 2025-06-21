@@ -67,22 +67,22 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log("🔄 Starting BasicInfo fetch...");
+            // console.log("🔄 Starting BasicInfo fetch...");
 
             // Ensure API_URL is correctly loaded
-            console.log("🌍 API_URL:", API_URL);
+            // console.log("🌍 API_URL:", API_URL);
 
             try {
                 const saved = localStorage.getItem("userBasicInfo");
 
                 if (saved && saved !== "undefined" && saved !== "null") {
-                    console.log("🔧 Found saved data in localStorage, attempting to parse...");
+                    // console.log("🔧 Found saved data in localStorage, attempting to parse...");
 
                     try {
                         const parsedSaved = JSON.parse(saved);
 
                         if (parsedSaved && typeof parsedSaved === "object") {
-                            console.log("✅ Successfully parsed localStorage data");
+                            // console.log("✅ Successfully parsed localStorage data");
                             setBasicData(parsedSaved);
                             setDBdata(parsedSaved);
 
@@ -102,18 +102,18 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                         console.error("❌ Failed to parse localStorage data:", e);
                     }
                 } else {
-                    console.log("📭 No valid localStorage data found. Proceeding to fetch from API...");
+                    // console.log("📭 No valid localStorage data found. Proceeding to fetch from API...");
                 }
 
                 // Step 2: API Fallback
                 try {
-                    console.log("🌐 Fetching basicData from API...");
+                    // console.log("🌐 Fetching basicData from API...");
                     const res = await axios.get(`${API_URL}/basic-info/`, {
                         withCredentials: true,
                         timeout: 10000 // Optional: prevents indefinite hangs
                     });
 
-                    console.log("📦 API Response:", res.data);
+                    // console.log("📦 API Response:", res.data);
 
                     setBasicData(res.data);
                     setDBdata(res.data);
@@ -127,7 +127,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                     }
 
                     localStorage.setItem("userBasicInfo", JSON.stringify(res.data));
-                    console.log("✅ Successfully saved basicData to localStorage from API");
+                    // console.log("✅ Successfully saved basicData to localStorage from API");
 
                 } catch (apiError) {
                     console.error("❌ Error fetching from API:", apiError.message, apiError);
@@ -137,7 +137,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                 console.error("💥 Unexpected fetch failure:", outerError);
             }
 
-            console.log("✅ BasicInfo fetch process completed.");
+            // console.log("✅ BasicInfo fetch process completed.");
         };
 
         fetchData();

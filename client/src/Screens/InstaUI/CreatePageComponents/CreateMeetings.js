@@ -201,7 +201,7 @@ const CreateMeetings = () => {
         const existingItem = savedItems.find(item => item.id === id);
 
         if (id) {
-            console.log("Id : ", id);
+            // console.log("Id : ", id);
 
             if (existingItem) {
                 setIsEditMode(true);
@@ -213,7 +213,7 @@ const CreateMeetings = () => {
                     duration: existingItem.duration || 30,
                     availability: existingItem.availability || getInitialAvailability()
                 });
-                console.log("formData : ", formData);
+                // console.log("formData : ", formData);
 
             } else {
                 // navigate('/pagenotfound');

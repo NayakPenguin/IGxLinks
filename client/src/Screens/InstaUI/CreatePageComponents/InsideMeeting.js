@@ -13,14 +13,14 @@ const InsideMeeting = ({ data }) => {
     const [input, setInput] = useState("");
 
     const userBasicInfo = JSON.parse(localStorage.getItem("userBasicInfo"));
-    console.log(userBasicInfo);
+    // console.log(userBasicInfo);
 
     const newLocalImageURL = localStorage.getItem("newLocalImageURL");
-    console.log(newLocalImageURL);
+    // console.log(newLocalImageURL);
 
     // const newLocalImageURL = JSON.parse(localStorage.getItem("newLocalImageURL"));
 
-    console.log(data);
+    // console.log(data);
 
     return (
         <Container>

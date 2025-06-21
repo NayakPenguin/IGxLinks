@@ -43,15 +43,15 @@ const ViewProfile = () => {
         }
 
         const fetchProfile = async () => {
-            console.log("🟡 Starting profile fetch process...");
+            // console.log("🟡 Starting profile fetch process...");
             setLoading(true);
             setError(null);
 
             const lastClick = localStorage.getItem("lastClick");
             const now = Date.now();
 
-            console.log("🕒 Current timestamp:", now);
-            console.log("🧠 lastClick from localStorage:", lastClick);
+            // console.log("🕒 Current timestamp:", now);
+            // console.log("🧠 lastClick from localStorage:", lastClick);
 
             const within5Seconds =
                 lastClick && now - parseInt(lastClick, 10) <= 5000;
@@ -59,7 +59,7 @@ const ViewProfile = () => {
             const profileDataRaw = localStorage.getItem("profileDataSave");
 
             if (within5Seconds && profileDataRaw) {
-                console.log("📦 Using cached profileDataSave from localStorage (within 5s)");
+                // console.log("📦 Using cached profileDataSave from localStorage (within 5s)");
                 try {
                     const parsed = JSON.parse(profileDataRaw);
                     setProfileData(parsed);
@@ -70,30 +70,30 @@ const ViewProfile = () => {
                     fetchFromAPI();
                 } finally {
                     setLoading(false);
-                    console.log("✅ Finished with localStorage path.");
+                    // console.log("✅ Finished with localStorage path.");
                 }
                 return;
             }
 
-            console.log("🌐 Cached data expired or missing, making API request...");
+            // console.log("🌐 Cached data expired or missing, making API request...");
             fetchFromAPI();
         };
 
         const fetchFromAPI = async () => {
             try {
                 const res = await api.get(`/all-info/${username}`);
-                console.log("✅ Profile fetched successfully from API:", res.data);
+                // console.log("✅ Profile fetched successfully from API:", res.data);
 
                 setProfileData(res.data);
                 localStorage.setItem("profileDataSave", JSON.stringify(res.data));
                 localStorage.setItem("lastClick", Date.now().toString());
-                console.log("💾 Cached new profile data and updated lastClick.");
+                // console.log("💾 Cached new profile data and updated lastClick.");
             } catch (err) {
                 console.error("❌ Failed to fetch profile from API:", err.message, err);
                 setError(err);
             } finally {
                 setLoading(false);
-                console.log("✅ Finished with API path.");
+                // console.log("✅ Finished with API path.");
             }
         };
 
@@ -283,7 +283,7 @@ const ViewProfile = () => {
 
                                 const handleClick = () => {
                                     localStorage.setItem("lastClick", Date.now().toString());
-                                    console.log(`🕒 lastClick updated at ${new Date().toISOString()}`);
+                                    // console.log(`🕒 lastClick updated at ${new Date().toISOString()}`);
                                 };
 
                                 switch (type) {

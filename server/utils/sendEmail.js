@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendEmail(to, subject, text) {
-    console.log("Using email:", process.env.EMAIL_USER);
+    // console.log("Using email:", process.env.EMAIL_USER);
     try {
         const info = await transporter.sendMail({
             from: `"IGxLinks" <${process.env.EMAIL_USER}>`,
@@ -23,7 +23,7 @@ async function sendEmail(to, subject, text) {
             text,
         });
 
-        console.log("Message sent: %s", info.messageId);
+        // console.log("Message sent: %s", info.messageId);
     } catch (error) {
         console.error("Email send error:", error);
         throw error;

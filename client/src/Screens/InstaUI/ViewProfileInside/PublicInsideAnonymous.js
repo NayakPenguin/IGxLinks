@@ -25,7 +25,7 @@ const PublicInsideAnonymous = ({ data, username }) => {
     try {
       setLoading(true);
 
-      console.log("📤 Submitting anonymous response:", {
+      // console.log("📤 Submitting anonymous response:", {
         userContentId: data.id,
         type: "anonymous",
         ownerId: data.ownerId,
@@ -39,7 +39,7 @@ const PublicInsideAnonymous = ({ data, username }) => {
         data: { reply: input }
       });
 
-      console.log("✅ Response submitted:", res.data);
+      // console.log("✅ Response submitted:", res.data);
 
       // Optionally update local replies UI
       setReplies([input, ...replies]);

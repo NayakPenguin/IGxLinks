@@ -20,7 +20,7 @@ router.get(
 router.get(
   "/google/callback",
   (req, res, next) => {
-    console.log("➡️ Incoming callback request with query:", req.query);
+    // console.log("➡️ Incoming callback request with query:", req.query);
     next();
   },
   passport.authenticate("google", {

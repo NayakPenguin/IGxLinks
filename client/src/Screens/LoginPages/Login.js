@@ -8,7 +8,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 const Login = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
-    console.log(API_URL);
+    // console.log(API_URL);
   }, [API_URL]);
   
 
@@ -38,7 +38,7 @@ const Login = () => {
         method: "GET",
         credentials: "include",
       });
-      console.log("Logged out");
+      // console.log("Logged out");
       window.location.href = "/";
     } catch (err) {
       console.error("Logout failed", err);
@@ -88,7 +88,7 @@ const Login = () => {
     })
       .then(res => res.json())
       .then(user => {
-        console.log("Logged-in user:", user);
+        // console.log("Logged-in user:", user);
         if (user && user.email) {
           window.location.href = "/redirect";
         }

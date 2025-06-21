@@ -16,7 +16,7 @@ const Profile = () => {
             try {
                 const parsed = JSON.parse(storedData);
                 setBasicItems(parsed.formData);
-                console.log(parsed.formData);
+                // console.log(parsed.formData);
             } catch (e) {
                 console.error("Failed to parse userBasicInfo", e);
             }

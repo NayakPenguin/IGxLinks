@@ -118,7 +118,7 @@ const ViewChanges = () => {
     });
 
     useEffect(() => {
-        console.log("userEditData : ", userEditData);
+        // console.log("userEditData : ", userEditData);
     }, [userEditData]);
 
     useEffect(() => {

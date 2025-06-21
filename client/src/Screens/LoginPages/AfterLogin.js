@@ -89,7 +89,7 @@ const AfterLogin = () => {
 
                 setUsernames(new Set(res.data));
 
-                console.log("✅ Usernames loaded:", res.data);
+                // console.log("✅ Usernames loaded:", res.data);
             } catch (err) {
                 console.error("❌ Failed to fetch usernames:", err);
             }
@@ -316,7 +316,7 @@ const AfterLogin = () => {
 
             // 1. Upload the cropped image
             let imageUrl = '';
-            console.log("croppedImageBlob : ", croppedImageBlob);
+            // console.log("croppedImageBlob : ", croppedImageBlob);
 
             if (croppedImageBlob) {
                 const formData = new FormData();
@@ -329,7 +329,7 @@ const AfterLogin = () => {
                 });
 
                 imageUrl = uploadResponse.data.imageUrl;
-                console.log("imageUrl:", imageUrl);
+                // console.log("imageUrl:", imageUrl);
             }
 
             // 2. Submit basic info
@@ -343,7 +343,7 @@ const AfterLogin = () => {
                 profileImage: imageUrl || 'default_image_url'
             };
 
-            // console.log(basicInfoData);
+            // // console.log(basicInfoData);
 
             await api.post('/basic-info', basicInfoData);
 

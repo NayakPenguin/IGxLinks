@@ -10,7 +10,7 @@ const InsideForm = ({ data }) => {
     const [replies, setReplies] = useState([]);
     const [input, setInput] = useState("");
 
-    console.log(data);
+    // console.log(data);
 
     return (
         <Container>

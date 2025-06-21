@@ -9,7 +9,7 @@ const AllUsernames = require('../models/AllUsernames');
 router.post('/', authenticateJWT, async (req, res) => {
   try {
     const { userName, ...updateData } = req.body;
-    console.log("req.user : ", req.user);
+    // console.log("req.user : ", req.user);
     const userEmail = req.user.email;
 
     // Check if document exists
@@ -29,7 +29,7 @@ router.post('/', authenticateJWT, async (req, res) => {
         return res.status(400).json({ message: 'Username already taken' });
       }
 
-      console.log(userEmail);
+      // console.log(userEmail);
 
       // Add to AllUsernames collection
       await AllUsernames.create({

@@ -22,7 +22,7 @@ const MyResponsesPage = () => {
         const fetchResponses = async () => {
             try {
                 const res = await api.get(`/response/${userName}`);
-                console.log("✅ Grouped responses:", res.data);
+                // console.log("✅ Grouped responses:", res.data);
                 setGroupedResponses(res.data);
             } catch (err) {
                 console.error("❌ Error fetching responses", err.response?.data || err);

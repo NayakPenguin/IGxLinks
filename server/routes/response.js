@@ -7,9 +7,9 @@ const AllUsernames = require("../models/AllUsernames");
 // 📨 POST /response — create new response
 router.post("/", authenticateJWT, async (req, res) => {
   try {
-    console.log("🔍 Incoming POST /response");
-    console.log("req.user =>", req.user);
-    console.log("req.body =>", req.body);
+    // console.log("🔍 Incoming POST /response");
+    // console.log("req.user =>", req.user);
+    // console.log("req.body =>", req.body);
 
     const { userContentId, type, data, ownerId } = req.body;
 
@@ -42,9 +42,9 @@ router.post("/", authenticateJWT, async (req, res) => {
 router.get("/:userName", authenticateJWT, async (req, res) => {
   try {
     const { userName } = req.params;
-    console.log("userName : ", userName);
+    // console.log("userName : ", userName);
     const userEmailFromJWT = req.user.email;
-    console.log("userEmailFromJWT : ", userEmailFromJWT);
+    // console.log("userEmailFromJWT : ", userEmailFromJWT);
 
     // 1. Find username entry
     const userEntry = await AllUsernames.findOne({
@@ -60,7 +60,7 @@ router.get("/:userName", authenticateJWT, async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    console.log("userEntry.userEmail === userEmailFromJWT");
+    // console.log("userEntry.userEmail === userEmailFromJWT");
 
     // 3. Find the User document to get _id
     const User = require("../models/user");
