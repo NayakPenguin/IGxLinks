@@ -13,6 +13,7 @@ const Publish = () => {
   const [highlightTopBar, setHighlightTopBar] = useState(false);
   const [username, setUsername] = useState("Not-Found");
   
+  const navigate = useNavigate();
 
   const API_URL = process.env.REACT_APP_API_URL;
 
@@ -65,6 +66,11 @@ const Publish = () => {
     } catch (error) {
       console.error("Publishing failed:", error.response?.data || error.message);
       setPublishStatus('error');
+      
+     if (error.response?.data || error.message === 
+        "Username is required for initial setup") {
+        navigate("/redirect");
+      }
 
       setTimeout(() => setPublishStatus(null), 5000);
     }

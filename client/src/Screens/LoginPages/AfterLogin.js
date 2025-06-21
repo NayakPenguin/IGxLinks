@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import { CircularProgress } from "@material-ui/core";
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
@@ -82,8 +83,19 @@ const AfterLogin = () => {
     const fileInputRef = useRef(null);
 
     useEffect(() => {
-        const fakeData = ['atanu', 'john_doe', 'elon.musk', 'riya12'];
-        setUsernames(new Set(fakeData));
+        const fetchUsernames = async () => {
+            try {
+                const res = await api.get("/usernames");
+
+                setUsernames(new Set(res.data));
+
+                console.log("✅ Usernames loaded:", res.data);
+            } catch (err) {
+                console.error("❌ Failed to fetch usernames:", err);
+            }
+        };
+
+        fetchUsernames();
     }, []);
 
     const validateUsername = (value) => {
@@ -336,7 +348,7 @@ const AfterLogin = () => {
             await api.post('/basic-info', basicInfoData);
 
             // Redirect after successful submission
-            // navigate(`/${inputUsername}`);
+            navigate(`/redirect`);
         } catch (error) {
             console.error('Submission failed:', error);
             setSubmitError(error.response?.data?.message || 'Failed to save information');
@@ -624,9 +636,13 @@ const AfterLogin = () => {
 
                         <div className="next-btn" onClick={handleSubmit} disabled={isSubmitting}>
                             {isSubmitting ? (
-                                <span>Uploading...</span>
+                                <span>
+                                    <CircularProgress style={{ height: 20, width: 20, margin: "-2.5px 0" }} />
+                                </span>
                             ) : (
-                                <span>Submit</span>
+                                <span>
+                                    Submit
+                                </span>
                             )}
                         </div>
                         {submitError && (
@@ -885,21 +901,25 @@ const Container = styled.div`
     }
 
     .next-btn{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-    width: 100%;
-    padding: 13.6px;
+        width: 100%;
+        padding: 13.6px;
 
-    font-size: 0.85rem;
+        font-size: 0.85rem;
 
-    background-color: black;
-    color: white;
-    text-decoration: none;
-    
-    margin-top: 20px;
-    border-radius: 100px;
+        background-color: black;
+        color: white;
+        text-decoration: none;
+        
+        margin-top: 20px;
+        border-radius: 100px;
+
+        span{
+            font-size: 0.85rem;
+        }
     }
 
   .error-msg {
