@@ -8,15 +8,19 @@ const AllUsernames = require('../models/AllUsernames');
 
 router.post('/', authenticateJWT, async (req, res) => {
   try {
-    const { userName, ...updateData } = req.body;
-    // console.log("req.user : ", req.user);
+    const { userName, _id, ...updateData } = req.body;
+    console.log("req.user : ", req.user);
     const userEmail = req.user.email;
+    console.log(userEmail);
+    console.log(userName);
 
     // Check if document exists
     const existingDoc = await BasicInfo.findOne({ userEmail });
+    console.log(existingDoc);
 
     // First-time creation validation
     if (!existingDoc && !userName) {
+      console.log("YES");
       return res.status(400).json({ message: 'Username is required for initial setup' });
     }
 
@@ -29,7 +33,7 @@ router.post('/', authenticateJWT, async (req, res) => {
         return res.status(400).json({ message: 'Username already taken' });
       }
 
-      // console.log(userEmail);
+      console.log(userEmail);
 
       // Add to AllUsernames collection
       await AllUsernames.create({

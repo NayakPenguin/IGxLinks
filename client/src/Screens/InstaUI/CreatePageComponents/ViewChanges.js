@@ -800,6 +800,7 @@ const Subscribe = styled.div`
 
 const BackBtn = styled.div`
     a{
+        cursor: pointer;
         position: fixed; 
         top: 20px;
         left: 20px;

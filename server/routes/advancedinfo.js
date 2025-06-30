@@ -40,7 +40,6 @@ router.post('/', authenticateJWT, async (req, res) => {
 
     // // console.log("✅ AdvancedInfo saved/updated successfully");
     res.json(advancedInfo);
-    
   } catch (err) {
     console.error("🔥 AdvancedInfo save error:", err);
     res.status(500).json({

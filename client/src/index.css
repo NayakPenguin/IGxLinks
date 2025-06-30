@@ -48,6 +48,7 @@ body{
 a{
   color: cornflowerblue;
   font-weight: 300;
+  cursor: pointer;
 }
 
 input{

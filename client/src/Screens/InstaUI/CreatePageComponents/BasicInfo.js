@@ -228,7 +228,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         let updatedLinks;
 
         if (existingLinkIndex >= 0) {
-            updatedLinks = basicData.socialLinks.map(link =>
+            updatedLinks = basicData.socialLinks?.map(link =>
                 link.platformId === platformId ? { ...link, profileUrl: value } : link
             );
         } else {
@@ -580,7 +580,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                 }
 
                 <div className="socials">
-                    {basicData.socialLinks.map((link, idx) => (
+                    {basicData.socialLinks?.map((link, idx) => (
                         <div key={idx} className="social-icon">
                             <img src={AllSocialMediaPlatforms.find(p => p.id === link.platformId)?.iconUrl} alt="" />
                         </div>
@@ -687,6 +687,7 @@ const Container = styled.div`
             align-items: center;
             font-size: 0.75rem;
             font-weight: 500;
+            cursor: pointer;
 
             color: white;
             text-decoration: none;

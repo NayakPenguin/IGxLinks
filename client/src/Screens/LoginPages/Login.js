@@ -4,18 +4,20 @@ import logo from "../../Images/logo-main.png";
 import logo2 from "../../Images/logo-bg.png";
 import InfoIcon from '@material-ui/icons/Info';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import { CircularProgress } from "@material-ui/core";
 
 const Login = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   useEffect(() => {
     // console.log(API_URL);
   }, [API_URL]);
-  
+
 
   const [showOTP, setShowOTP] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(Array(6).fill(""));
   const inputRefs = useRef([]);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e, index) => {
     const value = e.target.value;
@@ -47,18 +49,29 @@ const Login = () => {
 
   const handleRequestOTP = async () => {
     if (!email) return alert("Enter your email");
-    const res = await fetch(`${API_URL}/auth/request-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
 
-    const data = await res.json();
-    if (res.ok) {
-      alert("OTP sent to your email");
-      setShowOTP(true);
-    } else {
-      alert(data.message || "Error sending OTP");
+    try {
+      setLoading(true); // 🟡 Start loading
+
+      const res = await fetch(`${API_URL}/auth/request-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("OTP sent to your email");
+        setShowOTP(true);
+      } else {
+        alert(data.message || "Error sending OTP");
+      }
+    } catch (err) {
+      alert("Network error");
+      console.error(err);
+    } finally {
+      setLoading(false); // 🟢 Stop loading
     }
   };
 
@@ -66,19 +79,29 @@ const Login = () => {
     const fullOtp = otp.join("");
     if (fullOtp.length !== 6) return alert("Enter all 6 digits of OTP");
 
-    const res = await fetch(`${API_URL}/auth/verify-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, otp: fullOtp }),
-    });
+    try {
+      setLoading(true); // 🟡 Start loading
 
-    const data = await res.json();
-    if (res.ok) {
-      alert("Logged in successfully!");
-      window.location.href = "/redirect";
-    } else {
-      alert(data.message || "Invalid OTP");
+      const res = await fetch(`${API_URL}/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, otp: fullOtp }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Logged in successfully!");
+        window.location.href = "/redirect";
+      } else {
+        alert(data.message || "Invalid OTP");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error");
+    } finally {
+      setLoading(false); // 🟢 End loading
     }
   };
 
@@ -143,10 +166,18 @@ const Login = () => {
                   ))}
                 </div>
               </div>
-              <div className="next-btn" onClick={handleVerifyOTP}>Submit</div>
+              <div className="next-btn" onClick={handleVerifyOTP}>
+                {
+                  loading ? <CircularProgress style={{ height: 20, width: 20, margin: "-2.5px 0" }} /> : "Submit"
+                }
+              </div>
             </>
           ) : (
-            <div onClick={handleRequestOTP} className="next-btn">Continue</div>
+            <div onClick={handleRequestOTP} className="next-btn">
+              {
+                loading ? <CircularProgress style={{ height: 20, width: 20, margin: "-2.5px 0" }} /> : "Continue"
+              }
+            </div>
           )}
         </div>
 
@@ -235,6 +266,7 @@ const Container = styled.div`
   }
 
   .social-login{
+    cursor: pointer;
     width: 100%;
     height: 50px;
     background-color: #f9fafb;
@@ -294,9 +326,11 @@ const Container = styled.div`
     } 
 
     .next-btn{
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
 
       width: 100%;
       padding: 13.6px;
@@ -374,6 +408,7 @@ const Container = styled.div`
       font-size: 0.75rem;
       color: #333;
       font-weight: 200;
+      cursor: pointer;
     }
   }
 
@@ -381,6 +416,7 @@ const Container = styled.div`
 
 const BackBtn = styled.div`
   a{
+    cursor: pointer;
     height: 40px;
     aspect-ratio: 1/1;
     border: 1px solid #d1d5db;

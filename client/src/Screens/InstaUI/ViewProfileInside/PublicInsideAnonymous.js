@@ -26,11 +26,11 @@ const PublicInsideAnonymous = ({ data, username }) => {
       setLoading(true);
 
       // console.log("📤 Submitting anonymous response:", {
-        userContentId: data.id,
-        type: "anonymous",
-        ownerId: data.ownerId,
-        data: { reply: input }
-      });
+      //   userContentId: data.id,
+      //   type: "anonymous",
+      //   ownerId: data.ownerId,
+      //   data: { reply: input }
+      // });
 
       const res = await api.post("/response", {
         userContentId: data.id,

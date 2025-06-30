@@ -847,6 +847,7 @@ const MainCreate = styled.div`
             margin-top: 25px;
 
             a{
+                cursor: pointer;
                 text-decoration: none;
                 font-size: 0.85rem;
                 font-weight: 500;
