@@ -343,7 +343,7 @@ const AfterLogin = () => {
                 profileImage: imageUrl || 'default_image_url'
             };
 
-            // // console.log(basicInfoData);
+            // console.log(basicInfoData);
 
             await api.post('/basic-info', basicInfoData);
 

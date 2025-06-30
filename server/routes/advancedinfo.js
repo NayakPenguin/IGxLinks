@@ -12,8 +12,8 @@ router.post('/', authenticateJWT, async (req, res) => {
     const { localStorageData } = req.body;
     const userEmail = req.user.email; // Extracted from JWT
 
-    // // console.log("▶️ POST /advancedinfo called");
-    // // console.log("📩 Extracted userEmail from JWT:", userEmail);
+    // console.log("▶️ POST /advancedinfo called");
+    // console.log("📩 Extracted userEmail from JWT:", userEmail);
 
     if (!userEmail) {
       console.warn("❌ Missing userEmail in JWT");
@@ -21,24 +21,24 @@ router.post('/', authenticateJWT, async (req, res) => {
     }
 
     // Step 1: Check user exists in BasicInfo
-    // // console.log("🔍 Searching for user in BasicInfo...");
+    // console.log("🔍 Searching for user in BasicInfo...");
     const user = await BasicInfo.findOne({ userEmail });
 
     if (!user) {
       console.warn(`❌ No BasicInfo found for email: ${userEmail}`);
       return res.status(404).json({ message: 'User not found in BasicInfo' });
     }
-    // // console.log("✅ BasicInfo found for user:", user.userName || userEmail);
+    // console.log("✅ BasicInfo found for user:", user.userName || userEmail);
 
     // Step 2: Upsert AdvancedInfo
-    // // console.log("📦 Upserting AdvancedInfo...");
+    // console.log("📦 Upserting AdvancedInfo...");
     const advancedInfo = await AdvancedInfo.findOneAndUpdate(
       { userEmail },
       { $set: { localStorageData, lastUpdated: Date.now(), userEmail } },
       { new: true, upsert: true, runValidators: true }
     );
 
-    // // console.log("✅ AdvancedInfo saved/updated successfully");
+    // console.log("✅ AdvancedInfo saved/updated successfully");
     res.json(advancedInfo);
   } catch (err) {
     console.error("🔥 AdvancedInfo save error:", err);
