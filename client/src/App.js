@@ -92,11 +92,12 @@ const App = () => {
         <Route path="/user/mylist" element={<MyList />} />
         <Route path="/user/myjournal" element={<MyJournal />} />
 
-        <Route path="/my-reviews" element={<MyReviews />} />
-        <Route path="/votes" element={<VoteAnswer />} />
-        <Route path="/user/getvalues" element={<GetAnswers1 />} />
-        <Route path="/@mrungreat" element={<UserArya />} />
-        <Route path="/mrungreat" element={<UserArya />} />
+        {/* <Route path="/my-reviews" element={<MyReviews />} /> */}
+        {/* <Route path="/votes" element={<VoteAnswer />} /> */}
+        {/* <Route path="/user/getvalues" element={<GetAnswers1 />} /> */}
+        {/* <Route path="/@mrungreat" element={<UserArya />} /> */}
+        {/* <Route path="/mrungreat" element={<UserArya />} /> */}
+        
         <Route path="/@nayakpenguin" element={<Landing />} />
         <Route path="/nayakpenguin" element={<Landing />} />
         <Route path="/testing" element={<TemplateTesting />} />

@@ -88,12 +88,12 @@ router.get("/me", authenticateJWT, (req, res) => {
 router.get("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: NODE_ENV === "production",
-    sameSite: NODE_ENV === "production" ? "None" : "Lax",
-    domain: NODE_ENV === "production" ? ".igxl.ink" : undefined,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
   });
-  res.send({ message: "Logged out" });
+  res.status(200).json({ message: "Logged out successfully" });
 });
+
 
 // Export auth middleware too
 router.authenticateJWT = authenticateJWT;

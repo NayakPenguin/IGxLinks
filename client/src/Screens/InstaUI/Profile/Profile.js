@@ -1,103 +1,148 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import axios from 'axios';
 import ControlFooter from '../../../Components/ControlFooter';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SettingsIcon from '@material-ui/icons/Settings';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { parseRichText } from '../../Helpers/parseRichText';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 const Profile = () => {
-    const [basicItems, setBasicItems] = useState([]);
+    const API_URL = process.env.REACT_APP_API_URL;
+    const [basicItems, setBasicItems] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate(); // Initialize navigate
+
+    const fetchUserData = async () => {
+        try {
+            const storedData = localStorage.getItem("userBasicInfo");
+
+            if (storedData) {
+                const parsed = JSON.parse(storedData);
+                setBasicItems(parsed.formData || parsed);
+                setLoading(false);
+                return;
+            }
+
+            const res = await axios.get(`${API_URL}/basic-info/`, {
+                withCredentials: true
+            });
+
+            if (res.data) {
+                setBasicItems(res.data);
+                localStorage.setItem("userBasicInfo", JSON.stringify(res.data));
+            }
+        } catch (err) {
+            console.error("Failed to fetch user data:", err);
+            setError(err.message || 'Failed to load profile data');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await fetch(`${API_URL}/auth/logout`, {
+                method: "GET",
+                credentials: "include", // Important to include cookies
+            });
+            // Optionally redirect or reset state
+            window.location.href = "/login"; // or navigate("/")
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
 
     useEffect(() => {
-        const storedData = localStorage.getItem("userBasicInfo");
-        if (storedData) {
-            try {
-                const parsed = JSON.parse(storedData);
-                setBasicItems(parsed.formData);
-                // console.log(parsed.formData);
-            } catch (e) {
-                console.error("Failed to parse userBasicInfo", e);
-            }
-        }
+        fetchUserData();
     }, []);
+
+    if (loading) {
+        return (
+            <Container>
+                <div className="page-name">Your Profile</div>
+                <div className="loading-message">Loading your profile...</div>
+                <ControlFooter />
+            </Container>
+        );
+    }
+
+    if (error) {
+        return (
+            <Container>
+                <div className="page-name">Your Profile</div>
+                <div className="error-message">{error}</div>
+                <ControlFooter />
+            </Container>
+        );
+    }
 
     return (
         <Container>
             <div className="page-name">Your Profile</div>
 
-            <div className="main-content">
-                <div className="top-content">
-                    <div className="logo-x-dp">
-                        <img src={basicItems.profileImage ? basicItems.profileImage : "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"} alt="" />
+            {basicItems && (
+                <div className="main-content">
+                    <div className="top-content">
+                        <div className="logo-x-dp">
+                            <img
+                                src={basicItems.profileImage || "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png"}
+                                alt="Profile"
+                            />
+                        </div>
+                        <div className="name">{basicItems.name || 'Your Name'}</div>
+                        <div className="user-name">@{basicItems.userName || 'username'}</div>
                     </div>
-                    <div className="name">Riya Bhowmik</div>
-                    <div className="user-name">@RiyaPenguin</div>
-                </div>
-                <div className="content">
-                    <div className="stat">
-                        <div className="stat-value">1238</div>
-                        <div className="stat-name">Subscribers</div>
-                    </div>
-                    <div className="mid-circle"></div>
-                    <div className="stat">
-                        <div className="stat-value">89</div>
-                        <div className="stat-name">Subscribed</div>
-                    </div>
-                </div>
-                <div className="content">
-                    <div className="btn">Share</div>
-                    <div className="btn">Edit Profile</div>
-                </div>
-                <div className="settings">
-                    <div className="title">Settings</div>
-                    <div className="setting-one">
-                        <div className="text">Tutorial / Onboarding Guide</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Change Password</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Change Username</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Update Page</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Email Notification Preferences</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Contact Support</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Report a Bug</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Terms & Conditions</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Privacy Policy</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one">
-                        <div className="text">Share your Stats</div>
-                        <ChevronRightIcon/>
-                    </div>
-                    <div className="setting-one logout">
-                        <div className="text">Logout</div>
-                    </div>
-                </div>
-            </div>
 
+                    <div className="content">
+                        <div className="stat">
+                            <div className="stat-value">{basicItems.subscribers || '0'}</div>
+                            <div className="stat-name">Subscribers</div>
+                        </div>
+                        <div className="mid-circle"></div>
+                        <div className="stat">
+                            <div className="stat-value">{basicItems.subscribed || '0'}</div>
+                            <div className="stat-name">Subscribed</div>
+                        </div>
+                    </div>
+
+                    <div className="content">
+                        <div className="btn">Share</div>
+                        <div className="btn">Edit Profile</div>
+                    </div>
+
+                    <div className="settings">
+                        <div className="title">Settings</div>
+                        {[
+                            'Tutorial / Onboarding Guide',
+                            'Change Password',
+                            'Change Username',
+                            'Update Page',
+                            'Email Notification Preferences',
+                            'Contact Support',
+                            'Report a Bug',
+                            'Terms & Conditions',
+                            'Privacy Policy',
+                            'Share your Stats'
+                        ].map((item) => (
+                            <div className="setting-one" key={item}>
+                                <div className="text">{item}</div>
+                                <ChevronRightIcon />
+                            </div>
+                        ))}
+                        <div
+                            className="setting-one logout"
+                            onClick={handleLogout}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <div className="text">Logout</div>
+                        </div>
+                    </div>
+                </div>
+            )}
             <ControlFooter />
         </Container>
     );
