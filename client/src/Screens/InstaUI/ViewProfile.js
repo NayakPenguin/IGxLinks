@@ -195,7 +195,7 @@ const ViewProfile = () => {
             {
                 profileData ?
                 <div className="main-content">
-                    <Subscribe>
+                    {/* <Subscribe>
                         {
                             subscribed ? (
                                 <div className="subscribe-btn subscribed" onClick={() => handleSubscription()}>
@@ -207,7 +207,7 @@ const ViewProfile = () => {
                                 </div>
                             )
                         }
-                    </Subscribe>
+                    </Subscribe> */}
                     {
                         showAd == true &&
                         <CreateYourPageAd>

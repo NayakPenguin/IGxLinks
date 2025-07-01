@@ -41,7 +41,7 @@ const Landing = () => {
                 <img src={samplePage1} alt="" />
                 <div className="link-to-profile">
                     <img src={logo2} alt="" />
-                    <div className="username">igxl.ink/@nayakpenguin</div>
+                    <a href="/p/nayakpenguin" target="_blank" className="username">igxl.ink/p/nayakpenguin</a>
                     <CallMadeIcon />
                 </div>
             </div>

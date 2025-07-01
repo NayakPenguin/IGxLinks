@@ -278,8 +278,7 @@ const ViewChanges = () => {
             <Publish />
 
             <div className="main-content">
-                <Subscribe>
-                    {/*  */}
+                {/* <Subscribe>
                     {
                         subscribed ? (
                             <div className="subscribe-btn subscribed" onClick={() => handleSubscription()}>
@@ -291,7 +290,7 @@ const ViewChanges = () => {
                             </div>
                         )
                     }
-                </Subscribe>
+                </Subscribe> */}
                 <BackBtn>
                     <a href="/page/create">
                         <ChevronLeftIcon />
