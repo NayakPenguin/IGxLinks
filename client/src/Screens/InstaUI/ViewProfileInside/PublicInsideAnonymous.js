@@ -36,7 +36,7 @@ const PublicInsideAnonymous = ({ data, username }) => {
         userContentId: data.id,
         type: "anonymous",
         ownerId: username,
-        data: { reply: input }
+        data: { [data.question]: input }
       });
 
       // console.log("✅ Response submitted:", res.data);

@@ -165,7 +165,6 @@ const ViewProfile = () => {
         setNotificationModelOpen(true);
     }
 
-
     return (
         <Container>
             {
@@ -220,6 +219,7 @@ const ViewProfile = () => {
                             </a>
                         </CreateYourPageAd>
                     }
+                    
                     <div className="user-data">
                         <div className="logo-x-dp">
                             <img src={profileData.basicInfo.profileImage} alt="" />
@@ -314,7 +314,41 @@ const ViewProfile = () => {
                                         );
 
                                     case "Anonymous Replies":
+                                        return (
+                                            <a
+                                                key={id}
+                                                href={`/p/${profileData.basicInfo.userName}/${id}`}
+                                                className="link1"
+                                                onClick={handleClick}
+                                            >
+                                                <div>{parseRichText(title)}</div>
+                                                <div className="link-circle">
+                                                    <ChevronRightIcon />
+                                                </div>
+                                            </a>
+                                        );
                                     case "Meeting Scheduler":
+                                        return (
+                                            <a
+                                                key={id}
+                                                href={`/p/${profileData.basicInfo.userName}/${id}`}
+                                                className="link1"
+                                                onClick={handleClick}
+                                            >
+                                                <div>{parseRichText(title)}</div>
+                                                <div className="link-circle">
+                                                    {
+                                                        type === "Anonymous Replies" ? (
+                                                            <svg /* [SVG ICON HERE] */ />
+                                                        ) : type === "Meeting Scheduler" ? (
+                                                            <EventAvailableIcon />
+                                                        ) : (
+                                                            <ChevronRightIcon />
+                                                        )
+                                                    }
+                                                </div>
+                                            </a>
+                                        );
                                     default:
                                         return (
                                             <a
@@ -481,6 +515,7 @@ const Container = styled.div`
                 align-items: center; 
                 justify-content: center;
                 flex-wrap: wrap;
+                margin-bottom: -20px;
 
                 gap: 10px;
 
@@ -1147,7 +1182,7 @@ const NotificationModelConatiner = styled.div`
 
 const PinnedAnnouncement = styled.div`
     width: 100%;
-    margin-top: 100px;
+    margin-top: 120px;
     margin-bottom: -20px;
     padding: 15px;
     background-color: #363636;
