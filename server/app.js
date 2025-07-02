@@ -21,8 +21,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
-app.use(express.json({ limit: '100mb' })); // For JSON bodies
-app.use(express.urlencoded({ limit: '100mb', extended: true })); // For URL-encoded
+app.use(express.json({ limit: '10mb' })); // For JSON bodies
+app.use(express.urlencoded({ limit: '10mb', extended: true })); // For URL-encoded
+
+console.log("Connecting to MongoDB:", process.env.MONGO_URI);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, {
@@ -47,6 +49,14 @@ app.use('/usernames', require('./routes/usernames'));
 // Root test route
 app.get("/", (req, res) => {
   res.send("🚀 Backend is running!");
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("❌ Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("❌ Unhandled Rejection:", reason);
 });
 
 // Start server
