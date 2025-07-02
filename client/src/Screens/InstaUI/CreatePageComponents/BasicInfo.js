@@ -53,11 +53,11 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const [imageSrc, setImageSrc] = useState(null);
     const [crop, setCrop] = useState({
         unit: '%',
-        width: 25,
-        height: 25,
+        width: 50,
+        height: 50,
         aspect: 1,
-        x: 37.5,
-        y: 37.5
+        x: 25,
+        y: 25
     });
     const [completedCrop, setCompletedCrop] = useState(null);
     const imageRef = useRef(null);
@@ -323,18 +323,23 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
 
     const onImageLoad = (e) => {
         const { width, height } = e.currentTarget;
+
         const crop = makeAspectCrop(
             {
                 unit: "px",
-                width: MIN_DIMENSION,
+                width: MIN_DIMENSION, // e.g., 200 or similar
             },
-            ASPECT_RATIO,
+            ASPECT_RATIO, // e.g., 1 for square
             width,
             height
         );
+
         const centeredCrop = centerCrop(crop, width, height);
+
         setCrop(centeredCrop);
+        setCompletedCrop(centeredCrop); 
     };
+
 
     const renderInput = (field, label, placeholder = "") => (
         <div className="input-container">

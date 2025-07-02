@@ -293,19 +293,24 @@ const AfterLogin = () => {
         }, 'image/jpeg', 0.9); // 0.9 quality
     };
 
+
     const onImageLoad = (e) => {
         const { width, height } = e.currentTarget;
+
         const crop = makeAspectCrop(
             {
                 unit: "px",
-                width: MIN_DIMENSION,
+                width: MIN_DIMENSION, // e.g., 200 or similar
             },
-            ASPECT_RATIO,
+            ASPECT_RATIO, // e.g., 1 for square
             width,
             height
         );
+
         const centeredCrop = centerCrop(crop, width, height);
+
         setCrop(centeredCrop);
+        setCompletedCrop(centeredCrop); // extra line added
     };
 
     const handleSubmit = async () => {

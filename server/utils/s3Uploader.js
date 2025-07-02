@@ -39,7 +39,7 @@ const uploadToS3 = async (buffer, originalName, mimetype) => {
       .toBuffer();
   }
 
-  console.log(finalBuffer.length);
+  // console.log(finalBuffer.length / 1024);
 
   const fileName = `profile-pictures/${Date.now()}-${originalName.replace(/\s+/g, '_')}`;
 
