@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import SmsOutlinedIcon from "@material-ui/icons/SmsOutlined";
 import { parseRichText } from "../../Helpers/parseRichText";
 import PublicBackControl from "./PublicBackControl";
 import axios from "axios";
+import CustomAlert from "../../../Components/CustomAlert";
 
 // Axios instance with credentials
 const API_URL = process.env.REACT_APP_API_URL;
@@ -20,6 +21,10 @@ const api = axios.create({
 const PublicInsideForm = ({ data, username }) => {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const [alertMessage, setAlertMessage] = useState("");
+  const [toggle, setToggle] = useState(0);
+  const [showContainer, setShowContainer] = useState(false);
 
   const handleInputChange = (title, value) => {
     setAnswers((prev) => ({ ...prev, [title]: value }));
@@ -42,18 +47,29 @@ const PublicInsideForm = ({ data, username }) => {
       });
 
       // console.log("✅ Response submitted", response.data);
-      alert("Response submitted!");
+      // alert("Response submitted!");
       setAnswers({});
+      setAlertMessage("Your response has been successfully shared!");
+      setToggle(toggle + 1);
     } catch (err) {
       console.error("❌ Failed to submit response", err);
-      alert("Failed to send response");
+      setAlertMessage("Failed to send response!");
+      setToggle(toggle + 1);
+      // alert("Failed to send response");
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (alertMessage) {
+      setShowContainer(true);
+    }
+  }, [toggle, alertMessage]);
+
   return (
     <Container>
+      {showContainer && <CustomAlert color="dark" text={alertMessage} setShowContainer={setShowContainer} />}
       <div className="main-content">
         <PublicBackControl username={username} />
         <div className="title">{parseRichText(data.titleInside)}</div>

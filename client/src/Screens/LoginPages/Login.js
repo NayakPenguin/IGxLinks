@@ -145,7 +145,9 @@ const Login = () => {
   };
 
   useEffect(() => {
-    setShowContainer(true);
+    if(alertMessage){
+      setShowContainer(true);
+    }
   }, [toggle, alertMessage]);
 
   useEffect(() => {

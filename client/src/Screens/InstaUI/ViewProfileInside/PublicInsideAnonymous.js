@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { parseRichText } from "../../Helpers/parseRichText";
 import PublicBackControl from "./PublicBackControl";
 import axios from "axios";
+import CustomAlert from "../../../Components/CustomAlert";
 
 // Axios instance
 const API_URL = process.env.REACT_APP_API_URL;
@@ -18,6 +19,10 @@ const PublicInsideAnonymous = ({ data, username }) => {
   const [input, setInput] = useState("");
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [alertMessage, setAlertMessage] = useState("");
+  const [toggle, setToggle] = useState(0);
+  const [showContainer, setShowContainer] = useState(false);
 
   const handleReply = async () => {
     if (input.trim() === "") return;
@@ -44,16 +49,26 @@ const PublicInsideAnonymous = ({ data, username }) => {
       // Optionally update local replies UI
       setReplies([input, ...replies]);
       setInput("");
+      setAlertMessage("Your response has been successfully shared!");
+      setToggle(toggle + 1);
     } catch (err) {
       console.error("❌ Failed to submit response:", err);
-      alert("Failed to send response");
+      setAlertMessage("Failed to send response!");
+      setToggle(toggle + 1);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+      if(alertMessage){
+        setShowContainer(true);
+      }
+    }, [toggle, alertMessage]);
+
   return (
     <Container>
+      {showContainer && <CustomAlert color="dark" text={alertMessage} setShowContainer={setShowContainer} />}
       <div className="main-content">
         <PublicBackControl username={username} />
         <div className="question">
@@ -75,11 +90,11 @@ const PublicInsideAnonymous = ({ data, username }) => {
 
         <div className="extra-btns">
           <div className="svg-frd">
-            <svg aria-label="Share" className="x1lliihq x1n2onr6 xyb1xck" fill="currentColor" height="24" viewBox="0 0 24 24" width="24">
+            {/* <svg aria-label="Share" className="x1lliihq x1n2onr6 xyb1xck" fill="currentColor" height="24" viewBox="0 0 24 24" width="24">
               <title>Share</title>
               <line fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" x1="22" x2="9.218" y1="3" y2="10.083" />
               <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
-            </svg>
+            </svg> */}
           </div>
         </div>
       </div>

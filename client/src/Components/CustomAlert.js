@@ -16,7 +16,7 @@ const CustomAlert = ({color, text, setShowContainer}) => {
   )
 }
 
-export default CustomAlert
+export default CustomAlert;
 
 const Container = styled.div`
     .dark-container{
@@ -80,7 +80,7 @@ const Container = styled.div`
     
         .dark{
             .top-section{
-                background-color:rgb(10, 10, 10);
+                background-color: #252323;
                 
                 .text{
                     color: #fff;
@@ -90,7 +90,7 @@ const Container = styled.div`
             .bottom-section{
                 border-top: 1px solid rgb(10, 10, 10);
                 
-                background-color: #333;
+                background-color: #3c3c3c;
                 color: #fff;
             }
         }
