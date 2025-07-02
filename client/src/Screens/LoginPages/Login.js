@@ -13,7 +13,9 @@ const Login = () => {
     // console.log(API_URL);
   }, [API_URL]);
 
-
+  const [alertMessage, setAlertMessage] = useState("");
+  const [toggle, setToggle] = useState(0)
+  const [showContainer, setShowContainer] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(Array(6).fill(""));
@@ -69,10 +71,14 @@ const Login = () => {
   };
 
   const handleRequestOTP = async () => {
-    if (!email) return alert("Enter your email");
+    if (!email) {
+      setAlertMessage("Enter your email");
+      setToggle(toggle + 1);
+      return;
+    }
 
     try {
-      setLoading(true); // 🟡 Start loading
+      setLoading(true);
 
       const res = await fetch(`${API_URL}/auth/request-otp`, {
         method: "POST",
@@ -83,25 +89,32 @@ const Login = () => {
       const data = await res.json();
 
       if (res.ok) {
-        alert("OTP sent to your email");
+        setAlertMessage("OTP sent to your email");
+        setToggle(toggle + 1);
         setShowOTP(true);
       } else {
-        alert(data.message || "Error sending OTP");
+        setAlertMessage(data.message || "Error sending OTP");
       }
     } catch (err) {
-      alert("Network error");
       console.error(err);
+      setAlertMessage("Network error");
+      setToggle(toggle + 1);
     } finally {
-      setLoading(false); // 🟢 Stop loading
+      setLoading(false);
     }
   };
 
+
   const handleVerifyOTP = async () => {
     const fullOtp = otp.join("");
-    if (fullOtp.length !== 6) return alert("Enter all 6 digits of OTP");
+    if (fullOtp.length !== 6) {
+      setToggle(toggle + 1);
+      setAlertMessage("Enter all 6 digits of OTP");
+      return;
+    }
 
     try {
-      setLoading(true); // 🟡 Start loading
+      setLoading(true);
 
       const res = await fetch(`${API_URL}/auth/verify-otp`, {
         method: "POST",
@@ -113,18 +126,27 @@ const Login = () => {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Logged in successfully!");
-        window.location.href = "/redirect";
+        // setAlertMessage("Logged in successfully!");
+        // setToggle(toggle + 1);
+        setTimeout(() => {
+          window.location.href = "/redirect";
+        }, 1000);
       } else {
-        alert(data.message || "Invalid OTP");
+        setAlertMessage(data.message || "Invalid OTP");
+        setToggle(toggle + 1);
       }
     } catch (err) {
       console.error(err);
-      alert("Network error");
+      setAlertMessage("Network error");
+      setToggle(toggle + 1);
     } finally {
-      setLoading(false); // 🟢 End loading
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setShowContainer(true);
+  }, [toggle, alertMessage]);
 
   useEffect(() => {
     fetch(`${API_URL}/auth/me`, {
@@ -141,7 +163,7 @@ const Login = () => {
 
   return (
     <Container>
-      {/* <CustomAlert color={"light"}/> */}
+      {showContainer && <CustomAlert color="light" text={alertMessage} setShowContainer={setShowContainer} />}
       <BackBtn>
         <a href="/"><ChevronLeftIcon /></a>
       </BackBtn>
