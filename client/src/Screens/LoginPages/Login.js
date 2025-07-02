@@ -5,6 +5,7 @@ import logo2 from "../../Images/logo-bg.png";
 import InfoIcon from '@material-ui/icons/Info';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import { CircularProgress } from "@material-ui/core";
+import CustomAlert from "../../Components/CustomAlert";
 
 const Login = () => {
   const API_URL = process.env.REACT_APP_API_URL;
@@ -28,6 +29,26 @@ const Login = () => {
 
     if (value && index < 5) inputRefs.current[index + 1].focus();
     if (!value && index > 0) inputRefs.current[index - 1].focus();
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const paste = e.clipboardData.getData('text').trim();
+
+    if (!/^\d{6}$/.test(paste)) return; // Only allow 6-digit numeric OTP
+
+    const newOtp = paste.split('');
+    setOtp(newOtp);
+
+    newOtp.forEach((digit, idx) => {
+      if (inputRefs.current[idx]) {
+        inputRefs.current[idx].value = digit;
+      }
+    });
+
+    // Move focus to last input
+    const lastFilled = inputRefs.current[newOtp.length - 1];
+    if (lastFilled) lastFilled.focus();
   };
 
   const handleGoogleLogin = () => {
@@ -120,6 +141,7 @@ const Login = () => {
 
   return (
     <Container>
+      {/* <CustomAlert color={"light"}/> */}
       <BackBtn>
         <a href="/"><ChevronLeftIcon /></a>
       </BackBtn>
@@ -162,6 +184,7 @@ const Login = () => {
                       ref={(el) => (inputRefs.current[index] = el)}
                       value={otp[index]}
                       onChange={(e) => handleChange(e, index)}
+                      onPaste={index === 0 ? handlePaste : undefined}
                     />
                   ))}
                 </div>

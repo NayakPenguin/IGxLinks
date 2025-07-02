@@ -187,6 +187,8 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const handleSaveCroppedImage = async () => {
         if (!completedCrop || !imageRef.current) return;
 
+        setCropModalOpen(false);
+
         const image = imageRef.current;
         const canvas = document.createElement('canvas');
         const scaleX = image.naturalWidth / image.width;
@@ -415,6 +417,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
             {cropModalOpen && (
                 <ModalOverlay>
                     <ModalContent>
+                        <div className="info-text">Adjust and crop your profile picture</div>
                         {imageSrc && (
                             <div style={{ width: '100%', maxWidth: '500px' }}>
                                 <ReactCrop
@@ -1187,13 +1190,19 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background: white;
+  background: #372f2f;
   padding: 20px;
   border-radius: 8px;
   max-width: 90%;
   max-height: 90%;
   overflow: auto;
   z-index: 1200;
+
+  .info-text{
+    font-size: 0.85rem;
+    font-weight: 200;
+    margin-bottom: 10px;
+  }
 `;
 
 const ModalActions = styled.div`
@@ -1204,10 +1213,13 @@ const ModalActions = styled.div`
   z-index: 1200;
 
   button {
-    padding: 8px 16px;
+    padding: 6px 16px;
     border: none;
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #333;
   }
 
   button:last-child {
