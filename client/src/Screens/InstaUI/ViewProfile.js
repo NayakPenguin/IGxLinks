@@ -1241,12 +1241,19 @@ const fadeIn = keyframes`
 `;
 
 const CreateYourPageAd = styled.div`
-  .type1 {
     position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    bottom: 24px;
+    width: 100vw;
+    left: 0;
+    z-index: 1000;
+
+  .type1 {
     height: 60px;
     width: 80%;
-    bottom: 24px;
-    left: 10%;
+    max-width: 500px;
     z-index: 1000;
     border-radius: 100px;
 
@@ -1311,10 +1318,9 @@ const CreateYourPageAd = styled.div`
   }
 
    .close {
-    position: fixed;
+    position: absolute;
     height: 45px;
     aspect-ratio: 1/1;
-    bottom: 31.5px;
     right: 7.5%;
     z-index: 1001;
     border-radius: 100px;
@@ -1326,4 +1332,14 @@ const CreateYourPageAd = styled.div`
     opacity: 0;
     animation: ${fadeIn} 0.1s ease-in 6.5s forwards;
   }
+
+  @media (min-width: 625px) {
+    /* 625px = 500px / 0.8 assuming .type1 is 80% width */
+
+    .close {
+        right: auto;
+        left: calc(50vw + 220px);
+    }
+  }
+
 `;

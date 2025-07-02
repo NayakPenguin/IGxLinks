@@ -1,10 +1,12 @@
 // utils/s3Uploader.js
 
-const { S3Client } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const multer = require('multer');
-const multerS3 = require('multer-s3');
+const sharp = require('sharp');
+const path = require('path');
 require('dotenv').config();
 
+// Create S3 client
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
@@ -13,20 +15,45 @@ const s3Client = new S3Client({
   },
 });
 
+// Use memory storage to allow compression before uploading
 const upload = multer({
-  storage: multerS3({
-    s3: s3Client, // ✅ use S3Client (v3), NOT S3 from v2
-    bucket: process.env.AWS_BUCKET_NAME,
-    // acl: 'public-read',
-    metadata: (req, file, cb) => {
-      cb(null, { fieldName: file.fieldname });
-    },
-    key: (req, file, cb) => {
-      const fileName = `profile-pictures/${Date.now()}-${file.originalname}`;
-      cb(null, fileName);
-    },
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 }, // Max 5MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB upload max
 });
 
-module.exports = upload;
+// Upload compressed image to S3
+const uploadToS3 = async (buffer, originalName, mimetype) => {
+  const compressedBuffer = await sharp(buffer)
+    .resize({ width: 512 }) // Resize to safe dimensions
+    .jpeg({ quality: 60 }) // Compress: tune quality down
+    .toBuffer();
+
+  // Ensure under 100KB (approximate)
+  let finalBuffer = compressedBuffer;
+  let quality = 60;
+  while (finalBuffer.length > 100 * 1024 && quality > 20) {
+    quality -= 10;
+    finalBuffer = await sharp(buffer)
+      .resize({ width: 512 })
+      .jpeg({ quality })
+      .toBuffer();
+  }
+
+  console.log(finalBuffer.length);
+
+  const fileName = `profile-pictures/${Date.now()}-${originalName.replace(/\s+/g, '_')}`;
+
+  const command = new PutObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: fileName,
+    Body: finalBuffer,
+    ContentType: mimetype,
+  });
+
+  await s3Client.send(command);
+
+  const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+  return imageUrl;
+};
+
+module.exports = { upload, uploadToS3 };

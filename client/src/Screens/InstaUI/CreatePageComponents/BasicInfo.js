@@ -22,6 +22,14 @@ const MIN_DIMENSION = 150;
 const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const API_URL = process.env.REACT_APP_API_URL;
 
+    const api = axios.create({
+        baseURL: API_URL,
+        withCredentials: true,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
     const [dBdata, setDBdata] = useState(null);
 
     const [basicData, setBasicData] = useState({
@@ -45,11 +53,11 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
     const [imageSrc, setImageSrc] = useState(null);
     const [crop, setCrop] = useState({
         unit: '%',
-        width: 50,
-        height: 50,
+        width: 25,
+        height: 25,
         aspect: 1,
-        x: 25,
-        y: 25
+        x: 37.5,
+        y: 37.5
     });
     const [completedCrop, setCompletedCrop] = useState(null);
     const imageRef = useRef(null);
@@ -155,10 +163,6 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         const updatedData = { ...basicData, [field]: value };
         setBasicData(updatedData);
         handleSaveLocally();
-        // await axios.post(`${API_URL}/basic-info/`, updatedData, {
-        //     withCredentials: true
-        // });
-        // setDiffCreated(true);
     };
 
     const handleFileChange = (e) => {
@@ -180,7 +184,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
         setCompletedCrop(crop);
     };
 
-    const handleSaveCroppedImage = () => {
+    const handleSaveCroppedImage = async () => {
         if (!completedCrop || !imageRef.current) return;
 
         const image = imageRef.current;
@@ -204,20 +208,30 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
             completedCrop.height
         );
 
-        canvas.toBlob((blob) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = () => {
-                const updatedData = { ...basicData, profileImage: reader.result };
+        canvas.toBlob(async (croppedImageBlob) => {
+            if (!croppedImageBlob) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('profile', croppedImageBlob, 'profile.jpg');
+
+                const uploadResponse = await api.post('/api/upload-profile-picture', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                const imageUrl = uploadResponse.data.imageUrl;
+
+                const updatedData = { ...basicData, profileImage: imageUrl };
                 setBasicData(updatedData);
-                // axios.post(`${API_URL}/basic-info/`, updatedData, {
-                //     withCredentials: true
-                // });
                 setCropModalOpen(false);
-                // setDiffCreated(true);
-            };
+            } catch (error) {
+                console.error("Image upload failed:", error);
+            }
         }, 'image/jpeg', 1);
     };
+
 
     const handleInputChange = (platformId, value) => {
         // Check if this platform already exists in socialLinks
