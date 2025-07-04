@@ -79,11 +79,11 @@ const Engagement = () => {
 
                                 {containerClass === "anonymous-container" && (
                                     <div className="stats">
-                                        <div className="stat-1">
+                                        {/* <div className="stat-1">
                                             <div className="icon"></div>
                                             <div className="stat">Total Responses : </div>
                                             <div className="stat-value">91</div>
-                                        </div>
+                                        </div> */}
                                         {/* <div className="stat-1">
                                             <div className="icon"></div>
                                             <div className="stat">Last 30 Days : </div>
@@ -98,11 +98,11 @@ const Engagement = () => {
 
                                 {containerClass === "folder-container" && (
                                     <div className="stats">
-                                        <div className="stat-1">
+                                        {/* <div className="stat-1">
                                             <div className="icon"></div>
                                             <div className="stat">Total Responses : </div>
                                             <div className="stat-value">91</div>
-                                        </div>
+                                        </div> */}
                                         {/* <div className="stat-1">
                                             <div className="icon"></div>
                                             <div className="stat">Last 30 Days : </div>
@@ -113,11 +113,11 @@ const Engagement = () => {
 
                                 {containerClass === "form-container" && (
                                     <div className="stats">
-                                        <div className="stat-1">
+                                        {/* <div className="stat-1">
                                             <div className="icon"></div>
                                             <div className="stat">Total Responses : </div>
                                             <div className="stat-value">91</div>
-                                        </div>
+                                        </div> */}
                                         {/* <div className="stat-1">
                                             <div className="icon"></div>
                                             <div className="stat">Last 30 Days : </div>
@@ -187,8 +187,9 @@ const Container = styled.div`
 
         .container-basic{
             padding: 20px;
-            /* border: 1px solid #343434; */
-            background-color: #333;
+            border: 1px solid #343434;
+            /* background-color: #333; */
+            background-color: #121212;
             margin-bottom: 20px;
             font-size: 0.9rem;
             font-weight: 300;
@@ -199,12 +200,15 @@ const Container = styled.div`
         .bold-border{
             margin-top: 20px;
             margin-bottom: 20px;
-            background-color: transparent;
-            padding: 0px;
+            background-color: #121212;
+            padding: 10px;
             border: none;
-            font-size: 1.15rem;
+            font-size: 1rem;
             font-weight: 500;
             border-radius: 10px;
+
+            border: 1px solid #343434;
+            text-align: center;
         }
 
         .stat-1{
@@ -236,7 +240,7 @@ const Container = styled.div`
             width: 100%;
             border-radius: 10px;
             margin-top: 25px;
-            background-color: #564f4f;
+            background-color: #1f1f1f;
             /* border: 1px solid #fff; */
             padding: 15px;
             color: white;
