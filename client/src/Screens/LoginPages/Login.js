@@ -14,7 +14,7 @@ const Login = () => {
   }, [API_URL]);
 
   const [alertMessage, setAlertMessage] = useState("");
-  const [toggle, setToggle] = useState(0)
+  const [toggle, setToggle] = useState(0);
   const [showContainer, setShowContainer] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
   const [email, setEmail] = useState("");

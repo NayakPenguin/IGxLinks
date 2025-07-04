@@ -53,89 +53,100 @@ const Engagement = () => {
                             break;
                     }
 
-                    return (
-                        <div className={containerClass == "subgroup-container" ? "container-basic bold-border" : "container-basic"} key={item.id}>
-                            <div className="title">{parseRichText(item.title)}</div>
-                            {
-                                containerClass == "redirect-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Clicks : </div>
-                                        <div className="stat-value">1,782</div>
+                    if (
+                        containerClass === "anonymous-container" ||
+                        containerClass === "form-container" ||
+                        containerClass === "subgroup-container"
+                    ) {
+                        return (
+                            <div className={containerClass === "subgroup-container" ? "container-basic bold-border" : "container-basic"} key={item.id}>
+                                <div className="title">{parseRichText(item.title)}</div>
+
+                                {containerClass === "redirect-container" && (
+                                    <div className="stats">
+                                        <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Total Clicks : </div>
+                                            <div className="stat-value">1,782</div>
+                                        </div>
+                                        {/* <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Last 30 Days : </div>
+                                            <div className="stat-value">258</div>
+                                        </div> */}
                                     </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">258</div>
+                                )}
+
+                                {containerClass === "anonymous-container" && (
+                                    <div className="stats">
+                                        <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Total Responses : </div>
+                                            <div className="stat-value">91</div>
+                                        </div>
+                                        {/* <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Last 30 Days : </div>
+                                            <div className="stat-value">23</div>
+                                        </div> */}
+                                        <div className="view-responses">
+                                            <div className="text">View All Responses</div>
+                                            <ChevronRightIcon />
+                                        </div>
                                     </div>
-                                </div>
-                            }
-                            {
-                                containerClass == "anonymous-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Responses : </div>
-                                        <div className="stat-value">91</div>
+                                )}
+
+                                {containerClass === "folder-container" && (
+                                    <div className="stats">
+                                        <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Total Responses : </div>
+                                            <div className="stat-value">91</div>
+                                        </div>
+                                        {/* <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Last 30 Days : </div>
+                                            <div className="stat-value">23</div>
+                                        </div> */}
                                     </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">23</div>
+                                )}
+
+                                {containerClass === "form-container" && (
+                                    <div className="stats">
+                                        <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Total Responses : </div>
+                                            <div className="stat-value">91</div>
+                                        </div>
+                                        {/* <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Last 30 Days : </div>
+                                            <div className="stat-value">23</div>
+                                        </div> */}
+                                        <div className="view-responses">
+                                            <div className="text">View All Responses</div>
+                                            <ChevronRightIcon />
+                                        </div>
                                     </div>
-                                    <div className="view-responses">
-                                        <div className="text">View All Responses</div>
-                                        <ChevronRightIcon/>
+                                )}
+
+                                {containerClass === "write-content-container" && (
+                                    <div className="stats">
+                                        <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Total Views : </div>
+                                            <div className="stat-value">3921</div>
+                                        </div>
+                                        {/* <div className="stat-1">
+                                            <div className="icon"></div>
+                                            <div className="stat">Last 30 Days : </div>
+                                            <div className="stat-value">839</div>
+                                        </div> */}
                                     </div>
-                                </div>
-                            }
-                            {
-                                containerClass == "folder-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Responses : </div>
-                                        <div className="stat-value">91</div>
-                                    </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">23</div>
-                                    </div>
-                                </div>
-                            }
-                            {
-                                containerClass == "form-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Responses : </div>
-                                        <div className="stat-value">91</div>
-                                    </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">23</div>
-                                    </div>
-                                    <div className="view-responses">
-                                        <div className="text">View All Responses</div>
-                                        <ChevronRightIcon/>
-                                    </div>
-                                </div>
-                            }
-                            {
-                                containerClass == "write-content-container" && <div className="stats">
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Total Views : </div>
-                                        <div className="stat-value">3921</div>
-                                    </div>
-                                    <div className="stat-1">
-                                        <div className="icon"></div>
-                                        <div className="stat">Last 30 Days : </div>
-                                        <div className="stat-value">839</div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    );
+                                )}
+                            </div>
+                        );
+                    }
                 })}
             </div>
 
@@ -176,7 +187,8 @@ const Container = styled.div`
 
         .container-basic{
             padding: 20px;
-            border: 1px solid #343434;
+            /* border: 1px solid #343434; */
+            background-color: #333;
             margin-bottom: 20px;
             font-size: 0.9rem;
             font-weight: 300;
@@ -224,8 +236,8 @@ const Container = styled.div`
             width: 100%;
             border-radius: 10px;
             margin-top: 25px;
-            background-color: transparent;
-            border: 1px solid #fff;
+            background-color: #564f4f;
+            /* border: 1px solid #fff; */
             padding: 15px;
             color: white;
             text-decoration: none;

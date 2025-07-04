@@ -25,16 +25,27 @@ const PublicInsideForm = ({ data, username }) => {
   const [alertMessage, setAlertMessage] = useState("");
   const [toggle, setToggle] = useState(0);
   const [showContainer, setShowContainer] = useState(false);
+  const [alreadyResponded, setAlreadyResponded] = useState(false);
+
+  const key = `responded_${username}_${data.id}`;
+
+  useEffect(() => {
+    if (localStorage.getItem(key) === "true") {
+      setAlreadyResponded(true);
+    }
+  }, [key]);
 
   const handleInputChange = (title, value) => {
     setAnswers((prev) => ({ ...prev, [title]: value }));
   };
 
   const handleSend = async () => {
+    if (alreadyResponded) return;
+
     try {
       setLoading(true);
 
-      const response = await api.post("/response", {
+      await api.post("/response", {
         userContentId: data.id,
         type: "form",
         ownerId: username,
@@ -46,16 +57,15 @@ const PublicInsideForm = ({ data, username }) => {
         }
       });
 
-      // console.log("✅ Response submitted", response.data);
-      // alert("Response submitted!");
       setAnswers({});
       setAlertMessage("Your response has been successfully shared!");
       setToggle(toggle + 1);
+      localStorage.setItem(key, "true");
+      setAlreadyResponded(true);
     } catch (err) {
       console.error("❌ Failed to submit response", err);
       setAlertMessage("Failed to send response!");
       setToggle(toggle + 1);
-      // alert("Failed to send response");
     } finally {
       setLoading(false);
     }
@@ -75,42 +85,53 @@ const PublicInsideForm = ({ data, username }) => {
         <div className="title">{parseRichText(data.titleInside)}</div>
         <div className="desc">{parseRichText(data.description)}</div>
 
-        {data.formItems.map((item, key) => {
-          if (["Text", "Email", "Number"].includes(item.type)) {
-            return (
-              <div key={key} className="input-container">
-                <div className="label">{item.title}</div>
-                <input
-                  className="input-basic"
-                  placeholder={item.placeholder}
-                  value={answers[item.title] || ""}
-                  onChange={(e) => handleInputChange(item.title, e.target.value)}
-                />
-              </div>
-            );
-          } else if (item.type === "Long Answer") {
-            return (
-              <div key={key} className="input-container">
-                <div className="label">{item.title}</div>
-                <textarea
-                  className="input-basic"
-                  placeholder={item.placeholder}
-                  rows={4}
-                  value={answers[item.title] || ""}
-                  onChange={(e) => handleInputChange(item.title, e.target.value)}
-                />
-              </div>
-            );
-          } else {
-            return null;
-          }
-        })}
-
-        <div className="main-btns">
-          <div className="btn-1 trans" onClick={handleSend}>
-            {loading ? "Sending..." : "Send"}
+        {alreadyResponded ? (
+          <div className="after-reply" onClick={() => {
+            localStorage.removeItem(key);
+            setAlreadyResponded(false);
+          }}>
+            ✅ You already responded. <span className="click-again">Click to respond again</span>
           </div>
-        </div>
+        ) : (
+          <>
+            {data.formItems.map((item, key) => {
+              if (["Text", "Email", "Number"].includes(item.type)) {
+                return (
+                  <div key={key} className="input-container">
+                    <div className="label">{item.title}</div>
+                    <input
+                      className="input-basic"
+                      placeholder={item.placeholder}
+                      value={answers[item.title] || ""}
+                      onChange={(e) => handleInputChange(item.title, e.target.value)}
+                    />
+                  </div>
+                );
+              } else if (item.type === "Long Answer") {
+                return (
+                  <div key={key} className="input-container">
+                    <div className="label">{item.title}</div>
+                    <textarea
+                      className="input-basic"
+                      placeholder={item.placeholder}
+                      rows={4}
+                      value={answers[item.title] || ""}
+                      onChange={(e) => handleInputChange(item.title, e.target.value)}
+                    />
+                  </div>
+                );
+              } else {
+                return null;
+              }
+            })}
+
+            <div className="main-btns">
+              <div className="btn-1 trans" onClick={handleSend}>
+                {loading ? "Sending..." : "Send"}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </Container>
   );
@@ -262,4 +283,20 @@ const Container = styled.div`
         }
     }
 
+    .after-reply{
+      margin-top: 20px; 
+      font-size: 0.85rem;
+      font-weight: 200;
+
+      padding: 15px;
+      border: 1px solid #313231;
+      border-radius: 10px;
+
+      background-color: #1f1e1d;
+
+      span{
+        color: cornflowerblue;
+        font-weight: 500;
+      }
+    }
 `

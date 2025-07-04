@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
 import { parseRichText } from "../../Helpers/parseRichText";
 import PublicBackControl from "./PublicBackControl";
 import axios from "axios";
@@ -15,7 +16,8 @@ const api = axios.create({
   }
 });
 
-const PublicInsideAnonymous = ({ data, username }) => {
+const PublicInsideAnonymous = ({ data }) => {
+  const { username, id } = useParams();
   const [input, setInput] = useState("");
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,30 +25,33 @@ const PublicInsideAnonymous = ({ data, username }) => {
   const [alertMessage, setAlertMessage] = useState("");
   const [toggle, setToggle] = useState(0);
   const [showContainer, setShowContainer] = useState(false);
+  const [alreadyResponded, setAlreadyResponded] = useState(false);
+
+  useEffect(() => {
+    const key = `responded_${username}_${id}`;
+    if (localStorage.getItem(key) === "true") {
+      setAlreadyResponded(true);
+    }
+  }, [username, id]);
 
   const handleReply = async () => {
-    if (input.trim() === "") return;
+    if (input.trim() === "" || alreadyResponded) return;
 
     try {
       setLoading(true);
 
-      // console.log("📤 Submitting anonymous response:", {
-      //   userContentId: data.id,
-      //   type: "anonymous",
-      //   ownerId: data.ownerId,
-      //   data: { reply: input }
-      // });
-
-      const res = await api.post("/response", {
+      await api.post("/response", {
         userContentId: data.id,
         type: "anonymous",
         ownerId: username,
         data: { [data.question]: input }
       });
 
-      // console.log("✅ Response submitted:", res.data);
+      // Set in localStorage
+      const key = `responded_${username}_${id}`;
+      localStorage.setItem(key, "true");
+      setAlreadyResponded(true);
 
-      // Optionally update local replies UI
       setReplies([input, ...replies]);
       setInput("");
       setAlertMessage("Your response has been successfully shared!");
@@ -61,42 +66,50 @@ const PublicInsideAnonymous = ({ data, username }) => {
   };
 
   useEffect(() => {
-      if(alertMessage){
-        setShowContainer(true);
-      }
-    }, [toggle, alertMessage]);
+    if (alertMessage) {
+      setShowContainer(true);
+    }
+  }, [toggle, alertMessage]);
 
   return (
     <Container>
-      {showContainer && <CustomAlert color="dark" text={alertMessage} setShowContainer={setShowContainer} />}
+      {showContainer && (
+        <CustomAlert
+          color="dark"
+          text={alertMessage}
+          setShowContainer={setShowContainer}
+        />
+      )}
       <div className="main-content">
         <PublicBackControl username={username} />
+
         <div className="question">
           {parseRichText(data.question ? data.question : "")}
         </div>
 
-        <textarea
-          className="ans-input"
-          placeholder="Write your anonymous reply here..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-
-        <div className="main-btns">
-          <div className="btn-1 trans" onClick={handleReply}>
-            {loading ? "Sending..." : "Send"}
+        {alreadyResponded ? (
+          <div className="after-reply" onClick={() => {
+            localStorage.removeItem(`responded_${username}_${id}`);
+            setAlreadyResponded(false);
+          }}>
+            ✅ You already responded. <span className="click-again">Click to respond again</span>
           </div>
-        </div>
+        ) : (
+          <>
+            <textarea
+              className="ans-input"
+              placeholder="Write your anonymous reply here..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
 
-        <div className="extra-btns">
-          <div className="svg-frd">
-            {/* <svg aria-label="Share" className="x1lliihq x1n2onr6 xyb1xck" fill="currentColor" height="24" viewBox="0 0 24 24" width="24">
-              <title>Share</title>
-              <line fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" x1="22" x2="9.218" y1="3" y2="10.083" />
-              <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" />
-            </svg> */}
-          </div>
-        </div>
+            <div className="main-btns">
+              <div className="btn-1 trans" onClick={handleReply}>
+                {loading ? "Sending..." : "Send"}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </Container>
   );
@@ -246,5 +259,22 @@ const Container = styled.div`
             font-weight: 200;
             font-style: italic;
         }
+    }
+
+    .after-reply{
+      margin-top: 20px; 
+      font-size: 0.85rem;
+      font-weight: 200;
+
+      padding: 15px;
+      border: 1px solid #313231;
+      border-radius: 10px;
+
+      background-color: #1f1e1d;
+
+      span{
+        color: cornflowerblue;
+        font-weight: 500;
+      }
     }
 `
