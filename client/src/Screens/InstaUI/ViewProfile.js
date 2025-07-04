@@ -215,7 +215,7 @@ const ViewProfile = () => {
                             </div>
                             <a href="/page/create" target="_blank" className="type1">
                                 <b>Join {profileData.basicInfo.name} on IGxLinks</b>
-                                <p>Click to create your account</p>
+                                <p>Tap to join or log in</p>
                             </a>
                         </CreateYourPageAd>
                     }
@@ -375,21 +375,18 @@ const ViewProfile = () => {
                             })}
                     </div>
 
-                    {
-                        !showAd &&
-                        <CreateYourPageAd>
-                            <a href="/page/create" target="_blank" className="type2">
-                                <img src={logo2} alt="" />
-                                <div className="text">
-                                    <b>Powered by IGxLinks</b>
-                                    <p>
-                                        Click to create your account
-                                        <CallMadeIcon/>
-                                    </p>
-                                </div>
-                            </a>
-                        </CreateYourPageAd>
-                    }
+                    <CreateYourPageAd2>
+                        <a href="/page/create" target="_blank" className="type2">
+                            {/* <img src={logo2} alt="" /> */}
+                            <div className="text">
+                                <b>Powered by IGxLinks</b>
+                                <p>
+                                    Access your account
+                                    <CallMadeIcon/>
+                                </p>
+                            </div>
+                        </a>
+                    </CreateYourPageAd2>
                 </div>
                 : 
                 <div className="show-loader">
@@ -1279,44 +1276,6 @@ const CreateYourPageAd = styled.div`
     animation: ${slideIn} 0.5s ease-out 5s both;
   }
 
-  .type2{
-    height: 50px;
-    width: 100%;
-
-    margin-top: 40px;
-    margin-bottom: -50px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    img{
-        height: 40px;
-        border-radius: 50%;
-    }
-
-    .text{
-        margin-left: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
-
-        svg{
-            font-size: 0.9rem;
-            margin-left: 2.5px;
-        }
-    }
-
-    font-size: 0.7rem;
-    text-decoration: none;
-
-    b {
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-  }
-
    .close {
     position: absolute;
     height: 45px;
@@ -1343,3 +1302,44 @@ const CreateYourPageAd = styled.div`
   }
 
 `;
+
+const CreateYourPageAd2 = styled.div`
+    .type2{
+        height: 50px;
+        width: 100%;
+
+        margin-top: 60px;
+        margin-bottom: -50px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+    img{
+        height: 40px;
+        border-radius: 50%;
+    }
+
+    .text{
+        margin-left: 10px;
+        display: flex;
+        flex-direction: column;
+        /* align-items: flex-start; */
+        align-items: center;
+        justify-content: center;
+
+        svg{
+            font-size: 0.9rem;
+            margin-left: 2.5px;
+        }
+    }
+
+    font-size: 0.7rem;
+    text-decoration: none;
+
+    b {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+  }
+`
