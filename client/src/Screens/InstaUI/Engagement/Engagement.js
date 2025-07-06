@@ -203,59 +203,69 @@ const Engagement = () => {
             <div className="page-name">Engagements</div>
 
             <div className="main-content">
-                {contentItems.map((item) => {
-                    let containerClass = "item-card";
+                {contentItems.filter((item) => {
+                    const type = item.type?.toLowerCase();
+                    return type === "anonymous replies" || type === "custom form";
+                }).length === 0 ? (
+                    <div style={{ padding: "1rem 0", fontSize: "0.95rem", color: "#ccc", fontWeight: "200" }}>
+                        Please add a Custom Form or Anonymous Form to see responses here
+                    </div>
+                ) : (
+                    contentItems.map((item) => {
+                        let containerClass = "item-card";
 
-                    switch (item.type?.toLowerCase()) {
-                        case "subgroup":
-                            containerClass = "subgroup-container";
-                            break;
-                        case "redirect link":
-                            containerClass = "redirect-container";
-                            break;
-                        case "anonymous replies":
-                            containerClass = "anonymous-container";
-                            break;
-                        case "folder for redirect links":
-                            containerClass = "folder-container";
-                            break;
-                        case "custom form":
-                            containerClass = "form-container";
-                            break;
-                        case "write your content":
-                            containerClass = "write-content-container";
-                            break;
-                        default:
-                            containerClass = "item-card";
-                            break;
-                    }
+                        switch (item.type?.toLowerCase()) {
+                            case "subgroup":
+                                containerClass = "subgroup-container";
+                                break;
+                            case "redirect link":
+                                containerClass = "redirect-container";
+                                break;
+                            case "anonymous replies":
+                                containerClass = "anonymous-container";
+                                break;
+                            case "folder for redirect links":
+                                containerClass = "folder-container";
+                                break;
+                            case "custom form":
+                                containerClass = "form-container";
+                                break;
+                            case "write your content":
+                                containerClass = "write-content-container";
+                                break;
+                            default:
+                                containerClass = "item-card";
+                                break;
+                        }
 
-                    if (
-                        containerClass === "anonymous-container" ||
-                        containerClass === "form-container"
-                    ) {
-                        return (
-                            <div className="container-basic" key={item.id}>
-                                <div className="title">{parseRichText(item.title)}</div>
+                        if (
+                            containerClass === "anonymous-container" ||
+                            containerClass === "form-container"
+                        ) {
+                            return (
+                                <div className="container-basic" key={item.id}>
+                                    <div className="title">{parseRichText(item.title)}</div>
 
-                                <div
-                                    className="stats view-responses"
-                                    onClick={() => handleViewResponses(item)}
-                                    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                                >
-                                    <div className="text">View All Responses</div>
-                                    <ChevronRightIcon />
+                                    <div
+                                        className="stats view-responses"
+                                        onClick={() => handleViewResponses(item)}
+                                        style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                                    >
+                                        <div className="text">View All Responses</div>
+                                        <ChevronRightIcon />
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    }
+                            );
+                        }
 
-                    return null;
-                })}
+                        return null;
+                    })
+                )}
             </div>
 
             <ControlFooter />
         </Container>
+
     );
 };
 
