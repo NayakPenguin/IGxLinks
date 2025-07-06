@@ -38,6 +38,11 @@ router.post("/", authenticateJWT, async (req, res) => {
   }
 });
 
+router.get("/test", (req, res) => {
+  console.log("✅ Test route hit");
+  res.send("Test route works");
+});
+
 // GET /response/:userName — get all responses for a user, grouped by type
 router.get("/:userName", authenticateJWT, async (req, res) => {
   try {
@@ -88,5 +93,32 @@ router.get("/:userName", authenticateJWT, async (req, res) => {
   }
 });
 
+router.get("/by-content/:userContentId", authenticateJWT, async (req, res) => {
+  try {
+    const { userContentId } = req.params;
+    // console.log("userContentId : ", userContentId);
+    const userEmailFromJWT = req.user.email;
+    // console.log("userEmailFromJWT : ", userEmailFromJWT);
+
+    const userEntry = await AllUsernames.findOne({
+      userEmail: userEmailFromJWT,
+    });
+
+    if (!userEntry) {
+      return res.status(404).json({ message: "Username not found for user" });
+    }
+
+    const userName = userEntry.username;
+
+    const filteredResponses = await Response.find({
+      userContentId,
+      ownerId: userName,
+    }).sort({ createdAt: -1 });
+
+    res.json(filteredResponses);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 module.exports = router;
