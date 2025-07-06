@@ -45,6 +45,7 @@ import ViewProfile from "./Screens/InstaUI/ViewProfile";
 import ViewProfileInsideControl from "./Screens/InstaUI/ViewProfileInside/ViewProfileInsideControl";
 import MyResponsesPage from "./Testing/MyResponsesPage";
 import AllResponses from "./Testing/AllResponses";
+import ShowEngagementResults from "./Screens/InstaUI/Engagement/ShowEngagementResults";
 
 const App = () => {
   return (
@@ -79,6 +80,7 @@ const App = () => {
         <Route path="/page/view-edit/:id" element={<PrivateRoute><ViewChangeInside /></PrivateRoute>} />
         <Route path="/notification" element={<PrivateRoute><Notification /></PrivateRoute>} />
         <Route path="/engagement" element={<PrivateRoute><Engagement /></PrivateRoute>} />
+        <Route path="/engagement/:userContentId" element={<PrivateRoute><ShowEngagementResults /></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         {/* private end */}
 

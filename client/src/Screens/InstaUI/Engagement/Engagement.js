@@ -54,9 +54,9 @@ const Engagement = () => {
                     }
 
                     if (
+                        // containerClass === "subgroup-container" ||
                         containerClass === "anonymous-container" ||
-                        containerClass === "form-container" ||
-                        containerClass === "subgroup-container"
+                        containerClass === "form-container"
                     ) {
                         return (
                             <div className={containerClass === "subgroup-container" ? "container-basic bold-border" : "container-basic"} key={item.id}>
@@ -64,11 +64,11 @@ const Engagement = () => {
 
                                 {containerClass === "redirect-container" && (
                                     <div className="stats">
-                                        <div className="stat-1">
+                                        {/* <div className="stat-1">
                                             <div className="icon"></div>
                                             <div className="stat">Total Clicks : </div>
                                             <div className="stat-value">1,782</div>
-                                        </div>
+                                        </div> */}
                                         {/* <div className="stat-1">
                                             <div className="icon"></div>
                                             <div className="stat">Last 30 Days : </div>
@@ -89,10 +89,10 @@ const Engagement = () => {
                                             <div className="stat">Last 30 Days : </div>
                                             <div className="stat-value">23</div>
                                         </div> */}
-                                        <div className="view-responses">
+                                        <a href={`/engagement/${item.id}`} className="view-responses">
                                             <div className="text">View All Responses</div>
                                             <ChevronRightIcon />
-                                        </div>
+                                        </a>
                                     </div>
                                 )}
 
@@ -123,10 +123,10 @@ const Engagement = () => {
                                             <div className="stat">Last 30 Days : </div>
                                             <div className="stat-value">23</div>
                                         </div> */}
-                                        <div className="view-responses">
+                                        <a href={`/engagement/${item.id}`} className="view-responses">
                                             <div className="text">View All Responses</div>
                                             <ChevronRightIcon />
-                                        </div>
+                                        </a>
                                     </div>
                                 )}
 
