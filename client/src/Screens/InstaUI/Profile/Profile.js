@@ -97,7 +97,7 @@ const Profile = () => {
                         <div className="user-name">@{basicItems.userName || 'username'}</div>
                     </div>
 
-                    <div className="content">
+                    {/* <div className="content">
                         <div className="stat">
                             <div className="stat-value">{basicItems.subscribers || '0'}</div>
                             <div className="stat-name">Subscribers</div>
@@ -107,11 +107,11 @@ const Profile = () => {
                             <div className="stat-value">{basicItems.subscribed || '0'}</div>
                             <div className="stat-name">Subscribed</div>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="content">
-                        <div className="btn">Share</div>
-                        <div className="btn">Edit Profile</div>
+                        <a href={`/p/${basicItems.userName}`} target="_blank" className="btn">Share</a>
+                        <a href="/page/create" className="btn">Edit Profile</a>
                     </div>
 
                     <div className="settings">
@@ -252,6 +252,7 @@ const Container = styled.div`
                 background-color: #343434;
                 color: white;
                 letter-spacing: 0.05rem;
+                text-decoration: none;
             }
         }
 

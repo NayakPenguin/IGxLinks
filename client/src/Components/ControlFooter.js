@@ -36,9 +36,12 @@ const ControlFooter = () => {
                         <a href="/engagement">
                             {isActive("/engagement") ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                         </a>
-                        <a href="/notification">
+                        {/* <a href="/notification">
                             {isActive("/notification") ? <NotificationsIcon /> : <NotificationsNoneOutlinedIcon />}
-                        </a>
+                        </a> */}
+                        {/* <a href="/my-page">
+                            {isActive("/my-page") ? <NotificationsIcon /> : <NotificationsNoneOutlinedIcon />}
+                        </a> */}
                         <a href="/profile">
                             {isActive("/profile") ? <AccountCircleIcon /> : <AccountCircleOutlinedIcon />}
                         </a>
