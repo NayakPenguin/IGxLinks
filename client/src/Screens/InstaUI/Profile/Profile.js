@@ -116,9 +116,40 @@ const Profile = () => {
 
                     <div className="settings">
                         <div className="title">Settings</div>
-                        {[
+                        {/* <a href="/" target="_blank" className="setting-one">
+                            <div className="text">Tutorial / Onboarding Guide</div>
+                            <ChevronRightIcon />
+                        </a> */}
+                        <a href="/page/create" target="_blank" className="setting-one">
+                            <div className="text">Update Page</div>
+                            <ChevronRightIcon />
+                        </a>
+                        <a href="mailto:nayak@igxl.ink" target="_blank" className="setting-one">
+                            <div className="text">Report a Bug</div>
+                            <ChevronRightIcon />
+                        </a>
+                        <a href="/terms-of-service" target="_blank" className="setting-one">
+                            <div className="text">Terms of Service</div>
+                            <ChevronRightIcon />
+                        </a>
+                        <a href="/privacy-policy" target="_blank" className="setting-one">
+                            <div className="text">Privacy Policy</div>
+                            <ChevronRightIcon />
+                        </a>
+                        <a href="/cookie-policy" target="_blank" className="setting-one">
+                            <div className="text">Cookie Policy</div>
+                            <ChevronRightIcon />
+                        </a>
+                        <a href="/content-guidelines" target="_blank" className="setting-one">
+                            <div className="text">Content Guidelines</div>
+                            <ChevronRightIcon />
+                        </a>
+                        <a href="/disclaimer" target="_blank" className="setting-one">
+                            <div className="text">Disclaimer</div>
+                            <ChevronRightIcon />
+                        </a>
+                        {/* {[
                             'Tutorial / Onboarding Guide',
-                            'Change Password',
                             'Change Username',
                             'Update Page',
                             'Email Notification Preferences',
@@ -132,7 +163,7 @@ const Profile = () => {
                                 <div className="text">{item}</div>
                                 <ChevronRightIcon />
                             </div>
-                        ))}
+                        ))} */}
                         <div
                             className="setting-one logout"
                             onClick={handleLogout}
@@ -270,6 +301,7 @@ const Container = styled.div`
                 justify-content: space-between;
                 padding: 20px 0;
                 border-bottom: 1px solid #343434;
+                text-decoration: none;
 
 
                 .text{
