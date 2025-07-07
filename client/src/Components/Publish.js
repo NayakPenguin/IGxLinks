@@ -12,7 +12,7 @@ const Publish = () => {
   const [publishStatus, setPublishStatus] = useState(null);
   const [highlightTopBar, setHighlightTopBar] = useState(false);
   const [username, setUsername] = useState("Not-Found");
-  
+
   const navigate = useNavigate();
 
   const API_URL = process.env.REACT_APP_API_URL;
@@ -24,6 +24,57 @@ const Publish = () => {
       'Content-Type': 'application/json'
     }
   });
+
+  // const publishToDB = async () => {
+  //   if (publishStatus === 'publishing') return;
+
+  //   setPublishStatus('publishing');
+
+  //   const localContent = localStorage.getItem("userContentInfo");
+  //   const localBasic = localStorage.getItem("userBasicInfo");
+
+  //   if (!localContent || !localBasic) {
+  //     console.error("Missing data in localStorage");
+  //     setPublishStatus('error');
+  //     return;
+  //   }
+
+  //   try {
+  //     const basicData = JSON.parse(localBasic);
+  //     setUsername(basicData.userName);
+  //     const contentData = JSON.parse(localContent);
+
+  //     await Promise.all([
+  //       api.post('/basic-info/', {
+  //         ...basicData,
+  //         lastUpdated: Date.now()
+  //       }),
+  //       api.post('/advanced-info', {
+  //         localStorageData: { ...contentData },
+  //         lastUpdated: Date.now()
+  //       })
+  //     ]);
+
+  //     // // console.log("Both basic and content data published successfully.");
+  //     setPublishStatus('success');
+
+  //     setTimeout(() => setPublishStatus(null), 5000);
+  //     setHighlightTopBar(true);
+  //     setTimeout(() => setHighlightTopBar(false), 5000);
+
+  //     // setTimeout(() => window.location.reload(), 5000);
+  //   } catch (error) {
+  //     console.error("Publishing failed:", error.response?.data || error.message);
+  //     setPublishStatus('error');
+
+  //    if (error.response?.data || error.message === 
+  //       "Username is required for initial setup") {
+  //       navigate("/redirect");
+  //     }
+
+  //     setTimeout(() => setPublishStatus(null), 5000);
+  //   }
+  // };
 
   const publishToDB = async () => {
     if (publishStatus === 'publishing') return;
@@ -40,41 +91,52 @@ const Publish = () => {
     }
 
     try {
+      const updatedTimestamp = Date.now();
+
+      // Parse and update basic data
       const basicData = JSON.parse(localBasic);
+      basicData.lastUpdated = updatedTimestamp;
+
+      // Update localStorage to reflect latest timestamp
+      localStorage.setItem("userBasicInfo", JSON.stringify(basicData));
+
+      // Set username for UI or routing
       setUsername(basicData.userName);
+
+      // Parse content data
       const contentData = JSON.parse(localContent);
 
       await Promise.all([
-        api.post('/basic-info/', {
-          ...basicData,
-          lastUpdated: Date.now()
-        }),
+        api.post('/basic-info/', basicData),
         api.post('/advanced-info', {
           localStorageData: { ...contentData },
-          lastUpdated: Date.now()
+          lastUpdated: updatedTimestamp
         })
       ]);
 
-      // // console.log("Both basic and content data published successfully.");
       setPublishStatus('success');
-
       setTimeout(() => setPublishStatus(null), 5000);
+
       setHighlightTopBar(true);
       setTimeout(() => setHighlightTopBar(false), 5000);
 
-      // setTimeout(() => window.location.reload(), 5000);
+      // Optional page refresh
+      setTimeout(() => window.location.reload(), 5000);
     } catch (error) {
       console.error("Publishing failed:", error.response?.data || error.message);
       setPublishStatus('error');
-      
-     if (error.response?.data || error.message === 
-        "Username is required for initial setup") {
+
+      if (
+        error.response?.data === "Username is required for initial setup" ||
+        error.message === "Username is required for initial setup"
+      ) {
         navigate("/redirect");
       }
 
       setTimeout(() => setPublishStatus(null), 5000);
     }
   };
+
 
   return (
     <Container>
