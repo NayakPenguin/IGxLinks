@@ -44,7 +44,7 @@ const ITEM_TYPES = {
   ANONYMOUS: 'Anonymous Replies',
   FOLDER_REDIRECT: 'Folder for Redirect Links',
   FORM: 'Custom Form',
-  // MEETING_SCHEDULER: 'Meeting Scheduler',
+  MEETING_SCHEDULER: 'Meeting Scheduler',
   WRITE_CONTENT: 'Write your content',
 };
 
@@ -704,6 +704,7 @@ const Container = styled.div`
                         border-radius: 10px;
                         font-size: 0.85rem;
                         margin: 10px 0;
+                        cursor: pointer;
                       }
 
                       &:last-child {

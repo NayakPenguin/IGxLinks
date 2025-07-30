@@ -60,7 +60,7 @@ const Landing = () => {
             <div className="sample-page">
                 <h2>Influencers using IGxLinks collectively bring in <strong>50M+ followers</strong> — and counting.</h2>
                 <div className="desc">From niche creators to viral trendsetters, IGxLinks powers the link-in-bio for influencers whose combined audience exceeds <strong>50 million followers</strong>. Your reach starts here.</div>
-                <div className="faces">
+                {/* <div className="faces">
                     <div className="face">
                         <img src="https://digitalscholar.in/wp-content/uploads/2022/11/ranveer-allahbadia-male-fashion-influencer.jpg" alt="" />
                     </div>
@@ -91,7 +91,7 @@ const Landing = () => {
                     <div className="face">
                         <img src="https://yt3.googleusercontent.com/ytc/AIdro_mn-OrvRY_xYsDE-Vj9kV19tX8wxhPaXOoLz4bcJmOk6ltB=s900-c-k-c0x00ffffff-no-rj" alt="" />
                     </div>
-                </div>
+                </div> */}
             </div>
             <div className="sample-page-2">
                 <h2><strong>AI Power</strong> — Write with AI</h2>
@@ -315,7 +315,7 @@ const Container = styled.div`
             font-size: 1rem;
             font-weight: 200;
             text-align: center;
-            margin-bottom: 50px;
+            // margin-bottom: 50px;
 
             i{
                 color: #333;
