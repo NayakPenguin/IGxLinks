@@ -320,13 +320,18 @@ const CreateMeetings = () => {
     };
 
     const handleAddTimeSlot = (day) => {
+        console.log('====================================');
+        console.log("DEBUG LOG : func(handleAddTimeSlot) ");
+        console.log(day);
+        console.log(formData.availability[day].slots[formData.availability[day].slots.length - 1]);
+        console.log('====================================');
         const lastSlot = formData.availability[day].slots[formData.availability[day].slots.length - 1];
         const defaultStart = lastSlot ?
             formatMinutesToTime(parseTimeToMinutes(lastSlot.end) + 15) :
             '09:00 AM';
 
         const startMinutes = parseTimeToMinutes(defaultStart);
-        const endMinutes = Math.min(startMinutes + 90, parseTimeToMinutes("11:45 PM"));
+        const endMinutes = Math.min(startMinutes + formData.duration, parseTimeToMinutes("11:45 PM"));
         const defaultEnd = formatMinutesToTime(endMinutes);
 
         setFormData(prev => ({
