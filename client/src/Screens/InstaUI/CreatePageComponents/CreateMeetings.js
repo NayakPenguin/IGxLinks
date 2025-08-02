@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import AddIcon from "@material-ui/icons/Add";
+import EditIcon from '@material-ui/icons/Edit';
 import ControlFooter from "../../../Components/ControlFooter";
 import { Switch } from "@material-ui/core";
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -73,7 +74,7 @@ const CreateMeetings = () => {
         const [time, period] = timeStr.split(' ');
         const [hours, minutes] = time.split(':').map(Number);
         let totalMinutes = hours % 12 * 60 + minutes;
-        if (period === 'PM' && hours !== 12) totalMinutes += 12 * 60;
+        if (period === 'PM') totalMinutes += 12 * 60;
         return totalMinutes;
     };
 
@@ -123,7 +124,7 @@ const CreateMeetings = () => {
 
         // Helper function to ensure consistent time formatting
         const formatTimeSlot = (slot) => {
-            if (!slot) return { start: '09:00 AM', end: '10:30 AM' };
+            if (!slot) return { start: '09:00 AM' };
             return {
                 start: formatTimeString(slot.start),
                 end: formatTimeString(slot.end)
@@ -182,7 +183,7 @@ const CreateMeetings = () => {
                 acc[day] = {
                     enabled: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day),
                     slots: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(day)
-                        ? [{ start: '09:00 AM', end: '10:30 AM' }]
+                        ? [{ start: '09:00 AM' }]
                         : []
                 };
                 return acc;
@@ -259,8 +260,12 @@ const CreateMeetings = () => {
     };
 
     const getNextAvailableTime = (day, index) => {
+        console.log('====================================');
+        console.log("DEBUG LOG : func[getNextAvailableTime()]");
+        console.log(day, index);
+        console.log('====================================');
         if (selectedSlotMeta.type === 'start' && index > 0) {
-            const prevEndTime = formData.availability[day].slots[index - 1].end;
+            const prevEndTime = formData.availability[day].slots[index].end;
             const minutes = parseTimeToMinutes(prevEndTime) + 15;
             return formatMinutesToTime(minutes);
         }
@@ -280,6 +285,13 @@ const CreateMeetings = () => {
     }, [selectedTime, modelTimeAddOpen]);
 
     const handleInputChange = (field, value) => {
+        if (field == "duration") {
+            setFormData(prev => ({
+                ...prev,
+                availability: getInitialAvailability()
+            }));
+        }
+
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -290,49 +302,77 @@ const CreateMeetings = () => {
         setSelectedSlotMeta({ day, index, type });
         setSelectedTime(currentTime);
 
-        if (type === 'end') {
-            const startTime = formData.availability[day].slots[index].start;
-            const startMinutes = parseTimeToMinutes(startTime);
-            setMinTimeForPicker(formatMinutesToTime(startMinutes + 15).split(' ')[0]);
-            setMaxTimeForPicker("23:45");
-        } else { // start time
-            const baseTime = getNextAvailableTime(day, index);
-            setMinTimeForPicker(baseTime.split(' ')[0]);
-            setMaxTimeForPicker("23:30");
+        if(formData.availability[day].slots.length > 1){
+            const minStartTimePossible = formatMinutesToTime(parseTimeToMinutes(formData.availability[day].slots[index - 1].start.split(' ')[0]) + (formData.availability[day].slots[index - 1].start.split(' ')[1] == "PM" ? 12 * 60 : 0) + formData.duration + 15);
+            console.log('====================================');
+            console.log(minStartTimePossible);
+            console.log('====================================');
+            setMinTimeForPicker(minStartTimePossible); 
+            setMaxTimeForPicker(formatMinutesToTime(parseTimeToMinutes("23:45 PM") - formData.duration));
+            setModelTimeAddOpen(true);
         }
+
+        // if (type === 'end') {
+        //     const startTime = formData.availability[day].slots[index].start;
+        //     const startMinutes = parseTimeToMinutes(startTime);
+        //     setMinTimeForPicker(formatMinutesToTime(startMinutes + 15).split(' ')[0]);
+        //     setMaxTimeForPicker("23:45");
+        // } else {
+        //     const baseTime = getNextAvailableTime(day, index);
+        //     setMinTimeForPicker(baseTime.split(' ')[0]);
+        //     setMaxTimeForPicker("23:30");
+        // }
+
+
+        // let us consider all to be "start" and "end" will be auto generated based on 
+        // "start" and form.duration
+
+        // const baseTime = getNextAvailableTime(day, index);
+        // console.log('====================================');
+        // console.log(formatMinutesToTime(parseTimeToMinutes(formData.availability[day].slots[index].start)));
+        // console.log("BEBUG LOG : func[handleInputClick()]");
+        // console.log("baseTime : ", baseTime);
+        // console.log("baseTime.split(' ')[0]", baseTime.split(' ')[0]);
+        // console.log('====================================');
+
+        // setMinTimeForPicker(formData.availability[day].slots[index].start.split(' ')[0]);
+        // setMinTimeForPicker(baseTime.split(' ')[0]);
+        // setMaxTimeForPicker("23:30"); 
 
         setModelTimeAddOpen(true);
     };
 
     const handleDayToggle = (day, enabled) => {
-        setFormData(prev => ({
-            ...prev,
-            availability: {
-                ...prev.availability,
-                [day]: {
-                    enabled,
-                    slots: enabled ? (prev.availability[day].slots.length === 0
-                        ? [{ start: '09:00 AM', end: '10:30 AM' }]
-                        : prev.availability[day].slots) : []
+        setFormData(prev => {
+            const updated = {
+                ...prev,
+                availability: {
+                    ...prev.availability,
+                    [day]: {
+                        enabled,
+                        slots: enabled
+                            ? (prev.availability[day].slots.length === 0
+                                ? [{ start: '09:00 AM' }]
+                                : prev.availability[day].slots)
+                            : []
+                    }
                 }
-            }
-        }));
+            };
+            // console.log('Updated formData:', updated); 
+            return updated;
+        });
     };
 
     const handleAddTimeSlot = (day) => {
-        console.log('====================================');
-        console.log("DEBUG LOG : func(handleAddTimeSlot) ");
-        console.log(day);
-        console.log(formData.availability[day].slots[formData.availability[day].slots.length - 1]);
-        console.log('====================================');
         const lastSlot = formData.availability[day].slots[formData.availability[day].slots.length - 1];
+
         const defaultStart = lastSlot ?
-            formatMinutesToTime(parseTimeToMinutes(lastSlot.end) + 15) :
+            formatMinutesToTime(parseTimeToMinutes(lastSlot.start) + formData.duration + 15) :
             '09:00 AM';
 
         const startMinutes = parseTimeToMinutes(defaultStart);
-        const endMinutes = Math.min(startMinutes + formData.duration, parseTimeToMinutes("11:45 PM"));
-        const defaultEnd = formatMinutesToTime(endMinutes);
+
+        if (startMinutes + formData.duration + 15 >= 24 * 60) return; // I think by this the last time is 11:30
 
         setFormData(prev => ({
             ...prev,
@@ -342,7 +382,7 @@ const CreateMeetings = () => {
                     ...prev.availability[day],
                     slots: [
                         ...prev.availability[day].slots,
-                        { start: defaultStart, end: defaultEnd }
+                        { start: defaultStart }
                     ]
                 }
             }
@@ -473,6 +513,7 @@ const CreateMeetings = () => {
                     </div>
                 </ModelConatiner>
             }
+           
 
             <div className="main-content">
                 <div className="top-bar">
@@ -551,6 +592,12 @@ const CreateMeetings = () => {
                                     <div className="day-time">
                                         {formData.availability[day].enabled && formData.availability[day].slots.map((slot, index) => (
                                             <div className="input-container-2" key={index}>
+                                                {
+                                                    index == formData.availability[day].slots.length - 1 &&
+                                                    <div className="edit-time-btn" onClick={() => handleInputClick(day, index, 'end', slot.end)}>
+                                                        <EditIcon />
+                                                    </div>
+                                                }
                                                 <div
                                                     className="input-time"
                                                     onClick={() => handleInputClick(day, index, 'start', slot.start)}
@@ -562,9 +609,9 @@ const CreateMeetings = () => {
 
                                                 <div
                                                     className="input-time"
-                                                    onClick={() => handleInputClick(day, index, 'end', slot.end)}
+                                                // onClick={() => handleInputClick(day, index, 'end', slot.end)}
                                                 >
-                                                    {slot.end}
+                                                    {formatMinutesToTime(parseTimeToMinutes(slot.start) + formData.duration)}
                                                 </div>
 
                                                 {index === 0 ? (
@@ -1035,6 +1082,17 @@ const MainCreate = styled.div`
             font-size: 1.15rem;
         }
 
+        .edit-time-btn{
+            display: grid;
+            place-items: center; 
+            background-color:rgb(22, 22, 22);
+            border: 1px solid #363636;
+            padding: 5px;
+            margin-right: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
         .add-more-time-btn{
             display: grid;
             place-items: center; 
@@ -1118,11 +1176,20 @@ const ModelConatiner = styled.div`
                 /* background-color: orange; */
                 font-size: 0.85rem;
                 text-align: center;
+                cursor: pointer;
                 border-radius: 10px;
+
+                &:hover {
+                    background-color: #32302e;
+                }
             }
 
             .selected-time{
                 background-color: orange;
+
+                &:hover {
+                    background-color: orange;
+                }
             }
         }
 
