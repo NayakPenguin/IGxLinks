@@ -385,16 +385,19 @@ const CreateMeetings = () => {
     };
 
     const handleSaveMeeting = () => {
+        console.log('====================================');
+        console.log("handleSaveMeeting was clicked");
+        console.log('====================================');
         const savedItems = JSON.parse(localStorage.getItem("userContentInfo") || "[]");
 
         // Merge overlapping slots before saving
-        const mergedAvailability = {};
-        Object.keys(formData.availability).forEach(day => {
-            mergedAvailability[day] = {
-                enabled: formData.availability[day].enabled,
-                slots: mergeOverlappingSlots(formData.availability[day].slots)
-            };
-        });
+        // const mergedAvailability = {};
+        // Object.keys(formData.availability).forEach(day => {
+        //     mergedAvailability[day] = {
+        //         enabled: formData.availability[day].enabled,
+        //         slots: mergeOverlappingSlots(formData.availability[day].slots)
+        //     };
+        // });
 
         const newItem = {
             id: isEditMode ? id : Date.now().toString(),
@@ -403,10 +406,14 @@ const CreateMeetings = () => {
             titleInside: formData.titleInside,
             description: formData.description,
             duration: formData.duration,
-            availability: mergedAvailability,
+            availability: formData.availability,
             createdAt: isEditMode ? existingMeetingData.createdAt : new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
+
+        // console.log('====================================');
+        // console.log("newItem : ", newItem);
+        // console.log('====================================');
 
         let updatedItems;
         if (isEditMode) {
