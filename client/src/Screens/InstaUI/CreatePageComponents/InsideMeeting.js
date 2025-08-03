@@ -15,12 +15,43 @@ const InsideMeeting = ({ data }) => {
     const userBasicInfo = JSON.parse(localStorage.getItem("userBasicInfo"));
     // console.log(userBasicInfo);
 
-    const newLocalImageURL = localStorage.getItem("newLocalImageURL");
-    // console.log(newLocalImageURL);
+    const newLocalImageURL = userBasicInfo.profileImage;
 
-    // const newLocalImageURL = JSON.parse(localStorage.getItem("newLocalImageURL"));
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() + 1); // Start from tomorrow
 
-    // console.log(data);
+    const [selectedDate, setSelectedDate] = useState(startDate);
+
+    useEffect(() => {
+        console.log(selectedDate);
+    }, [selectedDate])
+
+    const weeks = [];
+    const dayNames = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+
+    let currentDate = new Date(startDate);
+
+    for (let week = 0; week < 4; week++) {
+        const weekArray = new Array(7).fill(null);
+
+        for (let i = 0; i < 7; i++) {
+            const dayOfWeek = currentDate.getDay(); // Sunday = 0
+            const index = (dayOfWeek + 6) % 7; // Adjust so Monday = 0
+            weekArray[index] = new Date(currentDate);
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        weeks.push(weekArray);
+    }
+
+    const monthName = startDate.toLocaleString('default', { month: 'long' });
+
+    const isSameDay = (date1, date2) =>
+        date1.getDate() === date2.getDate() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getFullYear() === date2.getFullYear();
+
 
     return (
         <Container>
@@ -29,65 +60,66 @@ const InsideMeeting = ({ data }) => {
                 <div className="heading">{parseRichText(data.titleInside ? data.titleInside : null)}</div>
                 <div className="desc">{parseRichText(data.description ? data.description : null)}</div>
                 <div className="time">
-                    <QueryBuilderIcon/>
+                    <QueryBuilderIcon />
                     <div className="text">{data.duration ? data.duration : null} Minutes</div>
                 </div>
                 <div className="owner-user">
                     <div className="user-dp"><img src={newLocalImageURL} alt="" /></div>
-                    <div className="user-name">{userBasicInfo.formData.name}</div>
+                    <div className="user-name">{userBasicInfo ? userBasicInfo.name : ""}</div>
                 </div>
+
                 <div className="line"></div>
 
                 <div className="date-select">
                     <div className="month">
-                        <div className="month-name">June</div>
+                        <div className="month-name">{monthName}</div>
                         <div className="weeks">
                             <div className="week">
-                                <div className="day">Mon</div>
-                                <div className="day">Tues</div>
-                                <div className="day">Wed</div>
-                                <div className="day">Thus</div>
-                                <div className="day">Fri</div>
-                                <div className="day">Sat</div>
-                                <div className="day">Sun</div>
+                                {dayNames.map((day) => (
+                                    <div key={day} className="day">{day}</div>
+                                ))}
                             </div>
-                            <div className="week">
-                                <div className="day"></div>
-                                <div className="day"></div>
-                                <div className="day circle">22</div>
-                                <div className="day">23</div>
-                                <div className="day">24</div>
-                                <div className="day">25</div>
-                                <div className="day">26</div>
-                            </div>
-                            <div className="week">
-                                <div className="day">28</div>
-                                <div className="day">29</div>
-                                <div className="day">30</div>
-                                <div className="day"></div>
-                                <div className="day"></div>
-                                <div className="day"></div>
-                                <div className="day"></div>
-                            </div>
-                            <div className="week">
-                                <div className="day"></div>
-                                <div className="day"></div>
-                                <div className="day"></div>
-                                <div className="day">1</div>
-                                <div className="day">2</div>
-                                <div className="day">3</div>
-                                <div className="day">4</div>
-                            </div>
-                            <div className="week">
-                                <div className="day">5</div>
-                                <div className="day">6</div>
-                                <div className="day">7</div>
-                                <div className="day">8</div>
-                                <div className="day">9</div>
-                                <div className="day">10</div>
-                                <div className="day">11</div>
-                            </div>
+                            {weeks.map((week, idx) => (
+                                <div key={idx} className="week">
+                                    {week.map((date, i) => {
+                                        const isSelected = date && isSameDay(date, selectedDate);
+                                        return (
+                                            <div
+                                                key={i}
+                                                className={`day ${isSelected ? 'circle' : ''}`}
+                                                onClick={() => date && setSelectedDate(date)}
+                                            >
+                                                {date ? date.getDate() : ''}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ))}
                         </div>
+                    </div>
+                </div>
+
+                <div className="line"></div>
+
+                <div className="time-select">
+                    <div className="day-for-meet">
+                        Select time for meet for day{' '}
+                        {selectedDate.toLocaleDateString('en-US', {
+                            day: 'numeric',
+                            month: 'long',
+                        })}
+                    </div>
+                    <div className="all-slots">
+                        <div class="slot">09:00 AM - 09:30 AM</div>
+                        <div class="slot">09:45 AM - 10:15 AM</div>
+                        <div class="slot">10:30 AM - 11:00 AM</div>
+                        <div class="slot">11:15 AM - 11:45 AM</div>
+                        <div class="slot">12:00 PM - 12:30 PM</div>
+                        <div class="slot">12:45 PM - 01:15 PM</div>
+                        <div class="slot">01:30 PM - 02:00 PM</div>
+                        <div class="slot">02:15 PM - 02:45 PM</div>
+                        <div class="slot">03:00 PM - 03:30 PM</div>
+                        <div class="slot">03:45 PM - 04:15 PM</div>
                     </div>
                 </div>
             </div>
@@ -263,5 +295,27 @@ const Container = styled.div`
             }
         }
 
+        .time-select{
+            .day-for-meet{
+                font-size: 1rem;
+                font-weight: 500;
+            }
+
+            .all-slots{
+                display: flex;
+                flex-wrap: wrap;
+                margin-top: 20px;
+                
+                .slot{
+                    padding: 10px;
+                    background-color: rgb(22, 22, 22);
+                    border: 1px solid #363636;
+                    border-radius: 5px;
+                    margin: 0 5px 5px 0;
+                    font-size: 0.75rem;
+                    color: white;
+                }
+            }
+        }
     }
 `
