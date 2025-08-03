@@ -260,10 +260,10 @@ const CreateMeetings = () => {
     };
 
     const getNextAvailableTime = (day, index) => {
-        console.log('====================================');
-        console.log("DEBUG LOG : func[getNextAvailableTime()]");
-        console.log(day, index);
-        console.log('====================================');
+        // console.log('====================================');
+        // console.log("DEBUG LOG : func[getNextAvailableTime()]");
+        // console.log(day, index);
+        // console.log('====================================');
         if (selectedSlotMeta.type === 'start' && index > 0) {
             const prevEndTime = formData.availability[day].slots[index].end;
             const minutes = parseTimeToMinutes(prevEndTime) + 15;
@@ -299,22 +299,18 @@ const CreateMeetings = () => {
     };
 
     const handleInputClick = (day, index, type, currentTime) => {
-        console.log("handleInputClick() was clicked");
-
         setSelectedSlotMeta({ day, index, type });
         setSelectedTime(currentTime);
-
-        if(formData.availability[day].slots.length > 1){
-            console.log("formData.availability[day].slots.length > 1 == true");
+        if (formData.availability[day].slots.length > 1) {
             const minStartTimePossibleMins = parseTimeToMinutes(formData.availability[day].slots[index - 1].start.split(' ')[0]) + (formData.availability[day].slots[index - 1].start.split(' ')[1] == "PM" ? 12 * 60 : 0) + formData.duration + 15;
             const minStartTimePossible = `${Math.floor(minStartTimePossibleMins / 60)}:${minStartTimePossibleMins % 60}`;
-            setMinTimeForPicker(minStartTimePossible); 
-            setMaxTimeForPicker(`${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration)/60)}:${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration)%60)}`);
+            setMinTimeForPicker(minStartTimePossible);
+            setMaxTimeForPicker(`${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration) / 60)}:${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration) % 60)}`);
             setModelTimeAddOpen(true);
         }
-        else{
-            setMinTimeForPicker("00:00");   
-            setMaxTimeForPicker(`${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration)/60)}:${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration)%60)}`);
+        else {
+            setMinTimeForPicker("00:00");
+            setMaxTimeForPicker(`${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration) / 60)}:${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration) % 60)}`);
         }
 
         setModelTimeAddOpen(true);
@@ -383,51 +379,8 @@ const CreateMeetings = () => {
     const handleTimeSelection = (time) => {
         const { day, index, type } = selectedSlotMeta;
 
-        if (day !== null && index !== null && type) {
-            setFormData(prev => {
-                const updatedSlots = [...prev.availability[day].slots];
-                const currentSlot = updatedSlots[index];
+        formData.availability[day].slots[index].start = time;
 
-                if (type === 'end') {
-                    const startMinutes = parseTimeToMinutes(currentSlot.start);
-                    const endMinutes = parseTimeToMinutes(time);
-                    if (endMinutes <= startMinutes) {
-                        time = formatMinutesToTime(startMinutes + 15);
-                    }
-                } else if (type === 'start') {
-                    const startMinutes = parseTimeToMinutes(time);
-                    const endMinutes = parseTimeToMinutes(currentSlot.end);
-                    if (startMinutes >= endMinutes) {
-                        time = formatMinutesToTime(endMinutes - 15);
-                    }
-                    if (index > 0) {
-                        const prevEndMinutes = parseTimeToMinutes(prev.availability[day].slots[index - 1].end);
-                        if (startMinutes < prevEndMinutes + 15) {
-                            time = formatMinutesToTime(prevEndMinutes + 15);
-                        }
-                    }
-                }
-
-                updatedSlots[index] = {
-                    ...updatedSlots[index],
-                    [type]: time
-                };
-
-                // Merge overlapping slots after update
-                const mergedSlots = mergeOverlappingSlots(updatedSlots);
-
-                return {
-                    ...prev,
-                    availability: {
-                        ...prev.availability,
-                        [day]: {
-                            ...prev.availability[day],
-                            slots: mergedSlots
-                        }
-                    }
-                };
-            });
-        }
         setModelTimeAddOpen(false);
     };
 
@@ -477,21 +430,23 @@ const CreateMeetings = () => {
                     <div className="model-closer" onClick={() => setModelTimeAddOpen(false)}></div>
                     <div className="model">
                         <div className="all-times">
-                            {slots.map((time) => (
-                                <div
-                                    key={time}
-                                    className={`one-time ${time === selectedTime ? "selected-time" : ""}`}
-                                    ref={time === selectedTime ? selectedRef : null}
-                                    onClick={() => handleTimeSelection(time)}
-                                >
-                                    {time}
-                                </div>
-                            ))}
+                            {slots.map((time) => {
+                                return (
+                                    <div
+                                        key={time}
+                                        className={`one-time ${(time === selectedTime || time == `0${selectedTime}`) ? "selected-time" : ""}`}
+                                        ref={(time === selectedTime || time == `0${selectedTime}`) ? selectedRef : null}
+                                        onClick={() => handleTimeSelection(time)}
+                                    >
+                                        {time}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </ModelConatiner>
             }
-           
+
 
             <div className="main-content">
                 <div className="top-bar">
@@ -572,7 +527,7 @@ const CreateMeetings = () => {
                                             <div className="input-container-2" key={index}>
                                                 {
                                                     index == formData.availability[day].slots.length - 1 &&
-                                                    <div className="edit-time-btn" onClick={() => handleInputClick(day, index, 'end', slot.end)}>
+                                                    <div className="edit-time-btn" onClick={() => handleInputClick(day, index, 'end', slot.start)}>
                                                         <EditIcon />
                                                     </div>
                                                 }
