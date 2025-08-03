@@ -1052,6 +1052,8 @@ const MainCreate = styled.div`
         font-size: 0.75rem;
         font-weight: 300;
         text-align: center;
+
+        cursor: pointer;
     }
 
     .full{

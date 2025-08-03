@@ -122,6 +122,12 @@ const InsideMeeting = ({ data }) => {
                         <div class="slot">03:45 PM - 04:15 PM</div>
                     </div>
                 </div>
+
+                <div className="line"></div>
+
+                <button className="add-btn full">
+                    Book Meeting
+                </button>
             </div>
             <ControlFooter />
         </Container>
@@ -284,6 +290,7 @@ const Container = styled.div`
                             align-items: center;
 
                             font-size: 0.75rem;
+                            cursor: pointer;
                         }
 
                         .circle{
@@ -316,6 +323,22 @@ const Container = styled.div`
                     color: white;
                 }
             }
+        }
+
+        .add-btn{
+            border: none;
+            background-color: #0095f6;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+
+            cursor: pointer;
+        }
+
+        .full{
+            margin-top: 20px;
+            width: 100%;
         }
     }
 `
