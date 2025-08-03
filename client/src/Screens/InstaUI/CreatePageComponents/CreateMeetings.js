@@ -299,45 +299,23 @@ const CreateMeetings = () => {
     };
 
     const handleInputClick = (day, index, type, currentTime) => {
+        console.log("handleInputClick() was clicked");
+
         setSelectedSlotMeta({ day, index, type });
         setSelectedTime(currentTime);
 
         if(formData.availability[day].slots.length > 1){
-            const minStartTimePossible = formatMinutesToTime(parseTimeToMinutes(formData.availability[day].slots[index - 1].start.split(' ')[0]) + (formData.availability[day].slots[index - 1].start.split(' ')[1] == "PM" ? 12 * 60 : 0) + formData.duration + 15);
-            console.log('====================================');
-            console.log(minStartTimePossible);
-            console.log('====================================');
+            console.log("formData.availability[day].slots.length > 1 == true");
+            const minStartTimePossibleMins = parseTimeToMinutes(formData.availability[day].slots[index - 1].start.split(' ')[0]) + (formData.availability[day].slots[index - 1].start.split(' ')[1] == "PM" ? 12 * 60 : 0) + formData.duration + 15;
+            const minStartTimePossible = `${Math.floor(minStartTimePossibleMins / 60)}:${minStartTimePossibleMins % 60}`;
             setMinTimeForPicker(minStartTimePossible); 
-            setMaxTimeForPicker(formatMinutesToTime(parseTimeToMinutes("23:45 PM") - formData.duration));
+            setMaxTimeForPicker(`${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration)/60)}:${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration)%60)}`);
             setModelTimeAddOpen(true);
         }
-
-        // if (type === 'end') {
-        //     const startTime = formData.availability[day].slots[index].start;
-        //     const startMinutes = parseTimeToMinutes(startTime);
-        //     setMinTimeForPicker(formatMinutesToTime(startMinutes + 15).split(' ')[0]);
-        //     setMaxTimeForPicker("23:45");
-        // } else {
-        //     const baseTime = getNextAvailableTime(day, index);
-        //     setMinTimeForPicker(baseTime.split(' ')[0]);
-        //     setMaxTimeForPicker("23:30");
-        // }
-
-
-        // let us consider all to be "start" and "end" will be auto generated based on 
-        // "start" and form.duration
-
-        // const baseTime = getNextAvailableTime(day, index);
-        // console.log('====================================');
-        // console.log(formatMinutesToTime(parseTimeToMinutes(formData.availability[day].slots[index].start)));
-        // console.log("BEBUG LOG : func[handleInputClick()]");
-        // console.log("baseTime : ", baseTime);
-        // console.log("baseTime.split(' ')[0]", baseTime.split(' ')[0]);
-        // console.log('====================================');
-
-        // setMinTimeForPicker(formData.availability[day].slots[index].start.split(' ')[0]);
-        // setMinTimeForPicker(baseTime.split(' ')[0]);
-        // setMaxTimeForPicker("23:30"); 
+        else{
+            setMinTimeForPicker("00:00");   
+            setMaxTimeForPicker(`${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration)/60)}:${Math.floor((parseTimeToMinutes("11:45 PM") - formData.duration)%60)}`);
+        }
 
         setModelTimeAddOpen(true);
     };
@@ -600,7 +578,6 @@ const CreateMeetings = () => {
                                                 }
                                                 <div
                                                     className="input-time"
-                                                    onClick={() => handleInputClick(day, index, 'start', slot.start)}
                                                 >
                                                     {slot.start}
                                                 </div>
