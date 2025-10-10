@@ -321,6 +321,11 @@ const Container = styled.div`
                     margin: 0 5px 5px 0;
                     font-size: 0.75rem;
                     color: white;
+                    cursor: pointer;
+
+                    &:hover{
+                        background-color: #363636;
+                    }
                 }
             }
         }
