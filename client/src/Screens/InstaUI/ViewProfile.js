@@ -264,7 +264,7 @@ const ViewProfile = () => {
                         </div>
                     </div>
 
-                    {
+                    {/* {
                         profileData.basicInfo.announcement.isVisible &&
                         <PinnedAnnouncement>
                             <div className="label">
@@ -274,7 +274,7 @@ const ViewProfile = () => {
                             <b>{profileData.basicInfo.announcement.title}</b>
                             {profileData.basicInfo.announcement.description}
                         </PinnedAnnouncement>
-                    }
+                    } */}
 
                     <div className="group">
                         {profileData.advancedInfo.localStorageData &&

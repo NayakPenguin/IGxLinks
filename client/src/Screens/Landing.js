@@ -9,11 +9,15 @@ import feature2 from "../Images/Landing/feature2.png";
 import feature3 from "../Images/Landing/feature3.png";
 import feature4 from "../Images/Landing/feature4.png";
 import feature5 from "../Images/Landing/feature5.png";
+import Zoom from 'react-reveal/Zoom';
+import Fade from 'react-reveal/Fade';
 
 const Landing = () => {
     return (
         <Container>
-            <div className="prenav">Watch us create an influencer page in 5 mins <CallMadeIcon /> </div>
+            <div className="prenav">
+                Pre-launch testing is live — thanks for joining early!
+            </div>
             <div className="navbar">
                 {/* <div className="left"></div> */}
                 {/* <div className="middle">IG <span>x</span> Links</div> */}
@@ -22,44 +26,72 @@ const Landing = () => {
                     IG x Links
                     {/* <img src={sitename} alt="" /> */}
                 </div>
-                <a href="/redirect" className="login-btn">Login</a>
+                <a href="/redirect" className="base-btn shine-hover">Login</a>
             </div>
             <div className="top-page">
                 {/* <div className="tag">Minimal Design</div> */}
-                <h1><br /> Share More Than Links. <br /> <strong>Share Yourself.</strong></h1>
-                <h3><i>It’s minimal, expressive, and modern.</i></h3>
-                <h3>
-                    IGxLinks lets you turn a single link into your <strong>personal hub</strong> — share <strong>forms, polls, stories, anonymous replies</strong>, <strong>sell or promote products</strong>, <strong>create paid links</strong>, and express everything that makes you <strong>you</strong>. Designed to be <strong>minimalist</strong> — not loud, not cluttered — your page feels like a <strong>sleek app extension</strong> when someone clicks your link. Whether you're a <strong>creator, entrepreneur, student</strong>, or just vibing online — it’s all here, <strong>your way</strong>.
-                </h3>
-                <a href="/redirect" className="create-your-page-btn">Create your Page</a>
+                <Fade>
+                    <Zoom>
+                        <h1>Creator OS — See <strong>AI Insights, Grow, & Earn</strong></h1>
+                    </Zoom>
+                </Fade>
+                <Fade>
+                    <h3><i>It’s minimal, expressive, and modern.</i></h3>
+                </Fade>
+                <Fade>
+                    <h3 className="desc">
+                        IGxLinks lets you turn a single link into your <strong>personal hub</strong> — share <strong>forms, polls, stories, anonymous replies</strong>, <strong>sell or promote products</strong>, <strong>create paid links</strong>, and express everything that makes you <strong>you</strong>. Designed to be <strong>minimalist</strong> — not loud, not cluttered — your page feels like a <strong>sleek app extension</strong> when someone clicks your link. Whether you're a <strong>creator, entrepreneur, student</strong>, or just vibing online — it’s all here, <strong>your way</strong>.
+                    </h3>
+                </Fade>
+                <a href="/redirect" className="base-btn shine-hover">Create your Page</a>
             </div>
             <div className="sample-page">
-                <h2>Discover the <strong>pages</strong> you can create with IGxLinks.</h2>
-                <div className="desc">
-                    Below are examples from a <strong>Software Developer, Influencer, Student, and Brand</strong> — now it’s your turn to build your own.
-                </div>
-                <img src={samplePage1} alt="" />
-                <div className="link-to-profile">
-                    <img src={logo2} alt="" />
-                    <a href="/p/nayakpenguin" target="_blank" className="username">igxl.ink/p/nayakpenguin</a>
-                    <CallMadeIcon />
-                </div>
+                <Fade bottom>
+                    <Zoom>
+                        <h2>Discover the <strong>pages</strong> you can create with IGxLinks.</h2>
+                        <div className="desc">
+                            Below are examples from a <strong>Software Developer, Influencer, Student, and Brand</strong> — now it’s your turn to build your own.
+                        </div>
+                        <img src={samplePage1} alt="" />
+                        <div className="link-to-profile">
+                            <img src={logo2} alt="" />
+                            <a href="/p/nayakpenguin" target="_blank" className="username">igxl.ink/p/nayakpenguin</a>
+                            <CallMadeIcon />
+                        </div>
+                    </Zoom>
+                </Fade>
             </div>
             <div className="sample-page-2">
-                <h2><strong>Features</strong> — One Link. Endless Possibilities.</h2>
-                <div className="desc">
-                    From <strong>forms</strong> and <strong>polls</strong> to <strong>paid links</strong> and <strong>anonymous replies</strong> — discover the features that make IGxLinks more than just a bio link.
-                    It's your <strong>most versatile tool</strong> to share, express, and grow.
-                </div>
-                <img src={feature1} alt="" />
-                <img src={feature2} alt="" />
-                <img src={feature3} alt="" />
-                <img src={feature4} alt="" />
-                <img src={feature5} alt="" />
+                <Fade bottom>
+                        <h2><strong>Features</strong> — One Link. Endless Possibilities.</h2>
+                        <div className="desc">
+                            From <strong>forms</strong> and <strong>polls</strong> to <strong>paid links</strong> and <strong>anonymous replies</strong> — discover the features that make IGxLinks more than just a bio link.
+                            It's your <strong>most versatile tool</strong> to share, express, and grow.
+                        </div>
+                    <Zoom>
+                        <img src={feature1} alt="" />
+                    </Zoom>
+                    <Zoom>
+                        <img src={feature2} alt="" />
+                    </Zoom>
+                    <Zoom>
+                        <img src={feature3} alt="" />
+                    </Zoom>
+                    <Zoom>
+                        <img src={feature4} alt="" />
+                    </Zoom>
+                    <Zoom>
+                        <img src={feature5} alt="" />
+                    </Zoom>
+                </Fade>
             </div>
             <div className="sample-page">
-                <h2>Influencers using IGxLinks collectively bring in <strong>50M+ followers</strong> — and counting.</h2>
-                <div className="desc">From niche creators to viral trendsetters, IGxLinks powers the link-in-bio for influencers whose combined audience exceeds <strong>50 million followers</strong>. Your reach starts here.</div>
+                <Fade bottom>
+                    <Zoom>
+                        <h2>Influencers using IGxLinks collectively bring in <strong>50M+ followers</strong> — and counting.</h2>
+                        <div className="desc">From niche creators to viral trendsetters, IGxLinks powers the link-in-bio for influencers whose combined audience exceeds <strong>50 million followers</strong>. Your reach starts here.</div>
+                    </Zoom>
+                </Fade>
                 {/* <div className="faces">
                     <div className="face">
                         <img src="https://digitalscholar.in/wp-content/uploads/2022/11/ranveer-allahbadia-male-fashion-influencer.jpg" alt="" />
@@ -94,37 +126,45 @@ const Landing = () => {
                 </div> */}
             </div>
             <div className="sample-page-2">
-                <h2><strong>AI Power</strong> — Write with AI</h2>
-                <div className="desc">
-                    We’ve built <strong>AI right into IGxLinks</strong> — just <strong>describe the kind of page</strong> you want, and it’ll generate it for you. Instantly <strong>create</strong>, <strong>customize</strong>, and <strong>enhance</strong> your page with AI.
-                </div>
-                {/* <img className="ai-logo" src="https://assets-v2.lottiefiles.com/a/5acc3e3c-428f-11ef-b34c-df6c030cb9f4/6oefGLvorT.gif" alt="" /> */}
+                <Fade bottom>
+                    <Zoom>
+                        <h2><strong>AI Power</strong> — Write with AI</h2>
+                        <div className="desc">
+                            We’ve built <strong>AI right into IGxLinks</strong> — just <strong>describe the kind of page</strong> you want, and it’ll generate it for you. Instantly <strong>create</strong>, <strong>customize</strong>, and <strong>enhance</strong> your page with AI.
+                        </div>
+                        {/* <img className="ai-logo" src="https://assets-v2.lottiefiles.com/a/5acc3e3c-428f-11ef-b34c-df6c030cb9f4/6oefGLvorT.gif" alt="" /> */}
+                    </Zoom>
+                </Fade>
                 <img className="ai-logo" src="https://miro.medium.com/v2/resize:fit:1400/0*NsAa6H_ZNoQS8bvm.gif" alt="" />
             </div>
             <div className="footer">
-                <div className="branding">
-                    <div className="logo">
-                        <img src={logo} alt="" />
-                        IG x Links
-                        {/* <img src={sitename} alt="" /> */}
-                    </div>
-                    <div className="tagline">Share More Than Links. Share Yourself.</div>
+                <Fade>
+                    <div className="branding">
+                        <div className="logo">
+                            <img src={logo} alt="" />
+                            IG x Links
+                            {/* <img src={sitename} alt="" /> */}
+                        </div>
+                        <div className="tagline">Share More Than Links. Share Yourself.</div>
 
-                    <div className="content">
-                        <div className="content-title">Trust & Legal</div>
-                        <div className="links">
-                            <a href="/terms-of-service">Terms of Service</a>
-                            <a href="/privacy-policy">Privacy Policy</a>
-                            <a href="/cookie-policy">Cookie Policy</a>
-                            <a href="/content-guidelines">Content Guidelines</a>
-                            <a href="/disclaimer">Disclaimer</a>
+                        <div className="content">
+                            <div className="content-title">Trust & Legal</div>
+                            <div className="links">
+                                <a href="/terms-of-service">Terms of Service</a>
+                                <a href="/privacy-policy">Privacy Policy</a>
+                                <a href="/cookie-policy">Cookie Policy</a>
+                                <a href="/content-guidelines">Content Guidelines</a>
+                                <a href="/disclaimer">Disclaimer</a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </Fade>
             </div>
             <div className="post-footer">
-                <b>© 2025 IGxLinks. All rights reserved.</b>
-                Made with ❤️ in India for users worldwide.
+                <Fade>
+                    <b>© 2025 IGxLinks. All rights reserved.</b>
+                    Made with ❤️ in India for users worldwide.
+                </Fade>
             </div>
         </Container>
     )
@@ -145,6 +185,43 @@ const Container = styled.div`
 
     padding-top: 45px;
 
+    .base-btn {
+        background-color: black;
+        padding: 15px 35px;
+        font-size: 0.85rem;
+        border-radius: 100px;
+        color: white;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .base-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .shine-hover::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -75%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+            120deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.5) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        transform: skewX(-25deg);
+        transition: all 0.5s ease;
+    }
+
+    .shine-hover:hover::before {
+        left: 125%;
+    }
+
     .prenav{
         position: fixed;
         top: 0;
@@ -152,6 +229,8 @@ const Container = styled.div`
         height: 45px;
         width: 100vw;
         background-color: #292030;
+
+        z-index: 100;
 
         display: flex;
         align-items: center;
@@ -204,7 +283,7 @@ const Container = styled.div`
             }
         }
 
-        .login-btn{
+        .base-btn{
             background-color: black;
             padding: 10px 27.5px;
             font-size: 0.85rem;
@@ -272,14 +351,8 @@ const Container = styled.div`
             }
         }
 
-        .create-your-page-btn{
-            margin-top: 50px;
-            background-color: black;
-            padding: 15px 35px;
-            font-size: 0.85rem;
-            border-radius: 100px;
-            color: white;
-            text-decoration: none;
+        .desc{
+            margin-bottom: 50px;
         }
     }
 
@@ -335,9 +408,14 @@ const Container = styled.div`
         img{
             width: 100%;
             max-width: 600px;
+            margin: 30px 0;
         }
 
         .link-to-profile{
+            img{
+                margin: 0;
+            }
+
             max-width: 600px;
             margin-top: 20px;
 
@@ -350,6 +428,7 @@ const Container = styled.div`
 
             display: flex;
             align-items: center;
+            justify-content: center;
 
             img{
                 width: 30px;

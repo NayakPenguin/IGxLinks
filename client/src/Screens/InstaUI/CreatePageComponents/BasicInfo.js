@@ -612,7 +612,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                     </div>
                 </div>
             </div>
-            <PinnedAnnouncement>
+            {/* <PinnedAnnouncement>
                 {!isAnnouncementEditing && (
                     <div className="edit-btn" onClick={() => {
                         setIsAnnouncementEditing(true);
@@ -676,7 +676,7 @@ const BasicInfo = ({ diffCreated, setDiffCreated }) => {
                         )}
                     </div>
                 )}
-            </PinnedAnnouncement>
+            </PinnedAnnouncement> */}
         </Container>
     );
 };

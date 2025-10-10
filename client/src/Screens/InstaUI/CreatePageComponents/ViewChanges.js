@@ -329,7 +329,7 @@ const ViewChanges = () => {
 
                 </div>
 
-                {
+                {/* {
                     userEditData.Basic.announcement.isVisible ? (
                         <PinnedAnnouncement>
                             <div className="label">
@@ -340,7 +340,7 @@ const ViewChanges = () => {
                             <div className="desc">{parseRichText(userEditData.Basic.announcement.description)}</div>
                         </PinnedAnnouncement>
                     ) : null
-                }
+                } */}
 
 
                 <div className="group">
