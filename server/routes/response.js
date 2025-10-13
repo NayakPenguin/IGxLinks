@@ -5,7 +5,7 @@ const { authenticateJWT } = require("./auth");
 const AllUsernames = require("../models/AllUsernames");
 
 // 📨 POST /response — create new response
-router.post("/", authenticateJWT, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     // console.log("🔍 Incoming POST /response");
     // console.log("req.user =>", req.user);
@@ -27,7 +27,7 @@ router.post("/", authenticateJWT, async (req, res) => {
       userContentId,
       type,
       data,
-      responderId: req.user._id || null,
+      responderId: null,
       ownerId
     });
 
