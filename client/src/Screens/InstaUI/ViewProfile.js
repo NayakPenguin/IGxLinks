@@ -207,6 +207,7 @@ const ViewProfile = () => {
                             )
                         }
                     </Subscribe> */}
+
                     {
                         showAd == true &&
                         <CreateYourPageAd>
@@ -275,6 +276,32 @@ const ViewProfile = () => {
                             {profileData.basicInfo.announcement.description}
                         </PinnedAnnouncement>
                     } */}
+
+
+                    <Rating>
+                        <div className="tag">
+                            Social Score
+                        </div>
+                        <div className="all-stars">
+                            <div className="circle rated"></div>
+                            <div className="circle rated"></div>
+                            <div className="circle rated"></div>
+                            <div className="circle rated"></div>
+                            <div className="circle rated"></div>
+                            <div className="circle rated"></div>
+                            <div className="circle rated"></div>
+                            <div className="circle rated"></div>
+                            <div className="circle"></div>
+                            <div className="circle"></div>
+                        </div>
+                        <div className="text">
+                            <p>Social score of <b>8 rating,</b> rated by <b>129 users.</b></p>
+                        </div>
+                        <div className="cast-your-vote">
+                            Cast your vote
+                            <ChevronRightIcon/>
+                        </div>
+                    </Rating>
 
                     <div className="group">
                         {profileData.advancedInfo.localStorageData &&
@@ -533,7 +560,7 @@ const Container = styled.div`
         
     .group{
         width: 100%;
-        margin-top: 85px;
+        margin-top: 25px;
 
         .group-name-container{
             margin: 30px 0;
@@ -1343,3 +1370,74 @@ const CreateYourPageAd2 = styled.div`
     }
   }
 `
+
+const Rating = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 75px 0;
+
+    /* border: 1px solid #313231; */
+
+    .tag{
+        font-size: 0.75rem;
+        background-color: #363636;
+        padding: 5px 10px;
+        border-radius: 100px;
+        margin-bottom: 25px;
+        font-weight: 300;
+    }
+
+    .all-stars{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 25px;
+        
+        .circle{
+            width: 35px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            background-color: #363636;
+        }
+    
+        .rated{
+            background-color: gold;
+        }   
+    }
+
+    .text{
+        margin-top: 20px;   
+        p{
+            font-size: 0.85rem;
+            font-weight: 200;
+            
+            b{
+                font-size: 1rem;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .cast-your-vote{
+        margin-top: 25px;
+        font-size: 0.75rem;
+        background-color: #363636;
+        padding: 10px 25px;
+        border-radius: 100px;
+        font-weight: 500;
+        cursor: pointer;
+
+        display: flex;
+        align-items: center;
+
+        svg{
+            font-size: 1rem;
+            margin-left: 5px;
+        }
+    }
+
+`;
