@@ -39,8 +39,8 @@ import Publish from "../../../Components/Publish";
 import axios from 'axios';
 
 const ITEM_TYPES = {
-  SUBGROUP: 'Add your group name',
-  REDIRECT: 'Add a new Link',
+  SUBGROUP: 'Group Name',
+  REDIRECT: 'Link',
   // ANONYMOUS: 'Anonymous Replies',
   // FOLDER_REDIRECT: 'Folder for Redirect Links',
   // FORM: 'Custom Form',
@@ -517,7 +517,7 @@ const CreateYourPage = () => {
 
           <MainCreate>
             <div className="input-container">
-              <div className="label">Group Name</div>
+              <div className="label">Title</div>
               <input
                 className="input-basic"
                 value={newItemData.title}

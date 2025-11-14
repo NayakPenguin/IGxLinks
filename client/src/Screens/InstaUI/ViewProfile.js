@@ -87,7 +87,10 @@ const ViewProfile = () => {
                 setProfileData(res.data);
                 localStorage.setItem("profileDataSave", JSON.stringify(res.data));
                 localStorage.setItem("lastClick", Date.now().toString());
-                // console.log("💾 Cached new profile data and updated lastClick.");
+
+                // console.log('====================================');
+                // console.log("💾 Cached new profile data and updated lastClick.", res.data);
+                // console.log('====================================');
             } catch (err) {
                 console.error("❌ Failed to fetch profile from API:", err.message, err);
                 setError(err);
@@ -314,7 +317,7 @@ const ViewProfile = () => {
                                 };
 
                                 switch (type) {
-                                    case "Subgroup":
+                                    case "Group Name":
                                         return (
                                             <div key={id} className="group-name-container" onClick={handleClick}>
                                                 <div className="group-name-container-line"></div>
@@ -323,7 +326,7 @@ const ViewProfile = () => {
                                             </div>
                                         );
 
-                                    case "Redirect Link":
+                                    case "Link":
                                         return (
                                             <a
                                                 key={id}
@@ -1382,12 +1385,12 @@ const Rating = styled.div`
     /* border: 1px solid #313231; */
 
     .tag{
-        font-size: 0.75rem;
-        background-color: #363636;
+        font-size: 0.65rem;
         padding: 5px 10px;
         border-radius: 100px;
         margin-bottom: 25px;
         font-weight: 300;
+        background-color: #313231;
     }
 
     .all-stars{
@@ -1395,10 +1398,10 @@ const Rating = styled.div`
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 25px;
+        padding: 0 20px;
         
         .circle{
-            width: 35px;
+            width: calc(100% / 10 - 5px);
             aspect-ratio: 1/1;
             border-radius: 50%;
             background-color: #363636;
@@ -1412,12 +1415,13 @@ const Rating = styled.div`
     .text{
         margin-top: 20px;   
         p{
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 200;
             
             b{
-                font-size: 1rem;
-                font-weight: 600;
+                font-size: 0.85rem;
+                font-weight: 500;
+                color: gold;
             }
         }
     }
@@ -1437,6 +1441,7 @@ const Rating = styled.div`
         svg{
             font-size: 1rem;
             margin-left: 5px;
+            margin-right: -5px;
         }
     }
 
