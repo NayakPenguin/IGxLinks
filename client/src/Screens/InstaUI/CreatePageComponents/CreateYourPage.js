@@ -39,13 +39,13 @@ import Publish from "../../../Components/Publish";
 import axios from 'axios';
 
 const ITEM_TYPES = {
-  SUBGROUP: 'Subgroup',
-  REDIRECT: 'Redirect Link',
-  ANONYMOUS: 'Anonymous Replies',
-  FOLDER_REDIRECT: 'Folder for Redirect Links',
-  FORM: 'Custom Form',
-  MEETING_SCHEDULER: 'Meeting Scheduler',
-  WRITE_CONTENT: 'Write your content',
+  SUBGROUP: 'Add your group name',
+  REDIRECT: 'Add a new Link',
+  // ANONYMOUS: 'Anonymous Replies',
+  // FOLDER_REDIRECT: 'Folder for Redirect Links',
+  // FORM: 'Custom Form',
+  // MEETING_SCHEDULER: 'Meeting Scheduler',
+  // WRITE_CONTENT: 'Write your content',
 };
 
 const getRouteForType = (type) => {
@@ -128,7 +128,7 @@ const SortableItem = ({ item, onEdit, editingId, onSaveEdit, onCancelEdit, onDel
       <div className="item editing">
         <MainEdit>
           <div className="input-container">
-            <div className="label">Title</div>
+            <div className="label">Group Name</div>
             <input
               className="input-basic"
               value={editData.title}
@@ -437,6 +437,8 @@ const CreateYourPage = () => {
 
   const getPlaceholder = (field) => {
     switch (field) {
+      case 'groupName':
+        return "Enter your group name eg. My Links";
       case 'title':
         return itemType === ITEM_TYPES.REDIRECT
           ? "Enter your title eg. My latest instagram reel"
@@ -515,12 +517,12 @@ const CreateYourPage = () => {
 
           <MainCreate>
             <div className="input-container">
-              <div className="label">Title</div>
+              <div className="label">Group Name</div>
               <input
                 className="input-basic"
                 value={newItemData.title}
                 onChange={(e) => handleNewItemChange('title', e.target.value)}
-                placeholder={getPlaceholder('title')}
+                placeholder={getPlaceholder('groupName')}
               />
             </div>
 
