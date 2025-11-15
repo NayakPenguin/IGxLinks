@@ -46,6 +46,7 @@ import ViewProfileInsideControl from "./Screens/InstaUI/ViewProfileInside/ViewPr
 import MyResponsesPage from "./Testing/MyResponsesPage";
 import AllResponses from "./Testing/AllResponses";
 import ShowEngagementResults from "./Screens/InstaUI/Engagement/ShowEngagementResults";
+import ViewProfile2 from "./Screens/InstaUI/ViewProfile2";
 
 const App = () => {
   return (
@@ -56,7 +57,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/basic-info" element={<AfterLogin />} />
         <Route path="/redirect" element={<BetweenCalcPage />} />
-        <Route path="/p/:username" element={<ViewProfile />} />
+        {/* <Route path="/p/:username" element={<ViewProfile />} /> */}
+        <Route path="/p/:username" element={<ViewProfile2 />} />
         <Route path="/p/:username/:id" element={<ViewProfileInsideControl />} />
 
         <Route path="/testing/responses" element={<MyResponsesPage />} />
